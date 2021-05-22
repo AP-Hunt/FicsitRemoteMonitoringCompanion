@@ -3,6 +3,7 @@ var target = Argument("target", "Test");
 var configuration = Argument("configuration", "Release");
 
 var prometheusVersion = "2.27.1";
+var grafanaVersion = "7.5.7";
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
@@ -18,6 +19,7 @@ Task("Clean")
 Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Prometheus")
+    .IsDependentOn("Grafana")
     .Does(() =>
 {
     DotNetCoreBuild("./FicsitRemoteMonitoringCompanion.sln", new DotNetCoreBuildSettings
@@ -27,6 +29,7 @@ Task("Build")
     });
 
     CopyFile($"./Externals/Prometheus/prometheus-{prometheusVersion}.windows-amd64/prometheus.exe", $"./bin/{configuration}/prometheus.exe");
+    CopyDirectory($"./Externals/Grafana/grafana-{grafanaVersion}", $"./bin/{configuration}/grafana");
 });
 
 Task("Test")
@@ -57,6 +60,26 @@ Task("Prometheus")
     } else 
     {
         Information("Skipping Prometheus download because it has already been downloaded");    
+    }
+});
+
+Task("Grafana")
+    .IsDependentOn("ExternalsDir")
+    .Does(() => 
+{
+    System.IO.Directory.CreateDirectory("./Externals/Grafana");
+
+    if(!System.IO.Directory.Exists($"./Externals/Grafana/grafana-{grafanaVersion}"))
+    {
+        Information($"Downloading Grafana {grafanaVersion}");
+        DownloadFile(
+          $"https://dl.grafana.com/oss/release/grafana-{grafanaVersion}.windows-amd64.zip ",
+          "./Externals/Grafana/grafana.zip"
+        );
+        Unzip("./Externals/Grafana/grafana.zip", "./Externals/Grafana");
+    } else 
+    {
+        Information("Skipping Grafana download because it has already been downloaded");    
     }
 });
 
