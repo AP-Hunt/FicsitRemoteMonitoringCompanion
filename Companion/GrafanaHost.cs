@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Companion
 {
@@ -35,25 +37,31 @@ namespace Companion
 
         }
 
-        internal static void WaitForReadiness()
+        internal async static Task WaitForReadiness()
         {
-            WaitAPIHealthy();
+            await WaitAPIHealthy();
             ConfigureGrafana();
         }
 
-        private static void WaitAPIHealthy()
+        private async static Task WaitAPIHealthy()
         {
             bool statusOK = false;
             while (!statusOK)
             {
                 try
                 {
-                    HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://localhost:3000/api/health");
-                    req.Timeout = 3000;
-                    HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
-                    statusOK = (resp.StatusCode == HttpStatusCode.OK);
+                    using (var client = new HttpClient())
+                    {
+                        client.Timeout = TimeSpan.FromSeconds(3);
+                        var response = await client.GetAsync("http://localhost:3000/api/health");
+                        statusOK = (response.StatusCode == HttpStatusCode.OK);
+                    }                 
                 }
-                catch(WebException)
+                catch(TaskCanceledException)
+                {
+                    continue;
+                }
+                catch(HttpRequestException)
                 {
                     continue;
                 }

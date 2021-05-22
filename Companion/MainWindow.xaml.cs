@@ -47,9 +47,9 @@ namespace Companion
             });
         }
 
-        private void Window_ContentRendered(object sender, EventArgs e)
+        private async void Window_ContentRendered(object sender, EventArgs e)
         {
-            GrafanaHost.WaitForReadiness();
+            await GrafanaHost.WaitForReadiness();
             this.ShowGrafana();
         }
     }
