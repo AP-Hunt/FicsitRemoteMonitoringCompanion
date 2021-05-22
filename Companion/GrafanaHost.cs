@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Text;
 
 namespace Companion
@@ -30,6 +31,20 @@ namespace Companion
 
                 Arguments = $"-config \"{grafanaConfigPath}\""
             });
+
+
+        }
+
+        internal static void WaitForReadiness()
+        {
+            bool statusOK = false;
+            while (!statusOK)
+            {
+                HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://localhost:3000/api/health");
+                req.Timeout = 3000;
+                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+                statusOK = (resp.StatusCode == HttpStatusCode.OK);
+            }
         }
 
         private static string WriteGrafanaConfig(string grafanaWorkingDir)

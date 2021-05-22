@@ -6,8 +6,9 @@
         xmlns:wv2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         xmlns:local="clr-namespace:Companion"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <DockPanel>
-        <wv2:WebView2 Name="webView" Source="http://localhost:3000/" />
+        Title="MainWindow" Height="1024" Width="1280"
+        ContentRendered="Window_ContentRendered"
+>
+    <DockPanel Name="MainPanel">
     </DockPanel>
 </Window>

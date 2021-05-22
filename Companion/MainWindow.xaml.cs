@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Web.WebView2.Wpf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,36 @@ namespace Companion
     /// </summary>
     public partial class MainWindow : Window
     {
+        Label loadingLabel;
         public MainWindow()
         {
             InitializeComponent();
+            loadingLabel = new Label()
+            {
+                Content = "Loading Grafana...",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            this.MainPanel.Children.Add(loadingLabel);
+        }
+
+
+        public void ShowGrafana()
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                this.MainPanel.Children.Remove(loadingLabel);
+                this.MainPanel.Children.Add(new WebView2()
+                {
+                    Source = new Uri("http://localhost:3000")
+                });
+            });
+        }
+
+        private void Window_ContentRendered(object sender, EventArgs e)
+        {
+            GrafanaHost.WaitForReadiness();
+            this.ShowGrafana();
         }
     }
 }
