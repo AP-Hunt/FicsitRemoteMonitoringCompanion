@@ -37,15 +37,77 @@ namespace Companion
 
         internal static void WaitForReadiness()
         {
+            WaitAPIHealthy();
+            ConfigureGrafana();
+        }
+
+        private static void WaitAPIHealthy()
+        {
             bool statusOK = false;
             while (!statusOK)
             {
-                HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://localhost:3000/api/health");
-                req.Timeout = 3000;
+                try
+                {
+                    HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://localhost:3000/api/health");
+                    req.Timeout = 3000;
+                    HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
+                    statusOK = (resp.StatusCode == HttpStatusCode.OK);
+                }
+                catch(WebException)
+                {
+                    continue;
+                }
+            }
+
+        }
+
+        private static void ConfigureGrafana()
+        {
+            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://localhost:3000/api/datasources");
+            req.Method = "POST";
+            req.Accept = "application/json";
+            req.ContentType = "application/json";
+            req.Headers["Authorization"] = string.Format(
+                "Basic {0}",
+                Convert.ToBase64String(Encoding.Default.GetBytes("ficsit:pioneer"))
+            );
+           
+            using(Stream reqStream = req.GetRequestStream())
+            {
+                using(StreamWriter writer = new StreamWriter(reqStream))
+                {
+                    string bodyJson = @"
+                        {
+                            ""name"": ""prometheus"",
+                            ""type"": ""prometheus"",
+                            ""url"": ""http://localhost:9090"",
+                            ""access"": ""proxy""
+                        }
+                    ";
+                    writer.Write(bodyJson);
+                }
+            }
+
+            try
+            {
                 HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
-                statusOK = (resp.StatusCode == HttpStatusCode.OK);
+
+            }
+            catch(WebException ex)
+            {
+                Console.WriteLine("Grafana: Create datasource returned {0}", ex.Status);
+
+                using (Stream respStream = ex.Response.GetResponseStream())
+                {
+                    using (StreamReader rdr = new StreamReader(respStream))
+                    {
+                        string respText = rdr.ReadToEnd();
+                        Console.WriteLine(respText);
+                    }
+                }
             }
         }
+
 
         private static string WriteGrafanaConfig(string grafanaWorkingDir)
         {

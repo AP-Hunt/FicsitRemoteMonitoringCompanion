@@ -120,7 +120,11 @@
   <data name="GranaConfiguration" xml:space="preserve">
     <value>[auth.anonymous]
 enabled = true
-org_name = Ficsit</value>
+org_name = Ficsit
+
+[security]
+admin_user=ficsit
+admin_password=pioneer</value>
   </data>
   <data name="PrometheusConfiguration" xml:space="preserve">
     <value>global:

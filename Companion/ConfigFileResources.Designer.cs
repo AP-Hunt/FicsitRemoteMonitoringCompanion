@@ -63,7 +63,11 @@ namespace Companion {
         /// <summary>
         ///   Looks up a localized string similar to [auth.anonymous]
         ///enabled = true
-        ///org_name = Ficsit.
+        ///org_name = Ficsit
+        ///
+        ///[security]
+        ///admin_user=ficsit
+        ///admin_password=pioneer.
         /// </summary>
         internal static string GranaConfiguration {
             get {
