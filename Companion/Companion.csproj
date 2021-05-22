@@ -11,6 +11,10 @@
   </Target>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.818.41" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="ConfigFileResources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
