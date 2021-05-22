@@ -72,11 +72,24 @@ namespace Companion {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to global:
+        ///  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+        ///
+        ///# A scrape configuration containing exactly one endpoint to scrape:
+        ///# Here it&apos;s Prometheus itself.
+        ///scrape_configs:
+        ///  # The job name is added as a label `job=&lt;job_name&gt;` to any timeseries scraped from this config.
+        ///  - job_name: &apos;prometheus&apos;
+        ///
+        ///    # Override the global default and scrape targets from this job every 5 seconds.
+        ///    scrape_interval: 5s
+        ///
+        ///    static_configs:
+        ///      - targets: [&apos;localhost:9090&apos;].
         /// </summary>
-        internal static string String1 {
+        internal static string PrometheusConfiguration {
             get {
-                return ResourceManager.GetString("String1", resourceCulture);
+                return ResourceManager.GetString("PrometheusConfiguration", resourceCulture);
             }
         }
     }

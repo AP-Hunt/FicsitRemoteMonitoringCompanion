@@ -17,6 +17,7 @@ namespace Companion
         {
             base.OnStartup(e);
 
+            PrometheusHost.Start();
             GrafanaHost.Start();
         }
 
@@ -25,6 +26,7 @@ namespace Companion
             base.OnExit(e);
 
             GrafanaHost.Stop();
+            PrometheusHost.Stop();
         }
     }
 }
