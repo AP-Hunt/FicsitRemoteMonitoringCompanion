@@ -40,7 +40,7 @@ namespace Companion
         internal async static Task WaitForReadiness()
         {
             await WaitAPIHealthy();
-            ConfigureGrafana();
+            await ConfigureGrafana();
         }
 
         private async static Task WaitAPIHealthy()
@@ -69,22 +69,34 @@ namespace Companion
 
         }
 
-        private static void ConfigureGrafana()
+        private async static Task ConfigureGrafana()
         {
-            HttpWebRequest req = (HttpWebRequest)WebRequest.Create("http://localhost:3000/api/datasources");
-            req.Method = "POST";
-            req.Accept = "application/json";
-            req.ContentType = "application/json";
-            req.Headers["Authorization"] = string.Format(
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Add("Authorization", string.Format(
                 "Basic {0}",
                 Convert.ToBase64String(Encoding.Default.GetBytes("ficsit:pioneer"))
-            );
-           
-            using(Stream reqStream = req.GetRequestStream())
+            ));
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+
+            await CreatePrometheusDataSource(client);
+            await ConfigureOrgs(client);
+        }
+
+        private async static Task CreatePrometheusDataSource(HttpClient client)
+        {
+            bool datasourceFound;
+            try
             {
-                using(StreamWriter writer = new StreamWriter(reqStream))
-                {
-                    string bodyJson = @"
+                var response = await client.GetAsync("http://localhost:3000/api/datasources/uid/prometheus");
+                datasourceFound = (response.StatusCode != HttpStatusCode.NotFound);
+            }
+            catch(HttpRequestException)
+            {
+                datasourceFound = false;
+            }
+
+            if(!datasourceFound){
+                string bodyJson = @"
                         {
                             ""name"": ""prometheus"",
                             ""type"": ""prometheus"",
@@ -92,26 +104,50 @@ namespace Companion
                             ""access"": ""proxy""
                         }
                     ";
-                    writer.Write(bodyJson);
+                HttpContent content = new StringContent(bodyJson);
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+                try
+                {
+                    await client.PostAsync("http://localhost:3000/api/datasources", content);
+                }
+                catch(HttpRequestException ex)
+                {
+                    Console.WriteLine("Failed creating Prometheus data source: {0}", ex.Message);
                 }
             }
+        }
 
+        private async static Task ConfigureOrgs(HttpClient client)
+        {
+            bool orgFound;
             try
             {
-                HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
-
+                var response = await client.GetAsync("http://localhost:3000/api/orgs/name/Ficsit");
+                orgFound = (response.StatusCode != HttpStatusCode.NotFound);
             }
-            catch(WebException ex)
+            catch (HttpRequestException)
             {
-                Console.WriteLine("Grafana: Create datasource returned {0}", ex.Status);
+                orgFound = false;
+            }
 
-                using (Stream respStream = ex.Response.GetResponseStream())
+            if (!orgFound)
+            {
+                string bodyJson = @"
+                        {
+                            ""name"": ""Ficsit""
+                        }
+                    ";
+                HttpContent content = new StringContent(bodyJson);
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+                try
                 {
-                    using (StreamReader rdr = new StreamReader(respStream))
-                    {
-                        string respText = rdr.ReadToEnd();
-                        Console.WriteLine(respText);
-                    }
+                    var resp = await client.PostAsync("http://localhost:3000/api/orgs", content);
+                }
+                catch (HttpRequestException ex)
+                {
+                    Console.WriteLine("Failed creating Grafana org: {0}", ex.Message);
                 }
             }
         }
