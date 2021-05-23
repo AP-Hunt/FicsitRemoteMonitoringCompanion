@@ -79,6 +79,8 @@ namespace Companion
 
             await CreatePrometheusDataSource(client);
             await ConfigureOrgs(client);
+            await CreateFolder(client);
+            await PopulateDashboards(client);
         }
 
         private async static Task CreatePrometheusDataSource(HttpClient client)
@@ -142,11 +144,55 @@ namespace Companion
 
                 try
                 {
-                    var resp = await client.PostAsync("http://localhost:3000/api/orgs", content);
+                    await client.PostAsync("http://localhost:3000/api/orgs", content);
                 }
                 catch (HttpRequestException ex)
                 {
                     Console.WriteLine("Failed creating Grafana org: {0}", ex.Message);
+                }
+            }
+        }
+
+        private async static Task CreateFolder(HttpClient client)
+        {
+            string bodyJson = @"
+                        {
+                            ""title"": ""Ficsit"",
+                            ""uuid"": ""ficsit"",
+                            ""overwrite"": true
+                        }
+                    ";
+            HttpContent content = new StringContent(bodyJson);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+            try
+            {
+                await client.PutAsync("http://localhost:3000/api/folders/ficsit", content);
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine("Failed creating Grafana folder: {0}", ex.Message);
+            }
+        }
+
+        private async static Task PopulateDashboards(HttpClient client)
+        {
+            string[] dashboards = new string[]{
+                Dashboards.Power
+            };
+
+            foreach(string dashboard in dashboards)
+            {
+                HttpContent content = new StringContent(dashboard);
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+                try
+                {
+                    await client.PostAsync("http://localhost:3000/api/dashboards/db ", content);
+                }
+                catch (HttpRequestException ex)
+                {
+                    Console.WriteLine("Failed creating Grafana dashboard: {0}", ex.Message);
                 }
             }
         }

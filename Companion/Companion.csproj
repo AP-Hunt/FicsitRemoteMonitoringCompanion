@@ -20,12 +20,21 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ConfigFileResources.resx</DependentUpon>
     </Compile>
+    <Compile Update="Dashboards.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Dashboards.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="ConfigFileResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ConfigFileResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Dashboards.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Dashboards.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 
