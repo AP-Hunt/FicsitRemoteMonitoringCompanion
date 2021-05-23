@@ -17,6 +17,7 @@ namespace Companion
         {
             base.OnStartup(e);
 
+            PrometheusExporterHost.Start();
             PrometheusHost.Start();
             GrafanaHost.Start();
         }
@@ -27,6 +28,7 @@ namespace Companion
 
             GrafanaHost.Stop();
             PrometheusHost.Stop();
+            PrometheusExporterHost.Stop();
         }
     }
 }

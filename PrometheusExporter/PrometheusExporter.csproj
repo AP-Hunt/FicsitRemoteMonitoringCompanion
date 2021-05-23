@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>PrometheusExporter</AssemblyName>
     <RootNamespace>PrometheusExporter</RootNamespace>
+    <StartupObject>PrometheusExporter.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>

@@ -89,7 +89,8 @@ namespace Companion {
         ///    scrape_interval: 5s
         ///
         ///    static_configs:
-        ///      - targets: [&apos;localhost:9090&apos;].
+        ///      - targets: [&apos;localhost:9090&apos;]
+        ///      - t [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PrometheusConfiguration {
             get {
