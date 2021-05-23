@@ -21,10 +21,9 @@ namespace Companion
             ProcessStartInfo promExporterProcessStartInfo = new ProcessStartInfo()
             {
                 FileName = prometheusExporterExePath,
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
                 WorkingDirectory = prometheusExporterWorkingDir,
-                UseShellExecute = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
             };
             _prometheusExporterProcess = Process.Start(promExporterProcessStartInfo);
         }

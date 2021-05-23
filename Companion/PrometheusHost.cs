@@ -23,10 +23,9 @@ namespace Companion
             ProcessStartInfo promProcessStartInfo = new ProcessStartInfo()
             {
                 FileName = prometheusExePath,
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
                 WorkingDirectory = prometheusWorkingDir,
-                UseShellExecute = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
 
                 Arguments = $"--config.file=\"{prometheusConfigPath}\""
             };

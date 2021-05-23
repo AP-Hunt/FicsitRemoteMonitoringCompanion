@@ -26,10 +26,9 @@ namespace Companion
             _grafanaProcess = Process.Start(new ProcessStartInfo()
             {
                 FileName = grafanaExePath,
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
                 WorkingDirectory = grafanaWorkingDir,
-                UseShellExecute = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
 
                 Arguments = $"-config \"{grafanaConfigPath}\""
             });
