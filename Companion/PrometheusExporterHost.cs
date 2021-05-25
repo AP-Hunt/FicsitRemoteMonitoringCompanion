@@ -12,20 +12,27 @@ namespace Companion
 
         internal static void Start()
         {
-            string currentExeLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string currentExeDir = Path.GetDirectoryName(currentExeLocation);
+            string currentExeDir = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
 
-            string prometheusExporterWorkingDir = Path.Combine(currentExeDir, "prometheus-exporter");
+            string prometheusExporterWorkingDir = Path.Combine(currentExeDir);
             string prometheusExporterExePath = Path.Combine(prometheusExporterWorkingDir, "PrometheusExporter.exe");
 
-            ProcessStartInfo promExporterProcessStartInfo = new ProcessStartInfo()
+            try
             {
-                FileName = prometheusExporterExePath,
-                WorkingDirectory = prometheusExporterWorkingDir,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-            _prometheusExporterProcess = Process.Start(promExporterProcessStartInfo);
+                ProcessStartInfo promExporterProcessStartInfo = new ProcessStartInfo()
+                {
+                    FileName = prometheusExporterExePath,
+                    WorkingDirectory = prometheusExporterWorkingDir,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                _prometheusExporterProcess = Process.Start(promExporterProcessStartInfo);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("Working dir: {0}\nExe path: {1}", prometheusExporterWorkingDir, prometheusExporterExePath);
+            }
         }
 
         internal static void Stop()

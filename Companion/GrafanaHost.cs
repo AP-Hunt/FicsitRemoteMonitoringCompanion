@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,8 +16,7 @@ namespace Companion
 
         internal static void Start()
         {
-            string currentExeLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string currentExeDir = Path.GetDirectoryName(currentExeLocation);
+            string currentExeDir = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
 
             string grafanaWorkingDir = Path.Combine(currentExeDir, "grafana", "bin");
             string grafanaExePath = Path.Combine(grafanaWorkingDir, "grafana-server.exe");

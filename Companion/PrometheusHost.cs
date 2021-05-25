@@ -12,27 +12,34 @@ namespace Companion
 
         internal static void Start()
         {
-            string currentExeLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string currentExeDir = Path.GetDirectoryName(currentExeLocation);
+            string currentExeDir = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
 
             string prometheusWorkingDir = currentExeDir;
             string prometheusExePath = Path.Combine(prometheusWorkingDir, "prometheus.exe");
 
-            string prometheusConfigPath = WriteGrafanaConfig(prometheusWorkingDir);
+            string prometheusConfigPath = WritePrometheusConfig(prometheusWorkingDir);
 
-            ProcessStartInfo promProcessStartInfo = new ProcessStartInfo()
+            try
             {
-                FileName = prometheusExePath,
-                WorkingDirectory = prometheusWorkingDir,
-                UseShellExecute = false,
-                CreateNoWindow = true,
+                ProcessStartInfo promProcessStartInfo = new ProcessStartInfo()
+                {
+                    FileName = prometheusExePath,
+                    WorkingDirectory = prometheusWorkingDir,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
 
-                Arguments = $"--config.file=\"{prometheusConfigPath}\""
-            };
-            _prometheusProcess = Process.Start(promProcessStartInfo);
+                    Arguments = $"--config.file=\"{prometheusConfigPath}\""
+                };
+                _prometheusProcess = Process.Start(promProcessStartInfo);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("Working dir: {0}\nExe path: {1}", prometheusWorkingDir, prometheusExePath);
+            }
         }
 
-        private static string WriteGrafanaConfig(string prometheusWorkingDir)
+        private static string WritePrometheusConfig(string prometheusWorkingDir)
         {
             string configPath = Path.Combine(prometheusWorkingDir, "config.yml");
             File.WriteAllText(configPath, ConfigFileResources.PrometheusConfiguration);
