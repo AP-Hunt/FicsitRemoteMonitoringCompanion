@@ -5,7 +5,10 @@ VisualStudioVersion = 16.0.30709.132
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PrometheusExporter", "PrometheusExporter\PrometheusExporter.csproj", "{AC2D13A5-459E-4A1B-A2FF-B435135F88A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Companion", "Companion\Companion.csproj", "{7050FC07-8BC1-4C04-8B6F-1FB863424CC6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Companion", "Companion\Companion.csproj", "{7050FC07-8BC1-4C04-8B6F-1FB863424CC6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AC2D13A5-459E-4A1B-A2FF-B435135F88A6} = {AC2D13A5-459E-4A1B-A2FF-B435135F88A6}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

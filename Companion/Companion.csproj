@@ -6,8 +6,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="IF NOT EXIST &quot;$(TargetDir)grafana&quot; mklink /J /D &quot;$(TargetDir)grafana&quot; &quot;$(SolutionDir)Externals\Grafana\grafana-7.5.7&quot;&#xD;&#xA;&#xD;&#xA;IF NOT EXIST &quot;$(TargetDir)prometheus.exe&quot; copy &quot;$(SolutionDir)Externals\Prometheus\prometheus-2.27.1.windows-amd64\prometheus.exe&quot; &quot;$(TargetDir)\prometheus.exe&quot;&#xD;&#xA;&#xD;&#xA;IF NOT EXIST &quot;$(TargetDir)prometheus-exporter&quot; mklink /J /D &quot;$(TargetDir)prometheus-exporter&quot; &quot;$(SolutionDir)PrometheusExporter\$(OutDir)win-x64\publish\" />
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Debug'">
+    <Exec Command="IF NOT EXIST &quot;$(TargetDir)grafana&quot; mklink /J /D &quot;$(TargetDir)grafana&quot; &quot;$(SolutionDir)Externals\Grafana\grafana-7.5.7&quot;&#xD;&#xA;&#xD;&#xA;IF NOT EXIST &quot;$(TargetDir)prometheus.exe&quot; copy &quot;$(SolutionDir)Externals\Prometheus\prometheus-2.27.1.windows-amd64\prometheus.exe&quot; &quot;$(TargetDir)\prometheus.exe&quot;&#xD;&#xA;&#xD;&#xA;IF NOT EXIST &quot;$(TargetDir)PrometheusExporter.exe&quot; copy &quot;$(SolutionDir)PrometheusExporter\$(OutDir)win-x64\publish\PrometheusExporter.exe&quot; &quot;$(TargetDir)\PrometheusExporter.exe&quot;" />
   </Target>
 
   <ItemGroup>
@@ -38,8 +38,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="cd &quot;$(SolutionDir)PrometheusExporter&quot;&#xD;&#xA;dotnet build&#xD;&#xA;dotnet publish --self-contained -r win-x64" />
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="'$(Configuration)'=='Debug'">
+    <Exec Command="cd &quot;$(SolutionDir)PrometheusExporter&quot;&#xD;&#xA;dotnet build&#xD;&#xA;dotnet publish --self-contained true -p:PublishSingleFile=true -r win-x64 --configuration Release" />
   </Target>
 
 </Project>

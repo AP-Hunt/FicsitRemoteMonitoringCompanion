@@ -14,6 +14,7 @@ Task("Clean")
     .Does(() =>
 {
     CleanDirectory($"./bin/{configuration}");
+    CleanDirectory($"./bin/publish/{configuration}");
 });
 
 Task("Build")
@@ -28,8 +29,38 @@ Task("Build")
         OutputDirectory = $"./bin/{configuration}"
     });
 
-    CopyFile($"./Externals/Prometheus/prometheus-{prometheusVersion}.windows-amd64/prometheus.exe", $"./bin/{configuration}/prometheus.exe");
-    CopyDirectory($"./Externals/Grafana/grafana-{grafanaVersion}", $"./bin/{configuration}/grafana");
+    if(configuration == "Release")
+    {
+        CopyFile($"./Externals/Prometheus/prometheus-{prometheusVersion}.windows-amd64/prometheus.exe", $"./bin/{configuration}/prometheus.exe");
+        CopyDirectory($"./Externals/Grafana/grafana-{grafanaVersion}", $"./bin/{configuration}/grafana");
+    }
+});
+
+Task("Publish")
+    .IsDependentOn("Clean")
+    .IsDependentOn("Build")
+    .Does(() =>
+{
+    DotNetCorePublish("./Companion/Companion.csproj", new DotNetCorePublishSettings
+    {
+        Configuration = configuration,
+        OutputDirectory = $"./bin/publish/{configuration}",
+        PublishSingleFile = true,
+        SelfContained = true,
+        Runtime = "win-x64"
+    });
+
+    DotNetCorePublish("./PrometheusExporter/PrometheusExporter.csproj", new DotNetCorePublishSettings
+    {
+        Configuration = configuration,
+        OutputDirectory = $"./bin/publish/{configuration}",
+        PublishSingleFile = true,
+        SelfContained = true,
+        Runtime = "win-x64"
+    });
+
+    CopyFile($"./Externals/Prometheus/prometheus-{prometheusVersion}.windows-amd64/prometheus.exe", $"./bin/publish/{configuration}/prometheus.exe");
+    CopyDirectory($"./Externals/Grafana/grafana-{grafanaVersion}", $"./bin/publish/{configuration}/grafana");
 });
 
 Task("Test")
