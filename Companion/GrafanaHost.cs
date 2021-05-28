@@ -178,7 +178,8 @@ namespace Companion
         private async static Task PopulateDashboards(HttpClient client)
         {
             string[] dashboards = new string[]{
-                Dashboards.Power
+                Dashboards.Power,
+                Dashboards.Production
             };
 
             foreach(string dashboard in dashboards)

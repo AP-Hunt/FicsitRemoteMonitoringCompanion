@@ -93,5 +93,39 @@ namespace Companion {
                 return ResourceManager.GetString("Power", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {
+        ///&quot;dashboard&quot;: {
+        ///  &quot;annotations&quot;: {
+        ///    &quot;list&quot;: [
+        ///      {
+        ///        &quot;builtIn&quot;: 1,
+        ///        &quot;datasource&quot;: &quot;-- Grafana --&quot;,
+        ///        &quot;enable&quot;: true,
+        ///        &quot;hide&quot;: true,
+        ///        &quot;iconColor&quot;: &quot;rgba(0, 211, 255, 1)&quot;,
+        ///        &quot;name&quot;: &quot;Annotations &amp; Alerts&quot;,
+        ///        &quot;type&quot;: &quot;dashboard&quot;
+        ///      }
+        ///    ]
+        ///  },
+        ///  &quot;editable&quot;: true,
+        ///  &quot;gnetId&quot;: null,
+        ///  &quot;graphTooltip&quot;: 0,
+        ///  &quot;id&quot;: null,
+        ///  &quot;iteration&quot;: 1622227826569,
+        ///  &quot;links&quot;: [],
+        ///  &quot;panels&quot;: [
+        ///    {
+        ///      &quot;aliasColors&quot;: {},
+        ///      &quot;bars&quot;: false,
+        ///       [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Production {
+            get {
+                return ResourceManager.GetString("Production", resourceCulture);
+            }
+        }
     }
 }
