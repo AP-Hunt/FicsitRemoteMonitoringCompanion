@@ -26,10 +26,13 @@ namespace PrometheusExporter
 
                 _source = new CancellationTokenSource();
                 CancellationToken token = _source.Token;
+
                 PowerMetricsCollector powerCollector = new PowerMetricsCollector();
+                ProductionMetricsCollector productionCollector = new ProductionMetricsCollector();
 
                 Task.WaitAll(
-                    powerCollector.BeginCollecting(token)
+                    powerCollector.BeginCollecting(token),
+                    productionCollector.BeginCollecting(token)
                 );
                 Console.WriteLine("Exiting");
             }
