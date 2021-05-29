@@ -16,10 +16,6 @@ namespace Companion
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
-            PrometheusExporterHost.Start();
-            PrometheusHost.Start();
-            GrafanaHost.Start();
         }
 
         protected override void OnExit(ExitEventArgs e)

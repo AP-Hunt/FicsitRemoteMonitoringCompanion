@@ -16,9 +16,7 @@ namespace Companion
 
         internal static void Start()
         {
-            string currentExeDir = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
-
-            string grafanaWorkingDir = Path.Combine(currentExeDir, "grafana", "bin");
+            string grafanaWorkingDir = Path.Combine(Paths.RootDirectory, "grafana", "bin");
             string grafanaExePath = Path.Combine(grafanaWorkingDir, "grafana-server.exe");
 
             string grafanaConfigPath = WriteGrafanaConfig(grafanaWorkingDir);

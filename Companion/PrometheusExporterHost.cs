@@ -12,9 +12,7 @@ namespace Companion
 
         internal static void Start()
         {
-            string currentExeDir = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
-
-            string prometheusExporterWorkingDir = Path.Combine(currentExeDir);
+            string prometheusExporterWorkingDir = Paths.RootDirectory;
             string prometheusExporterExePath = Path.Combine(prometheusExporterWorkingDir, "PrometheusExporter.exe");
 
             try

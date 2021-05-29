@@ -12,9 +12,7 @@ namespace Companion
 
         internal static void Start()
         {
-            string currentExeDir = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
-
-            string prometheusWorkingDir = currentExeDir;
+            string prometheusWorkingDir = Paths.RootDirectory;
             string prometheusExePath = Path.Combine(prometheusWorkingDir, "prometheus.exe");
 
             string prometheusConfigPath = WritePrometheusConfig(prometheusWorkingDir);

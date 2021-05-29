@@ -34,7 +34,6 @@ namespace Companion
             this.MainPanel.Children.Add(loadingLabel);
         }
 
-
         public void ShowGrafana()
         {
             Application.Current.Dispatcher.Invoke(() =>
@@ -49,6 +48,16 @@ namespace Companion
 
         private async void Window_ContentRendered(object sender, EventArgs e)
         {
+            Config.ConfigWindow configWindow = new Config.ConfigWindow();
+            configWindow.Owner = this;
+            configWindow.ShowDialog();
+
+            Config.ConfigFile cfg = configWindow.Config;
+
+            PrometheusExporterHost.Start();
+            PrometheusHost.Start();
+            GrafanaHost.Start();
+
             await GrafanaHost.WaitForReadiness();
             this.ShowGrafana();
         }
