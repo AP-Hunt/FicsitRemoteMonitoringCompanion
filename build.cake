@@ -6,7 +6,12 @@ var prometheusVersion = "2.27.1";
 var grafanaVersion = "7.5.7";
 
 var msBuildSettings = new DotNetCoreMSBuildSettings();
-msBuildSettings.Properties["AssemblyVersionNumber"] = new string[]{"0.1.0.0"};
+
+if(configuration == "Release")
+{
+    string version = System.IO.File.ReadAllText("version.txt");
+    msBuildSettings.Properties["AssemblyVersionNumber"] = new string[]{version};
+}
 
 //////////////////////////////////////////////////////////////////////
 // TASKS
