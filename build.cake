@@ -5,6 +5,9 @@ var configuration = Argument("configuration", "Release");
 var prometheusVersion = "2.27.1";
 var grafanaVersion = "7.5.7";
 
+var msBuildSettings = new DotNetCoreMSBuildSettings();
+msBuildSettings.Properties["AssemblyVersionNumber"] = new string[]{"0.1.0.0"};
+
 //////////////////////////////////////////////////////////////////////
 // TASKS
 //////////////////////////////////////////////////////////////////////
@@ -26,7 +29,8 @@ Task("Build")
     DotNetCoreBuild("./FicsitRemoteMonitoringCompanion.sln", new DotNetCoreBuildSettings
     {
         Configuration = configuration,
-        OutputDirectory = $"./bin/{configuration}"
+        OutputDirectory = $"./bin/{configuration}",
+        MSBuildSettings = msBuildSettings
     });
 
     if(configuration == "Release")
@@ -41,13 +45,15 @@ Task("Publish")
     .IsDependentOn("Build")
     .Does(() =>
 {
+
     DotNetCorePublish("./Companion/Companion.csproj", new DotNetCorePublishSettings
     {
         Configuration = configuration,
         OutputDirectory = $"./bin/publish/{configuration}",
         PublishSingleFile = true,
         SelfContained = true,
-        Runtime = "win-x64"
+        Runtime = "win-x64",
+        MSBuildSettings = msBuildSettings
     });
 
     DotNetCorePublish("./PrometheusExporter/PrometheusExporter.csproj", new DotNetCorePublishSettings
@@ -56,7 +62,8 @@ Task("Publish")
         OutputDirectory = $"./bin/publish/{configuration}",
         PublishSingleFile = true,
         SelfContained = true,
-        Runtime = "win-x64"
+        Runtime = "win-x64",
+        MSBuildSettings = msBuildSettings
     });
 
     CopyFile($"./Externals/Prometheus/prometheus-{prometheusVersion}.windows-amd64/prometheus.exe", $"./bin/publish/{configuration}/prometheus.exe");

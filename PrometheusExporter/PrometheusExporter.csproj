@@ -8,6 +8,15 @@
     <StartupObject>PrometheusExporter.Program</StartupObject>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(AssemblyVersionNumber)' == ''">
+    <Version>0.0.1</Version>
+    <VersionSuffix>-dev</VersionSuffix>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(AssemblyVersionNumber)' != ''">
+    <Version>$(AssemblyVersionNumber)</Version>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="prometheus-net" Version="4.1.1" />
   </ItemGroup>
