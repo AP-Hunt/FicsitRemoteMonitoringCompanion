@@ -10,7 +10,7 @@ namespace Companion
     {
         static Process _prometheusExporterProcess;
 
-        internal static void Start()
+        internal static void Start(Uri listenAddress)
         {
             string prometheusExporterWorkingDir = Paths.RootDirectory;
             string prometheusExporterExePath = Path.Combine(prometheusExporterWorkingDir, "PrometheusExporter.exe");
@@ -22,7 +22,8 @@ namespace Companion
                     FileName = prometheusExporterExePath,
                     WorkingDirectory = prometheusExporterWorkingDir,
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = true,
+                    Arguments = listenAddress.ToString()
                 };
                 _prometheusExporterProcess = Process.Start(promExporterProcessStartInfo);
             }

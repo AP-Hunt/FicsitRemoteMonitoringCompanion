@@ -54,7 +54,9 @@ namespace Companion
 
             Config.ConfigFile cfg = configWindow.Config;
 
-            PrometheusExporterHost.Start();
+            Config.FicsitRemoteMonitoringConfig ficsitConfig = await Config.ConfigIO.ReadFRMConfigFile(cfg.SatisfactoryGameDirectory);
+
+            PrometheusExporterHost.Start(ficsitConfig.ListenAddress);
             PrometheusHost.Start();
             GrafanaHost.Start();
 
