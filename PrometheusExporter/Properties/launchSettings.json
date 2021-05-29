@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PrometheusExporter": {
+      "commandName": "Project",
+      "commandLineArgs": "http://localhost:8090"
+    }
+  }
+}

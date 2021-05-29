@@ -10,9 +10,16 @@ namespace PrometheusExporter
 {
     class ProductionMetricsCollector : IMetricCollector
     {
+        private readonly Uri frmAddress;
+        public ProductionMetricsCollector(Uri frmAddress)
+        {
+            this.frmAddress = frmAddress;
+        }
+
         public Task BeginCollecting(CancellationToken token)
         {
-            string productionUrl = "http://localhost:8090/getProdStats";
+            string productionUrl = new Uri(this.frmAddress, "/getProdStats").ToString();
+            Console.WriteLine($"Will collect production metrics from {productionUrl}");
             return Task.Run(async () =>
             {
                 try

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -16,6 +17,20 @@ namespace PrometheusExporter
         {
             Console.CancelKeyPress += Console_CancelKeyPress;
 
+            if(args.Length < 1){
+                Console.Error.WriteLine("First argument must be the address on which Ficsit Remote Monitoring is listening");
+                Environment.Exit(1);
+            }
+
+            string satisfactoryAddress = args[0];
+            Uri satisfactoryUri;
+            if(!Uri.TryCreate(satisfactoryAddress, UriKind.Absolute, out satisfactoryUri)){
+                Console.Error.WriteLine($"'{satisfactoryAddress}' is not a valid URI");
+                Environment.Exit(2);
+            }
+
+            Console.WriteLine($"Will contact Ficsit Remote Montioring on {satisfactoryUri.ToString()}");
+
             try
             {
                 Prometheus.Metrics.SuppressDefaultMetrics();
@@ -27,8 +42,8 @@ namespace PrometheusExporter
                 _source = new CancellationTokenSource();
                 CancellationToken token = _source.Token;
 
-                PowerMetricsCollector powerCollector = new PowerMetricsCollector();
-                ProductionMetricsCollector productionCollector = new ProductionMetricsCollector();
+                PowerMetricsCollector powerCollector = new PowerMetricsCollector(satisfactoryUri);
+                ProductionMetricsCollector productionCollector = new ProductionMetricsCollector(satisfactoryUri);
 
                 Task.WaitAll(
                     powerCollector.BeginCollecting(token),

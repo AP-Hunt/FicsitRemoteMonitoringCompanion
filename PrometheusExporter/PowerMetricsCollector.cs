@@ -26,13 +26,18 @@ namespace PrometheusExporter
 
     class PowerMetricsCollector : IMetricCollector
     {
-        public PowerMetricsCollector()
+        private readonly Uri frmAddress;
+
+        public PowerMetricsCollector(Uri frmAddress)
         {
+            this.frmAddress = frmAddress;
         }
 
         public Task BeginCollecting(CancellationToken token)
         {
-            string powerUrl = "http://localhost:8090/getPowerData";
+            string powerUrl = new Uri(this.frmAddress, "/getPowerData").ToString();
+            Console.WriteLine($"Will collect power metrics from {powerUrl}");
+
             return Task.Run(async () =>
             {
                 try
