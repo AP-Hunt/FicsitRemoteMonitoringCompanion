@@ -32,7 +32,7 @@ namespace PrometheusExporter
                         return -1;
                 }
             }
-            catch(InvalidOperationException ex)
+            catch(InvalidOperationException)
             {
                 return -1;
             }
