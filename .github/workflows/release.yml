@@ -17,6 +17,7 @@ on:
             - "cake.config"
             - "build.cake"
             - "*.sln"
+            - ".github/workflows/release.yml"
 
 name: Release new version
 jobs:
