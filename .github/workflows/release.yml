@@ -54,7 +54,8 @@ jobs:
                 tag: "${{ env.NEW_VERSION }} --force"
 
             - name: Compile release
-              run: make release
+              run: |
+                dotnet cake build.cake --target Publish --configuration Release
 
             - name: Create release
               id: create_release
