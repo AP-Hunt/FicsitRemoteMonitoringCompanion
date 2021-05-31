@@ -9,5 +9,6 @@ namespace PrometheusExporter
     interface IMetricCollector
     {
         Task BeginCollecting(CancellationToken token); 
+        static IEnumerable<Prometheus.Collector> ExposedMetrics { get; }
     }
 }

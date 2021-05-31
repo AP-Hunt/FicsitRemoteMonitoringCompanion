@@ -11,6 +11,23 @@ namespace PrometheusExporter
     class ProductionMetricsCollector : IMetricCollector
     {
         private readonly Uri frmAddress;
+
+        public static IEnumerable<Prometheus.Collector> ExposedMetrics
+        {
+            get
+            {
+                return new List<Prometheus.Collector>
+                {
+                    ItemProductionCapacityPerMinute,
+                    ItemProductionCapacityPercent,
+                    ItemConsumptionCapacityPerMinute,
+                    ItemConsumptionCapacityPercent,
+                    ItemsProduced,
+                    ItemsConsumed
+                };
+            }
+        }
+
         public ProductionMetricsCollector(Uri frmAddress)
         {
             this.frmAddress = frmAddress;

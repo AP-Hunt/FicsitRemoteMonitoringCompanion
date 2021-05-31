@@ -3,6 +3,10 @@
     "PrometheusExporter": {
       "commandName": "Project",
       "commandLineArgs": "http://localhost:8090"
+    },
+    "PrometheusExporter-ShowMetrics": {
+      "commandName": "Project",
+      "commandLineArgs": "-SHOWMETRICS"
     }
   }
 }

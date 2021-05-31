@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -20,6 +22,14 @@ namespace PrometheusExporter
             if(args.Length < 1){
                 Console.Error.WriteLine("First argument must be the address on which Ficsit Remote Monitoring is listening");
                 Environment.Exit(1);
+            }
+
+            // Output the names of all the metrics exposed by this exporter
+            // in HTML format, as a helper for the README
+            if(args[0].ToUpper() == "-SHOWMETRICS")
+            {
+                ShowExportedMetrics();
+                return;
             }
 
             string satisfactoryAddress = args[0];
@@ -66,6 +76,53 @@ namespace PrometheusExporter
 
             _source.Cancel();
         }
+
+        private static void ShowExportedMetrics()
+        {
+            IEnumerable<Type> metricCollectorTypes = typeof(Program)
+                .Assembly
+                .GetTypes()
+                .Where(t => t.IsClass)
+                .Where(t => t.GetInterfaces().Contains(typeof(IMetricCollector)));
+
+            var collectors = new List<Prometheus.Collector>();
+            foreach (Type collectorType in metricCollectorTypes)
+            {
+                var exported = (IEnumerable<Prometheus.Collector>)collectorType
+                    .GetProperty(nameof(IMetricCollector.ExposedMetrics), System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
+                    .GetValue(null);
+                collectors.AddRange(exported);
+            }
+
+            StringBuilder builder = new StringBuilder();
+            builder.Append(@"
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Labels</th>
+        </tr>
+    </thead>
+    <tbody>");
+
+            foreach(Prometheus.Collector collector in collectors)
+            {
+                builder.Append($@"
+        <tr>
+            <td>{collector.Name}</td>
+            <td>{collector.Help}</td>
+            <td>{string.Join(", ", collector.LabelNames)}</td>
+        </tr>");
+            }
+
+            builder.Append(@"
+    </tbody>
+</table>");
+
+            Console.WriteLine(builder.ToString());
+        }
+
     }
 }
 

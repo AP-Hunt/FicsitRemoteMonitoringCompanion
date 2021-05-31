@@ -28,6 +28,25 @@ namespace PrometheusExporter
     {
         private readonly Uri frmAddress;
 
+        public static IEnumerable<Prometheus.Collector> ExposedMetrics
+        {
+            get
+            {
+                return new List<Prometheus.Collector>
+                {
+                    PowerCapacity,
+                    PowerConsumed,
+                    PowerMaxConsumed,
+                    PowerProduced,
+                    PowerBatteryDifferential,
+                    PowerBatteryPercent,
+                    PowerBatteryCapacity,
+                    PowerBatteryTimeEmpty,
+                    PowerFuseBlown
+                };
+            }
+        }
+
         public PowerMetricsCollector(Uri frmAddress)
         {
             this.frmAddress = frmAddress;
