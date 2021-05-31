@@ -75,4 +75,4 @@ jobs:
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                gh release upload "${NEW_VERSION}" "./bin/publish/FicsitRemoteMonitoringCompanion-v${NEW_VERSION}.zip"
+                gh release upload "${{ env.NEW_VERSION }}" "./bin/publish/FicsitRemoteMonitoringCompanion-v${{env.NEW_VERSION}}.zip"
