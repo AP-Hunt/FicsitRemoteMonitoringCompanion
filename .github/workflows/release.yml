@@ -40,7 +40,7 @@ jobs:
                 echo "Current version: $(cat version.txt)"
                 dotnet cake .\build.cake --target BumpMinorVersion
                 echo "New version: $(cat version.txt)"
-                echo "NEW_VERSION=$(cat version.txt)" >> $GITHUB_ENV 
+                echo "NEW_VERSION=$(cat version.txt)" >> $env:GITHUB_ENV 
 
             - name: Tag, commit, push
               uses: EndBug/add-and-commit@v7
