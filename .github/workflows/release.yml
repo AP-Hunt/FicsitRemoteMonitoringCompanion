@@ -65,6 +65,7 @@ jobs:
                 release_name: "Version ${{ env.NEW_VERSION }}"
                 draft: false
                 prerelease: false
+                body_path: InstallationInstructions.md
 
             - name: Upload assets
               id: upload_assets
