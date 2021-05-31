@@ -1,3 +1,6 @@
+#addin nuget:?package=semver&version=2.0.4
+
+using Semver; 
 
 var target = Argument("target", "Test");
 var configuration = Argument("configuration", "Release");
@@ -10,7 +13,9 @@ var msBuildSettings = new DotNetCoreMSBuildSettings();
 if(configuration == "Release")
 {
     string version = System.IO.File.ReadAllText("version.txt");
-    msBuildSettings.Properties["AssemblyVersionNumber"] = new string[]{version};
+    var semVersion = SemVersion.Parse(version, false);
+    
+    msBuildSettings.Properties["AssemblyVersionNumber"] = new string[]{semVersion.ToString()};
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -130,6 +135,17 @@ Task("ExternalsDir")
     .Does(() => 
 {
     System.IO.Directory.CreateDirectory("./Externals/");
+});
+
+Task("BumpMinorVersion")
+    .Does(() => 
+{
+    string version = System.IO.File.ReadAllText("version.txt");
+    var semVersion = SemVersion.Parse(version, false);
+
+    var nextVer = semVersion.Change(semVersion.Major, semVersion.Minor + 1, semVersion.Patch);
+
+    System.IO.File.WriteAllText("version.txt", nextVer.ToString());
 });
 
 //////////////////////////////////////////////////////////////////////
