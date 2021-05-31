@@ -78,6 +78,9 @@ Task("Publish")
 
     CopyFile($"./Externals/Prometheus/prometheus-{prometheusVersion}.windows-amd64/prometheus.exe", $"./bin/publish/{configuration}/prometheus.exe");
     CopyDirectory($"./Externals/Grafana/grafana-{grafanaVersion}", $"./bin/publish/{configuration}/grafana");
+
+    string version = System.IO.File.ReadAllText("version.txt");
+    Zip($"bin/publish/{configuration}", $"./bin/publish/FicsitRemoteMonitoringCompanion-v{version}.zip");
 });
 
 Task("Test")
