@@ -42,6 +42,10 @@ jobs:
                 echo "New version: $(cat version.txt)"
                 echo "NEW_VERSION=$(cat version.txt)" >> $env:GITHUB_ENV 
 
+            - name: Compile release
+              run: |
+                dotnet cake build.cake --target Publish --configuration Release
+
             - name: Tag, commit, push
               uses: EndBug/add-and-commit@v7
               env:
@@ -52,10 +56,6 @@ jobs:
                 author_email: "github@andyhunt.me"
                 message: "Bump version to ${{ env.NEW_VERSION }}"
                 tag: "${{ env.NEW_VERSION }} --force"
-
-            - name: Compile release
-              run: |
-                dotnet cake build.cake --target Publish --configuration Release
 
             - name: Create release
               id: create_release
