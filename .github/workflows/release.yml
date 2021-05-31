@@ -18,7 +18,7 @@ on:
             - "build.cake"
             - "*.sln"
 
-name: Increment minor version
+name: Release new version
 jobs:
     increment_minor_version:
         name: Increment minor version
@@ -42,7 +42,7 @@ jobs:
                 echo "NEW_VERSION=$(cat version.txt)" >> $GITHUB_ENV 
 
             - name: Tag, commit, push
-              uses: EndBug/add-and-commit@v5
+              uses: EndBug/add-and-commit@v7
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
