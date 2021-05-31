@@ -1,0 +1,74 @@
+# This workflow increments the minor version 
+# when there is a push to the main branch. It
+# also creates a new release for the tag.
+# 
+# It does not run if the commit has been tagged,
+# so that it doesn't get in to an endless loop
+# when a tagged commit gets pushed.
+on:
+    push:
+        branches:
+            - main
+        tags-ignore:
+            - "*"
+        paths:
+            - "Companion/**"
+            - "PrometheusExporter/**"
+            - "cake.config"
+            - "build.cake"
+            - "*.sln"
+
+name: Increment minor version
+jobs:
+    increment_minor_version:
+        name: Increment minor version
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-dotnet@v1
+              with:
+                dotnet-version: '5.0.x'
+
+            - name: Install dependencies
+              run: |
+                dotnet restore
+                dotnet tool restore
+
+            - name: Increment minor version
+              run: |
+                echo "Current version: $(cat version.txt)"
+                dotnet cake .\build.cake --target BumpMinorVersion
+                echo "New version: $(cat version.txt)"
+                echo "NEW_VERSION=$(cat version.txt)" >> $GITHUB_ENV 
+
+            - name: Tag, commit, push
+              uses: EndBug/add-and-commit@v5
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                add: version.txt
+                author_name: "GitHub Actions on behalf of Andy Hunt"
+                author_email: "github@andyhunt.me"
+                message: "Bump version to ${{ env.NEW_VERSION }}"
+                tag: "${{ env.NEW_VERSION }} --force"
+
+            - name: Compile release
+              run: make release
+
+            - name: Create release
+              id: create_release
+              uses: actions/create-release@v1
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                tag_name: ${{ env.NEW_VERSION }}
+                release_name: "Version ${{ env.NEW_VERSION }}"
+                draft: false
+                prerelease: false
+
+            - name: Upload assets
+              id: upload_assets
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                gh release upload "${NEW_VERSION}" "./bin/publish/FicsitRemoteMonitoringCompanion-v${NEW_VERSION}.zip"
