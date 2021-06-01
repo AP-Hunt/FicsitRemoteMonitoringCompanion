@@ -59,7 +59,7 @@ namespace Companion.Config
 
             await ConfigIO.WriteCompanionConfigFile(Paths.ConfigFile, cfg);
             this.Config = cfg;
-            this.Close();
+            this.DialogResult = true;
         }
     }
 }

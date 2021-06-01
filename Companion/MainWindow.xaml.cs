@@ -48,18 +48,6 @@ namespace Companion
 
         private async void Window_ContentRendered(object sender, EventArgs e)
         {
-            Config.ConfigWindow configWindow = new Config.ConfigWindow();
-            configWindow.Owner = this;
-            configWindow.ShowDialog();
-
-            Config.ConfigFile cfg = configWindow.Config;
-
-            Config.FicsitRemoteMonitoringConfig ficsitConfig = await Config.ConfigIO.ReadFRMConfigFile(cfg.SatisfactoryGameDirectory);
-
-            PrometheusExporterHost.Start(ficsitConfig.ListenAddress);
-            PrometheusHost.Start();
-            GrafanaHost.Start();
-
             await GrafanaHost.WaitForReadiness();
             this.ShowGrafana();
         }

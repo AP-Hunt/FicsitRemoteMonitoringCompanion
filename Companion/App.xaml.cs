@@ -13,7 +13,7 @@ namespace Companion
     /// </summary>
     public partial class App : Application
     {
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
         }
@@ -25,6 +25,26 @@ namespace Companion
             GrafanaHost.Stop();
             PrometheusHost.Stop();
             PrometheusExporterHost.Stop();
+        }
+
+        private async void Application_Startup(object sender, StartupEventArgs e)
+        {
+            var mainWindow = new MainWindow();
+            Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
+            Current.MainWindow = mainWindow;
+
+            Config.ConfigWindow configWindow = new Config.ConfigWindow();
+
+            if (configWindow.ShowDialog() == true)
+            {
+                Config.ConfigFile cfg = configWindow.Config;
+                Config.FicsitRemoteMonitoringConfig ficsitConfig = await Config.ConfigIO.ReadFRMConfigFile(cfg.SatisfactoryGameDirectory);
+
+                PrometheusExporterHost.Start(ficsitConfig.ListenAddress);
+                PrometheusHost.Start();
+                GrafanaHost.Start();
+                mainWindow.Show();
+            }
         }
     }
 }
