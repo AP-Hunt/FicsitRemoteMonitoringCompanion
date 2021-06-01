@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Companion
@@ -42,8 +43,11 @@ namespace Companion
 
         private async static Task WaitAPIHealthy()
         {
+            CancellationTokenSource source = new CancellationTokenSource();
+            source.CancelAfter(TimeSpan.FromMinutes(5));
+
             bool statusOK = false;
-            while (!statusOK)
+            while (!statusOK && !source.Token.IsCancellationRequested)
             {
                 try
                 {
@@ -52,18 +56,22 @@ namespace Companion
                         client.Timeout = TimeSpan.FromSeconds(3);
                         var response = await client.GetAsync("http://localhost:3000/api/health");
                         statusOK = (response.StatusCode == HttpStatusCode.OK);
-                    }                 
+                    }
                 }
-                catch(TaskCanceledException)
+                catch (TaskCanceledException)
                 {
                     continue;
                 }
-                catch(HttpRequestException)
+                catch (HttpRequestException)
                 {
                     continue;
                 }
             }
 
+            if(source.Token.IsCancellationRequested)
+            {
+                throw new TaskCanceledException();
+            }
         }
 
         private async static Task ConfigureGrafana()

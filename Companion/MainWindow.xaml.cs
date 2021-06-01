@@ -48,8 +48,18 @@ namespace Companion
 
         private async void Window_ContentRendered(object sender, EventArgs e)
         {
-            await GrafanaHost.WaitForReadiness();
+            try
+            {
+                await GrafanaHost.WaitForReadiness();
+            }
+            catch(TaskCanceledException ex)
+            {
+                MessageBox.Show("Grafana failed to start up. Try restarting the program.");
+                this.Close();
+                return;
+            }
+
             this.ShowGrafana();
         }
     }
-}
+}   
