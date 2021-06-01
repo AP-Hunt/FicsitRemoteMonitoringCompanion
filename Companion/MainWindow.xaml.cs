@@ -21,13 +21,16 @@ namespace Companion
     /// </summary>
     public partial class MainWindow : Window
     {
-        Label loadingLabel;
+        TextBlock loadingLabel;
         public MainWindow()
         {
             InitializeComponent();
-            loadingLabel = new Label()
+            loadingLabel = new TextBlock()
             {
-                Content = "Loading Grafana...",
+                Text = @$"
+                Loading Grafana...
+                
+                This can take up to 5 minutes the very first time.",
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
