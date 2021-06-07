@@ -7,6 +7,7 @@ var configuration = Argument("configuration", "Release");
 
 var prometheusVersion = "2.27.1";
 var grafanaVersion = "7.5.7";
+var gitchglogVersion = "0.14.2";
 
 var msBuildSettings = new DotNetCoreMSBuildSettings();
 
@@ -149,6 +150,51 @@ Task("BumpMinorVersion")
     var nextVer = semVersion.Change(semVersion.Major, semVersion.Minor + 1, semVersion.Patch);
 
     System.IO.File.WriteAllText("version.txt", nextVer.ToString());
+});
+
+Task("Git-Chglog")
+    .IsDependentOn("ExternalsDir")
+    .Does(() =>
+{
+    System.IO.Directory.CreateDirectory("./Externals/Git-Chglog");
+
+    if(!System.IO.File.Exists("./Externals/Git-Chglog/git-chglog.exe"))
+        {
+        Information($"Downloading git-chglog {gitchglogVersion}");
+        DownloadFile(
+            $"https://github.com/git-chglog/git-chglog/releases/download/v{gitchglogVersion}/git-chglog_{gitchglogVersion}_windows_amd64.zip",
+            "./Externals/Git-Chglog/chglog.zip"
+        );
+
+
+        Unzip("./Externals/Git-Chglog/chglog.zip", "./Externals/Git-Chglog/");
+    } 
+    else 
+    {
+       Information("Skipping Git-Chglog download because it has already been downloaded");    
+    }
+});
+
+Task("ReleaseNotes")
+    .IsDependentOn("Git-Chglog")
+    .Does(() =>
+{
+    var chglogPath = "./Externals/Git-Chglog/git-chglog.exe";
+
+    string version = System.IO.File.ReadAllText("version.txt");
+    
+    string changelogTemplate = System.IO.File.ReadAllText("./.chglog/CHANGELOG.tpl.md");
+    string installationInstructions = System.IO.File.ReadAllText("./InstallationInstructions.md");
+    string combined = changelogTemplate + Environment.NewLine + Environment.NewLine + installationInstructions;
+
+    System.IO.File.WriteAllText("./Externals/Git-Chglog/template.tpl", combined);
+
+    StartProcess(
+      chglogPath, 
+      new ProcessSettings {
+          Arguments = $"-t ./Externals/Git-Chglog/template.tpl -o ReleaseNotes.md {version}..{version}"
+      }
+    );
 });
 
 //////////////////////////////////////////////////////////////////////

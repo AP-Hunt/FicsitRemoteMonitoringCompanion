@@ -58,6 +58,10 @@ jobs:
                 message: "Bump version to ${{ env.NEW_VERSION }}"
                 tag: "${{ env.NEW_VERSION }} --force"
 
+            - name: Generate release notes
+              run: |
+                dotnet cake build.cake --target ReleaseNotes
+
             - name: Create release
               id: create_release
               uses: actions/create-release@v1
@@ -68,7 +72,7 @@ jobs:
                 release_name: "Version ${{ env.NEW_VERSION }}"
                 draft: false
                 prerelease: false
-                body_path: InstallationInstructions.md
+                body_path: ReleaseNotes.md
 
             - name: Upload assets
               id: upload_assets
