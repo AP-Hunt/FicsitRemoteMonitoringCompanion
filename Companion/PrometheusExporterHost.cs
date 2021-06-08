@@ -9,6 +9,15 @@ namespace Companion
     static class PrometheusExporterHost
     {
         static Process _prometheusExporterProcess;
+        static LogStream _logStream;
+
+        internal static LogStream LogStream
+        {
+            get
+            {
+                return _logStream;
+            }
+        }
 
         internal static void Start(Uri listenAddress)
         {
@@ -23,9 +32,13 @@ namespace Companion
                     WorkingDirectory = prometheusExporterWorkingDir,
                     UseShellExecute = false,
                     CreateNoWindow = true,
-                    Arguments = listenAddress.ToString()
+                    Arguments = listenAddress.ToString(),
+                    RedirectStandardOutput = true,
                 };
                 _prometheusExporterProcess = Process.Start(promExporterProcessStartInfo);
+                _logStream = new LogStream(_prometheusExporterProcess);
+
+                _prometheusExporterProcess.BeginOutputReadLine();
             }
             catch(Exception ex)
             {

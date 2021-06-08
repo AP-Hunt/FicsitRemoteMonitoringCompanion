@@ -9,6 +9,15 @@ namespace Companion
     static class PrometheusHost
     {
         static Process _prometheusProcess;
+        static LogStream _logStream;
+
+        internal static LogStream LogStream
+        {
+            get
+            {
+                return _logStream;
+            }
+        }
 
         internal static void Start()
         {
@@ -25,10 +34,14 @@ namespace Companion
                     WorkingDirectory = prometheusWorkingDir,
                     UseShellExecute = false,
                     CreateNoWindow = true,
+                    RedirectStandardOutput = true,
 
                     Arguments = $"--config.file=\"{prometheusConfigPath}\""
                 };
                 _prometheusProcess = Process.Start(promProcessStartInfo);
+                _logStream = new LogStream(_prometheusProcess);
+
+                _prometheusProcess.BeginOutputReadLine();
             }
             catch (Exception ex)
             {

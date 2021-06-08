@@ -10,5 +10,8 @@
         ContentRendered="Window_ContentRendered"
 >
     <DockPanel Name="MainPanel">
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_Diagnostics" Click="Diagnostics_Click"/>
+        </Menu>
     </DockPanel>
 </Window>

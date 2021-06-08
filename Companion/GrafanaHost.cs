@@ -14,6 +14,14 @@ namespace Companion
     static class GrafanaHost
     {
         static Process _grafanaProcess;
+        static LogStream _logStream;
+        internal static LogStream LogStream
+        {
+            get
+            {
+                return _logStream;
+            }
+        }
 
         internal static void Start()
         {
@@ -28,11 +36,14 @@ namespace Companion
                 WorkingDirectory = grafanaWorkingDir,
                 UseShellExecute = false,
                 CreateNoWindow = true,
+                RedirectStandardOutput = true,
 
                 Arguments = $"-config \"{grafanaConfigPath}\""
             });
 
+            _logStream = new LogStream(_grafanaProcess);
 
+            _grafanaProcess.BeginOutputReadLine();
         }
 
         internal async static Task WaitForReadiness()

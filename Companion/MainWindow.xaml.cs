@@ -64,5 +64,12 @@ namespace Companion
 
             this.ShowGrafana();
         }
+
+        private void Diagnostics_Click(object sender, RoutedEventArgs e)
+        {
+            LogLines logLinesWindow = new LogLines();
+            logLinesWindow.Owner = this;
+            logLinesWindow.Show();
+        }
     }
 }   
