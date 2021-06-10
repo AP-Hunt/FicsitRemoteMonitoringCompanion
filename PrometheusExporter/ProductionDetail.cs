@@ -21,22 +21,22 @@ namespace PrometheusExporter
         public string ItemName { get; set; }
         public string ProdPerMin { get; set; }
         [JsonPropertyName("ProdPercent")]
-        public double ProductionPercent { get; set; }
+        public double? ProductionPercent { get; set; }
         [JsonPropertyName("ConsPercent")]
-        public double ConsumptionPercent { get; set; }
+        public double? ConsumptionPercent { get; set; }
         [JsonPropertyName("CurrentProd")]
-        public double CurrentProduction { get; set; }
+        public double? CurrentProduction { get; set; }
         [JsonPropertyName("MaxProd")]
         [JsonConverter(typeof(DoublePossiblyNAJSONConverter))]
-        public double MaxProduction { get; set; }
+        public double? MaxProduction { get; set; }
         [JsonPropertyName("CurrentConsumed")]
-        public double CurrentConsumption { get; set; }
+        public double? CurrentConsumption { get; set; }
         [JsonPropertyName("MaxConsumed")]
         [JsonConverter(typeof(DoublePossiblyNAJSONConverter))]
-        public double MaxConsumption { get; set; }
+        public double? MaxConsumption { get; set; }
 
         [JsonIgnore]
-        public double ProductionCapacity
+        public double? ProductionCapacity
         {
             get
             { 
@@ -46,7 +46,7 @@ namespace PrometheusExporter
         }
 
         [JsonIgnore]
-        public double ConsumptionCapacity
+        public double? ConsumptionCapacity
         {
             get
             {
@@ -55,7 +55,7 @@ namespace PrometheusExporter
             }
         }
 
-        private double PerMinStat(string statName)
+        private double? PerMinStat(string statName)
         {
             if (_perMinStatsMatches == null)
             {
@@ -67,13 +67,25 @@ namespace PrometheusExporter
 
                 if (_perMinStatsMatches.Count == 0)
                 {
-                    return -1;
+                    return null;
                 }
             }
 
             Match m = _perMinStatsMatches[0];
             string statFigure = m.Groups[statName].Value;
-            return double.Parse(statFigure);
+
+            if(statFigure == "")
+            {
+                return null;
+            }
+
+            double d;
+            if(!double.TryParse(statFigure, out d))
+            {
+                throw new FormatException($"'{statFigure}' is not a valid double");
+            }
+
+            return d;
         }
     }
 }

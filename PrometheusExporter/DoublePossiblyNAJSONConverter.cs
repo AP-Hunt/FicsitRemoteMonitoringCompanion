@@ -6,9 +6,9 @@ using System.Text.Json.Serialization;
 
 namespace PrometheusExporter
 {
-    public class DoublePossiblyNAJSONConverter : JsonConverter<double>
+    public class DoublePossiblyNAJSONConverter : JsonConverter<Nullable<double>>
     {
-        public override double Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override double? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             try
             {
@@ -21,7 +21,7 @@ namespace PrometheusExporter
                         string sValue = reader.GetString();
                         if (sValue.ToUpperInvariant() == "N/A")
                         {
-                            return -1;
+                            return null;
                         }
                         else
                         {
@@ -29,18 +29,21 @@ namespace PrometheusExporter
                         }
 
                     default: 
-                        return -1;
+                        return null;
                 }
             }
             catch(InvalidOperationException)
             {
-                return -1;
+                return null;
             }
         }
 
-        public override void Write(Utf8JsonWriter writer, double value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, double? value, JsonSerializerOptions options)
         {
-            writer.WriteStringValue(value.ToString());
+            if (value.HasValue)
+            {
+                writer.WriteStringValue(value.ToString());
+            }
         }
     }
 }

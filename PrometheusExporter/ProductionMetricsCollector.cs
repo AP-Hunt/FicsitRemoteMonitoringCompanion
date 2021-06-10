@@ -67,13 +67,7 @@ namespace PrometheusExporter
                 string responseJson = rdr.ReadToEnd();
                 resp.Close();
 
-                var options = new System.Text.Json.JsonSerializerOptions
-                {
-                    AllowTrailingCommas = true,
-                    PropertyNameCaseInsensitive = true
-                };
-
-                List<ProductionDetail> productionDetails = System.Text.Json.JsonSerializer.Deserialize<List<ProductionDetail>>(responseJson, options);
+                List<ProductionDetail> productionDetails = Parsers.ProductionDetailsParser.ParseJSON(responseJson);
 
                 foreach (ProductionDetail detail in productionDetails)
                 {
@@ -89,12 +83,12 @@ namespace PrometheusExporter
 
         private void UpdateProductionMetrics(ProductionDetail detail)
         {
-            ItemProductionCapacityPerMinute.WithLabels(detail.ItemName).Set(detail.ProductionCapacity);
-            ItemProductionCapacityPercent.WithLabels(detail.ItemName).Set(detail.ProductionPercent);
-            ItemConsumptionCapacityPerMinute.WithLabels(detail.ItemName).Set(detail.ConsumptionCapacity);
-            ItemConsumptionCapacityPercent.WithLabels(detail.ItemName).Set(detail.ConsumptionPercent);
-            ItemsProduced.WithLabels(detail.ItemName).Set(detail.CurrentProduction);
-            ItemsConsumed.WithLabels(detail.ItemName).Set(detail.CurrentConsumption);
+            ItemProductionCapacityPerMinute.WithLabels(detail.ItemName).TrySet(detail.ProductionCapacity);
+            ItemProductionCapacityPercent.WithLabels(detail.ItemName).TrySet(detail.ProductionPercent);
+            ItemConsumptionCapacityPerMinute.WithLabels(detail.ItemName).TrySet(detail.ConsumptionCapacity);
+            ItemConsumptionCapacityPercent.WithLabels(detail.ItemName).TrySet(detail.ConsumptionPercent);
+            ItemsProduced.WithLabels(detail.ItemName).TrySet(detail.CurrentProduction);
+            ItemsConsumed.WithLabels(detail.ItemName).TrySet(detail.CurrentConsumption);
         }
 
         private static readonly Prometheus.Gauge ItemProductionCapacityPerMinute = Prometheus.Metrics.CreateGauge(
