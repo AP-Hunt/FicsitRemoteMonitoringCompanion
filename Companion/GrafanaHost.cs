@@ -50,6 +50,7 @@ namespace Companion
         {
             await WaitAPIHealthy();
             await ConfigureGrafana();
+            await WaitUIReady();
         }
 
         private async static Task WaitAPIHealthy()
@@ -80,7 +81,59 @@ namespace Companion
                 }
             }
 
-            if(source.Token.IsCancellationRequested)
+            if (statusOK)
+            {
+                AppLogStgream.Instance.WriteLine("Grafana API is ready");
+            }
+
+            if (source.Token.IsCancellationRequested)
+            {
+                throw new TaskCanceledException();
+            }
+        }
+
+        private async static Task WaitUIReady()
+        {
+            CancellationTokenSource source = new CancellationTokenSource();
+            source.CancelAfter(TimeSpan.FromMinutes(5));
+
+            bool statusOK = false;
+            while (!statusOK && !source.Token.IsCancellationRequested)
+            {
+                try
+                {
+                    using (var client = new HttpClient())
+                    {
+                        client.Timeout = TimeSpan.FromSeconds(3);
+                        AppLogStgream.Instance.WriteLine("waiting for Grafana UI to be ready");
+                        var response = await client.GetAsync("http://localhost:3000/");
+
+                        long? contentLength = 0;
+                        if(response.Content != null)
+                        {
+                            await response.Content.LoadIntoBufferAsync();
+                            contentLength = response.Content.Headers.ContentLength;
+                        }
+
+                        statusOK = (response.StatusCode == HttpStatusCode.OK && contentLength > 0);
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                    continue;
+                }
+                catch (HttpRequestException)
+                {
+                    continue;
+                }
+            }
+
+            if (statusOK)
+            {
+                AppLogStgream.Instance.WriteLine("Grafana UI is ready");
+            }
+
+            if (source.Token.IsCancellationRequested)
             {
                 throw new TaskCanceledException();
             }
