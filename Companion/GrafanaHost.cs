@@ -171,6 +171,7 @@ namespace Companion
                         {
                             ""name"": ""prometheus"",
                             ""type"": ""prometheus"",
+                            ""uid"": ""prometheus"",
                             ""url"": ""http://localhost:9090"",
                             ""access"": ""proxy""
                         }
