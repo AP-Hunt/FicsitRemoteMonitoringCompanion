@@ -8,16 +8,16 @@ namespace Companion
 {
     internal delegate void LogLineArrived(string data);
 
-    internal class LogStream
+    internal class ProcessLogStream : ILogStream
     {
         private readonly Process _process;
         private StringBuilder _builder;
 
         public event LogLineArrived OnLogLine;
 
-        public LogStream(Process process)
+        public ProcessLogStream(Process process)
         {
-            this._process= process;
+            this._process = process;
 
             _builder = new StringBuilder();
             _process.OutputDataReceived += _process_OutputDataReceived;
@@ -25,7 +25,7 @@ namespace Companion
 
         public string FullLogOutput
         {
-            get 
+            get
             {
                 return _builder.ToString();
             }
