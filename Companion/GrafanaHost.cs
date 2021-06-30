@@ -96,8 +96,6 @@ namespace Companion
             client.DefaultRequestHeaders.Add("Accept", "application/json");
 
             await CreatePrometheusDataSource(client);
-            await ConfigureOrgs(client);
-            await CreateFolder(client);
             await PopulateDashboards(client);
         }
 
@@ -136,65 +134,6 @@ namespace Companion
                 {
                     AppLogStgream.Instance.WriteLine("Failed creating Prometheus data source: {0}", ex.Message);
                 }
-            }
-        }
-
-        private async static Task ConfigureOrgs(HttpClient client)
-        {
-            bool orgFound;
-            try
-            {
-                var response = await client.GetAsync("http://localhost:3000/api/orgs/name/Ficsit");
-                orgFound = (response.StatusCode != HttpStatusCode.NotFound);
-            }
-            catch (HttpRequestException)
-            {
-                orgFound = false;
-            }
-
-            if (!orgFound)
-            {
-                AppLogStgream.Instance.WriteLine("Ficsit org was not found in Grafana. Creating.");
-                string bodyJson = @"
-                        {
-                            ""name"": ""Ficsit""
-                        }
-                    ";
-                HttpContent content = new StringContent(bodyJson);
-                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-
-                try
-                {
-                    await client.PostAsync("http://localhost:3000/api/orgs", content);
-                    AppLogStgream.Instance.WriteLine("Created Grafana org Ficsit");
-                }
-                catch (HttpRequestException ex)
-                {
-                    AppLogStgream.Instance.WriteLine("Failed creating Grafana org: {0}", ex.Message);
-                }
-            }
-        }
-
-        private async static Task CreateFolder(HttpClient client)
-        {
-            string bodyJson = @"
-                        {
-                            ""title"": ""Ficsit"",
-                            ""uuid"": ""ficsit"",
-                            ""overwrite"": true
-                        }
-                    ";
-            HttpContent content = new StringContent(bodyJson);
-            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-
-            try
-            {
-                await client.PutAsync("http://localhost:3000/api/folders/ficsit", content);
-                AppLogStgream.Instance.WriteLine("Created Ficsit folder");
-            }
-            catch (HttpRequestException ex)
-            {
-                AppLogStgream.Instance.WriteLine("Failed creating Grafana folder: {0}", ex.Message);
             }
         }
 
