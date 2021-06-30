@@ -17,8 +17,35 @@
   </PropertyGroup>
 
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Debug'">
-    <Exec Command="IF NOT EXIST &quot;$(TargetDir)grafana&quot; mklink /J /D &quot;$(TargetDir)grafana&quot; &quot;$(SolutionDir)Externals\Grafana\grafana-7.5.7&quot;&#xD;&#xA;&#xD;&#xA;IF NOT EXIST &quot;$(TargetDir)prometheus.exe&quot; copy &quot;$(SolutionDir)Externals\Prometheus\prometheus-2.27.1.windows-amd64\prometheus.exe&quot; &quot;$(TargetDir)\prometheus.exe&quot;&#xD;&#xA;&#xD;&#xA;copy &quot;$(SolutionDir)PrometheusExporter\bin\Release\netcoreapp3.1\win-x64\publish\PrometheusExporter.exe&quot; &quot;$(TargetDir)\PrometheusExporter.exe&quot;" />
+  <Target Name="GrafanaPostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Debug'">
+    <MakeDir Condition="!Exists('$(TargetDir)grafana')" Directories="$(TargetDir)grafana" />
+    <Exec Command="tar --strip-components=1 -x -f &quot;$(SolutionDir)Externals\Grafana\grafana.zip&quot; -C &quot;$(TargetDir)grafana&quot; ./grafana-7.5.7/" />
+  </Target>
+
+  <Target Name="PrometheusPostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Debug'">
+    <Copy SourceFiles="$(SolutionDir)Externals\Prometheus\prometheus-2.27.1.windows-amd64\prometheus.exe" DestinationFiles="$(TargetDir)prometheus.exe" />
+  </Target>
+
+  <Target Name="ExporterPostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Debug'">
+      <Copy
+        Condition="!Exists('$(TargetDir)PrometheusExporter.exe')"
+        SourceFiles="$(SolutionDir)PrometheusExporter\bin\Release\netcoreapp3.1\win-x64\publish\PrometheusExporter.exe"
+        DestinationFiles="$(TargetDir)PrometheusExporter.exe" />
+  </Target>
+
+  <Target Name="GrafanaPostClean" AfterTargets="Clean">
+      <RemoveDir Condition="Exists('$(TargetDir)grafana')" Directories="$(TargetDir)grafana" />
+  </Target>
+
+  <Target Name="PrometheusPostClean" AfterTargets="Clean">
+      <RemoveDir Condition="Exists('$(TargetDir)data')" Directories="$(TargetDir)data" />
+      <Delete Condition="Exists('$(TargetDir)prometheus.exe')" Files="$(TargetDir)prometheus.exe" />
+      <Delete Condition="Exists('$(TargetDir)config.yml')" Files="$(TargetDir)config.yml" />
+  </Target>
+
+  <Target Name="CompanionPostClean" AfterTargets="Clean">
+      <Delete Condition="Exists('$(TargetDir)companion_config.json')" Files="$(TargetDir)companion_config.json" />
+      <Delete Condition="Exists('$(TargetDir)PrometheusExporter.exe')" Files="$(TargetDir)PrometheusExporter.exe" />
   </Target>
 
   <ItemGroup>
