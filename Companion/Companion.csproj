@@ -27,10 +27,7 @@
   </Target>
 
   <Target Name="ExporterPostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Debug'">
-      <Copy
-        Condition="!Exists('$(TargetDir)PrometheusExporter.exe')"
-        SourceFiles="$(SolutionDir)PrometheusExporter\bin\Release\netcoreapp3.1\win-x64\publish\PrometheusExporter.exe"
-        DestinationFiles="$(TargetDir)PrometheusExporter.exe" />
+      <Copy Condition="!Exists('$(TargetDir)PrometheusExporter.exe')" SourceFiles="$(SolutionDir)PrometheusExporter\bin\Release\netcoreapp3.1\win-x64\publish\PrometheusExporter.exe" DestinationFiles="$(TargetDir)PrometheusExporter.exe" />
   </Target>
 
   <Target Name="GrafanaPostClean" AfterTargets="Clean">
@@ -49,7 +46,7 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.818.41" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.864.35" />
   </ItemGroup>
 
   <ItemGroup>
