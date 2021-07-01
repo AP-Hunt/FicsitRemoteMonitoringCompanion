@@ -13,5 +13,7 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_Diagnostics" Click="Diagnostics_Click"/>
         </Menu>
+
+        <wv2:WebView2 Name="webView" Visibility="Collapsed" />
     </DockPanel>
 </Window>
