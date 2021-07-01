@@ -14,8 +14,8 @@ namespace Companion
     static class GrafanaHost
     {
         static Process _grafanaProcess;
-        static LogStream _logStream;
-        internal static LogStream LogStream
+        static ProcessLogStream _logStream;
+        internal static ILogStream LogStream
         {
             get
             {
@@ -41,7 +41,7 @@ namespace Companion
                 Arguments = $"-config \"{grafanaConfigPath}\""
             });
 
-            _logStream = new LogStream(_grafanaProcess);
+            _logStream = new ProcessLogStream(_grafanaProcess);
 
             _grafanaProcess.BeginOutputReadLine();
         }
@@ -50,6 +50,7 @@ namespace Companion
         {
             await WaitAPIHealthy();
             await ConfigureGrafana();
+            await WaitUIReady();
         }
 
         private async static Task WaitAPIHealthy()
@@ -65,6 +66,7 @@ namespace Companion
                     using (var client = new HttpClient())
                     {
                         client.Timeout = TimeSpan.FromSeconds(3);
+                        AppLogStgream.Instance.WriteLine("waiting for Grafana API to be available");
                         var response = await client.GetAsync("http://localhost:3000/api/health");
                         statusOK = (response.StatusCode == HttpStatusCode.OK);
                     }
@@ -79,7 +81,59 @@ namespace Companion
                 }
             }
 
-            if(source.Token.IsCancellationRequested)
+            if (statusOK)
+            {
+                AppLogStgream.Instance.WriteLine("Grafana API is ready");
+            }
+
+            if (source.Token.IsCancellationRequested)
+            {
+                throw new TaskCanceledException();
+            }
+        }
+
+        private async static Task WaitUIReady()
+        {
+            CancellationTokenSource source = new CancellationTokenSource();
+            source.CancelAfter(TimeSpan.FromMinutes(5));
+
+            bool statusOK = false;
+            while (!statusOK && !source.Token.IsCancellationRequested)
+            {
+                try
+                {
+                    using (var client = new HttpClient())
+                    {
+                        client.Timeout = TimeSpan.FromSeconds(3);
+                        AppLogStgream.Instance.WriteLine("waiting for Grafana UI to be ready");
+                        var response = await client.GetAsync("http://localhost:3000/");
+
+                        long? contentLength = 0;
+                        if(response.Content != null)
+                        {
+                            await response.Content.LoadIntoBufferAsync();
+                            contentLength = response.Content.Headers.ContentLength;
+                        }
+
+                        statusOK = (response.StatusCode == HttpStatusCode.OK && contentLength > 0);
+                    }
+                }
+                catch (TaskCanceledException)
+                {
+                    continue;
+                }
+                catch (HttpRequestException)
+                {
+                    continue;
+                }
+            }
+
+            if (statusOK)
+            {
+                AppLogStgream.Instance.WriteLine("Grafana UI is ready");
+            }
+
+            if (source.Token.IsCancellationRequested)
             {
                 throw new TaskCanceledException();
             }
@@ -95,8 +149,6 @@ namespace Companion
             client.DefaultRequestHeaders.Add("Accept", "application/json");
 
             await CreatePrometheusDataSource(client);
-            await ConfigureOrgs(client);
-            await CreateFolder(client);
             await PopulateDashboards(client);
         }
 
@@ -114,10 +166,12 @@ namespace Companion
             }
 
             if(!datasourceFound){
+                AppLogStgream.Instance.WriteLine("Prometheus data source was not found in Grafana. Creating.");
                 string bodyJson = @"
                         {
                             ""name"": ""prometheus"",
                             ""type"": ""prometheus"",
+                            ""uid"": ""prometheus"",
                             ""url"": ""http://localhost:9090"",
                             ""access"": ""proxy""
                         }
@@ -128,89 +182,35 @@ namespace Companion
                 try
                 {
                     await client.PostAsync("http://localhost:3000/api/datasources", content);
+                    AppLogStgream.Instance.WriteLine("Created Prometheus data source in Grafana");
                 }
                 catch(HttpRequestException ex)
                 {
-                    Console.WriteLine("Failed creating Prometheus data source: {0}", ex.Message);
+                    AppLogStgream.Instance.WriteLine("Failed creating Prometheus data source: {0}", ex.Message);
                 }
-            }
-        }
-
-        private async static Task ConfigureOrgs(HttpClient client)
-        {
-            bool orgFound;
-            try
-            {
-                var response = await client.GetAsync("http://localhost:3000/api/orgs/name/Ficsit");
-                orgFound = (response.StatusCode != HttpStatusCode.NotFound);
-            }
-            catch (HttpRequestException)
-            {
-                orgFound = false;
-            }
-
-            if (!orgFound)
-            {
-                string bodyJson = @"
-                        {
-                            ""name"": ""Ficsit""
-                        }
-                    ";
-                HttpContent content = new StringContent(bodyJson);
-                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-
-                try
-                {
-                    await client.PostAsync("http://localhost:3000/api/orgs", content);
-                }
-                catch (HttpRequestException ex)
-                {
-                    Console.WriteLine("Failed creating Grafana org: {0}", ex.Message);
-                }
-            }
-        }
-
-        private async static Task CreateFolder(HttpClient client)
-        {
-            string bodyJson = @"
-                        {
-                            ""title"": ""Ficsit"",
-                            ""uuid"": ""ficsit"",
-                            ""overwrite"": true
-                        }
-                    ";
-            HttpContent content = new StringContent(bodyJson);
-            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
-
-            try
-            {
-                await client.PutAsync("http://localhost:3000/api/folders/ficsit", content);
-            }
-            catch (HttpRequestException ex)
-            {
-                Console.WriteLine("Failed creating Grafana folder: {0}", ex.Message);
             }
         }
 
         private async static Task PopulateDashboards(HttpClient client)
         {
-            string[] dashboards = new string[]{
-                Dashboards.Power,
-                Dashboards.Production
+            var dashboards = new Dictionary<string, string>{
+                { "Power", Dashboards.Power },
+                { "Production", Dashboards.Production }
             };
 
-            foreach(string dashboard in dashboards)
+            foreach(var kvp in dashboards)
             {
-                HttpContent content = new StringContent(dashboard);
+                HttpContent content = new StringContent(kvp.Value);
                 content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
 
                 try
                 {
                     await client.PostAsync("http://localhost:3000/api/dashboards/db ", content);
+                    AppLogStgream.Instance.WriteLine("Created Grafana dashboard: {0}", kvp.Key);
                 }
                 catch (HttpRequestException ex)
                 {
-                    Console.WriteLine("Failed creating Grafana dashboard: {0}", ex.Message);
+                    AppLogStgream.Instance.WriteLine("Failed creating Grafana dashboard {0}: {1}", kvp.Key, ex.Message);
                 }
             }
         }

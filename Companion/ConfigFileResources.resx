@@ -120,7 +120,7 @@
   <data name="GranaConfiguration" xml:space="preserve">
     <value>[auth.anonymous]
 enabled = true
-org_name = Ficsit
+org_name = "Main Org."
 
 [security]
 admin_user=ficsit

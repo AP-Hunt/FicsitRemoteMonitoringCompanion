@@ -12,6 +12,7 @@
                 <DockPanel LastChildFill="True">
                     <TextBox Name="tbExporter" IsReadOnly="True" 
                         ScrollViewer.HorizontalScrollBarVisibility="Auto" 
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
                         ScrollViewer.CanContentScroll="True"></TextBox>
                 </DockPanel>
             </TabItem>
@@ -20,6 +21,7 @@
                 <DockPanel LastChildFill="True">
                     <TextBox Name="tbPrometheus" IsReadOnly="True" 
                         ScrollViewer.HorizontalScrollBarVisibility="Auto" 
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
                         ScrollViewer.CanContentScroll="True"></TextBox>
                 </DockPanel>
             </TabItem>
@@ -28,6 +30,16 @@
                 <DockPanel LastChildFill="True">
                     <TextBox Name="tbGrafana" IsReadOnly="True" 
                         ScrollViewer.HorizontalScrollBarVisibility="Auto" 
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                        ScrollViewer.CanContentScroll="True"></TextBox>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Companion">
+                <DockPanel LastChildFill="True">
+                    <TextBox Name="tbCompanion" IsReadOnly="True" 
+                        ScrollViewer.HorizontalScrollBarVisibility="Auto" 
+                        ScrollViewer.VerticalScrollBarVisibility="Auto"
                         ScrollViewer.CanContentScroll="True"></TextBox>
                 </DockPanel>
             </TabItem>

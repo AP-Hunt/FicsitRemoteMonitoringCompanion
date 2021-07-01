@@ -9,9 +9,9 @@ namespace Companion
     static class PrometheusHost
     {
         static Process _prometheusProcess;
-        static LogStream _logStream;
+        static ProcessLogStream _logStream;
 
-        internal static LogStream LogStream
+        internal static ILogStream LogStream
         {
             get
             {
@@ -39,7 +39,7 @@ namespace Companion
                     Arguments = $"--config.file=\"{prometheusConfigPath}\""
                 };
                 _prometheusProcess = Process.Start(promProcessStartInfo);
-                _logStream = new LogStream(_prometheusProcess);
+                _logStream = new ProcessLogStream(_prometheusProcess);
 
                 _prometheusProcess.BeginOutputReadLine();
             }

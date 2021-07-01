@@ -9,9 +9,9 @@ namespace Companion
     static class PrometheusExporterHost
     {
         static Process _prometheusExporterProcess;
-        static LogStream _logStream;
+        static ProcessLogStream _logStream;
 
-        internal static LogStream LogStream
+        internal static ILogStream LogStream
         {
             get
             {
@@ -36,7 +36,7 @@ namespace Companion
                     RedirectStandardOutput = true,
                 };
                 _prometheusExporterProcess = Process.Start(promExporterProcessStartInfo);
-                _logStream = new LogStream(_prometheusExporterProcess);
+                _logStream = new ProcessLogStream(_prometheusExporterProcess);
 
                 _prometheusExporterProcess.BeginOutputReadLine();
             }

@@ -21,6 +21,7 @@ namespace Companion
         BackgroundWorker exporterWorker;
         BackgroundWorker prometheusWorker;
         BackgroundWorker grafanaWorker;
+        BackgroundWorker companionWorker;
 
         public LogLines()
         {
@@ -49,6 +50,13 @@ namespace Companion
             };
             grafanaWorker.DoWork += GrafanaWorker_Work;
             grafanaWorker.RunWorkerAsync();
+
+            companionWorker = new BackgroundWorker
+            {
+                WorkerSupportsCancellation = true
+            };
+            companionWorker.DoWork += CompanionWorker_Work;
+            companionWorker.RunWorkerAsync();
         }
 
         private void ExporterWorker_Work(object sender, DoWorkEventArgs e)
@@ -123,6 +131,32 @@ namespace Companion
                 }
 
                 GrafanaHost.LogStream.OnLogLine -= handler;
+            }
+        }
+
+        private void CompanionWorker_Work(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker bg = sender as BackgroundWorker;
+            if (!bg.CancellationPending)
+            {
+                string fullContent = AppLogStgream.Instance.FullLogOutput;
+
+                this.tbCompanion.Dispatcher.Invoke(() => { this.tbCompanion.AppendText(fullContent); });
+
+                LogLineArrived handler = CreateOnLogLineArrivedHandler(this.tbCompanion);
+                AppLogStgream.Instance.OnLogLine += handler;
+
+                while (true)
+                {
+                    if (bg.CancellationPending)
+                    {
+                        break;
+                    }
+
+                    System.Threading.Thread.Sleep(2000);
+                }
+
+                AppLogStgream.Instance.OnLogLine -= handler;
             }
         }
         private LogLineArrived CreateOnLogLineArrivedHandler(TextBox target)

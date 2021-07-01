@@ -1,4 +1,5 @@
-﻿using Microsoft.Web.WebView2.Wpf;
+﻿using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace Companion
     public partial class MainWindow : Window
     {
         TextBlock loadingLabel;
+        bool firstLoad;
         public MainWindow()
         {
             InitializeComponent();
@@ -35,18 +37,44 @@ namespace Companion
                 VerticalAlignment = VerticalAlignment.Center
             };
             this.MainPanel.Children.Add(loadingLabel);
+
+            firstLoad = true;
         }
 
-        public void ShowGrafana()
+        public async void ShowGrafana()
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            try
             {
-                this.MainPanel.Children.Remove(loadingLabel);
-                this.MainPanel.Children.Add(new WebView2()
-                {
-                    Source = new Uri("http://localhost:3000")
+                AppLogStgream.Instance.WriteLine("initialising web view");
+                var webViewEnv = await CoreWebView2Environment.CreateAsync();
+                await webView.EnsureCoreWebView2Async(webViewEnv);
+                webView.NavigationCompleted += WebView_NavigationCompleted;
+                webView.Source = new Uri("http://localhost:3000");
+            }
+            catch(Exception ex)
+            {
+                AppLogStgream.Instance.WriteLine("error initialising web view: {0}", ex.Message);
+            }
+        }
+
+        private void WebView_NavigationCompleted(object sender, CoreWebView2NavigationCompletedEventArgs e)
+        {
+            if(firstLoad && !e.IsSuccess)
+            {
+                AppLogStgream.Instance.WriteLine("Naviating to Grafana failed with error '{0}'", e.WebErrorStatus.ToString());
+                loadingLabel.Text = "Something went wrong loading Grafana. Take a look at the diagnostics tab";
+                firstLoad = false;
+            }
+            else if(firstLoad)
+            {
+                AppLogStgream.Instance.WriteLine("grafana page has loaded, showing browser window");
+                Application.Current.Dispatcher.Invoke(() => {
+                    this.MainPanel.Children.Remove(loadingLabel);
+                    webView.Visibility = Visibility.Visible;
+                    AppLogStgream.Instance.WriteLine("browser window was shown");
                 });
-            });
+                firstLoad = false;
+            }
         }
 
         private async void Window_ContentRendered(object sender, EventArgs e)
