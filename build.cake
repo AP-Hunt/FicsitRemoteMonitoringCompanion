@@ -1,6 +1,8 @@
 #addin nuget:?package=semver&version=2.0.4
+#addin nuget:?package=Cake.Git&version=1.0.1
 
 using Semver; 
+using Cake.Core.IO;
 
 var target = Argument("target", "Test");
 var configuration = Argument("configuration", "Release");
@@ -141,16 +143,41 @@ Task("ExternalsDir")
     System.IO.Directory.CreateDirectory("./Externals/");
 });
 
-Task("BumpMinorVersion")
+var bumpMinor = HasArgument("bump-minor") ? Argument<bool>("bump-minor", true) : true;
+var newMajorVersion = HasArgument("new-major-version") ? Argument<bool>("new-major-version", true) : false;
+Task("CutRelease")
     .Does(() => 
 {
     string version = System.IO.File.ReadAllText("version.txt");
     var semVersion = SemVersion.Parse(version, false);
+    SemVersion nextVer = null;
 
-    var nextVer = semVersion.Change(semVersion.Major, semVersion.Minor + 1, semVersion.Patch);
+    if(newMajorVersion)
+    {
+        nextVer = semVersion.Change(semVersion.Major + 1, 0, 0);
+        Console.WriteLine("New version is " + nextVer.ToString());
+    }
+    else if(bumpMinor) 
+    {
+        nextVer = semVersion.Change(semVersion.Major, semVersion.Minor + 1, semVersion.Patch);
+        Console.WriteLine("New version is " + nextVer.ToString());
+    }
+    else 
+    {
+        Console.Error.WriteLine("Must bump either major or minor version");
+        return;
+    }
 
     System.IO.File.WriteAllText("version.txt", nextVer.ToString());
-});
+    GitAdd(".", new FilePath[] { "./version.txt" });
+    var taggedCommit = GitCommit(".", "Andy Hunt", "github@andyhunt.me", "Bump version to " + nextVer.ToString());
+    GitTag(".", nextVer.ToString());
+
+    Console.WriteLine("Version bumped in commit " + taggedCommit.Sha.Substring(0, 12) + "");
+    Console.WriteLine("Run the following to push the new version");
+    Console.WriteLine("\tgit push origin main");
+    Console.WriteLine("\tgit push origin " + nextVer.ToString());
+}); 
 
 Task("Git-Chglog")
     .IsDependentOn("ExternalsDir")

@@ -7,18 +7,9 @@
 # when a tagged commit gets pushed.
 on:
     push:
-        branches:
-            - main
-        tags-ignore:
-            - "*"
-        paths:
-            - "Companion/**"
-            - "PrometheusExporter/**"
-            - "cake.config"
-            - "build.cake"
-            - "*.sln"
-            - ".github/workflows/release.yml"
-            - "InstallationInstructions.md"
+        tags:
+            # Tags that look like a semantic version
+            - "[0-9]+.[0-9]+.[0-9]+"
 
 name: Release new version
 jobs:
@@ -39,27 +30,13 @@ jobs:
                 dotnet restore
                 dotnet tool restore
 
-            - name: Increment minor version
+            - name: Set version
               run: |
-                echo "Current version: $(cat version.txt)"
-                dotnet cake .\build.cake --target BumpMinorVersion
-                echo "New version: $(cat version.txt)"
                 echo "NEW_VERSION=$(cat version.txt)" >> $env:GITHUB_ENV 
 
             - name: Compile release
               run: |
                 dotnet cake build.cake --target Publish --configuration Release
-
-            - name: Tag, commit, push
-              uses: EndBug/add-and-commit@v7
-              env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              with:
-                add: version.txt
-                author_name: "GitHub Actions on behalf of Andy Hunt"
-                author_email: "github@andyhunt.me"
-                message: "Bump version to ${{ env.NEW_VERSION }}"
-                tag: "${{ env.NEW_VERSION }} --force"
 
             - name: Generate release notes
               run: |
