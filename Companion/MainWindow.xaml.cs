@@ -49,7 +49,7 @@ namespace Companion
                 var webViewEnv = await CoreWebView2Environment.CreateAsync();
                 await webView.EnsureCoreWebView2Async(webViewEnv);
                 webView.NavigationCompleted += WebView_NavigationCompleted;
-                webView.Source = new Uri("http://localhost:3000");
+                webView.Source = new Uri("http://localhost:3000/d/production/production?orgId=1&refresh=10s");
             }
             catch(Exception ex)
             {
