@@ -1,3 +1,8 @@
+import { FactoryBuilding } from './api-types';
+import { fetchFactory } from './frm-api'
+import { BuildingMarker } from './marker';
+import { MarkerSet } from './set';
+
 class XPopup extends HTMLElement {
     constructor(slotText: string) {
         super();
@@ -20,6 +25,28 @@ class XPopup extends HTMLElement {
 
 customElements.define('x-popup', XPopup);
 
+const markerGroup : L.FeatureGroup = new L.FeatureGroup();
+
+function gameToWorldCoords(coords : L.LatLng) : L.LatLngExpression{
+    return [-coords.lat, coords.lng]
+}
+
+
+function plotMarkers(map : L.Map, markers : MarkerSet<BuildingMarker>) {
+    markerGroup.clearLayers();
+
+    for(let m of markers) {
+        markerGroup.addLayer(
+            new L.Marker(
+                gameToWorldCoords(m.coordinates())
+            )
+        );
+    }
+
+    if(!map.hasLayer(markerGroup)){
+        markerGroup.addTo(map);
+    }
+}
 
 function init()
 {
@@ -42,16 +69,22 @@ function init()
     map.fitBounds(bounds);
     map.setView(map.getCenter(), -10);
 
-    function gameToWorldCoords(coords : L.LatLng) : L.LatLngExpression{
-        return [-coords.lat, coords.lng]
-    }
-
     let imgOverlayLayer = new L.ImageOverlay("map-16k.png", bounds);
     imgOverlayLayer.addTo(map);
 
     let popup = new XPopup("I've changed");
     new L.Marker([-1000, 1000], { "title": "Random"}).bindPopup(popup).on("popupopen", popup.loadContent).addTo(map);
 
-    console.log("fuck");
+    setInterval(function(){
+        fetchFactory()
+        .then((factory : FactoryBuilding[]) => {
+            let markers = 
+            factory.map(b => new BuildingMarker(b));
+            let set = MarkerSet.fromArray(markers);
+
+            plotMarkers(map, set);
+        });
+
+    }, 10000)
 }
 init();

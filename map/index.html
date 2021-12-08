@@ -7,6 +7,9 @@
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+    
+    
+    <script src="https://requirejs.org/docs/release/2.3.6/comments/require.js"></script>
 
     <style type="text/css">
         * {
@@ -33,6 +36,10 @@
             <p><slot name="some-text">Default </slot></p>
         </div>
     </template>
+    <!-- <script type="text/javascript" src="js/map.js"></script> -->
     <script type="text/javascript" src="js/map.js"></script>
+    <script>
+        require(["index"]);
+    </script>
 </body>
 </html>
