@@ -3,7 +3,7 @@ import 'leaflet';
 declare module 'leaflet' {
     type RealtimeSource = string | FetchOptions | function
 
-    interface RealtimeOptions extends L.GeoJSON {
+    interface RealtimeOptions extends L.GeoJSONOptions {
         start: boolean;
         interval: number;
         getFeatureId: (featureData: L.GeoJSON) => TFeatureId;

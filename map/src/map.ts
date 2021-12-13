@@ -1,5 +1,7 @@
 import { map } from "leaflet";
 import { gameToWorldCoords } from "./coordinates";
+import { BuildingFeature } from "./feature-types";
+import { MarkerPopupElement } from "./marker-popup";
 
 export class GameMap {
     private _domTarget : HTMLElement
@@ -45,8 +47,15 @@ export class GameMap {
                 },
 
                 updateFeature(feature: GeoJSON.Feature, marker: L.Marker) {
+                    
+                    // If the given (old) layer is null, return null
+                    // so that leaflet-realtime will make an appropriate layer
+                    // for us, which we can customie
+                    // https://github.com/perliedman/leaflet-realtime/blob/88d364da9dde8aa0c8c01c5b46bc0673832c8965/src/L.Realtime.js#L202
+                    if(!marker){return}
+
                     let addToMap = marker === undefined;
-                    let m = marker || new L.Marker([0,0]);
+                    let m = marker || new L.Marker([0, 0]);
 
                     let geom = feature.geometry as GeoJSON.Point
                     
@@ -56,14 +65,16 @@ export class GameMap {
                             geom.coordinates[0], 
                             geom.coordinates[2]
                         ))
-                    )
-                    m.setTooltipContent(feature.properties!.building);
+                    );
 
                     if(addToMap) {
                         m.addTo(self._map);
                     }
-
                     return m;
+                },
+
+                onEachFeature(feature: BuildingFeature, marker: L.Marker) {
+                    marker.bindPopup(new MarkerPopupElement(`I am a ${feature.properties.building} producing ${feature.properties.Recipe}`));
                 }
             }
         );
