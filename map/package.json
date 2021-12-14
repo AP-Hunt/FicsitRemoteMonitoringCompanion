@@ -14,8 +14,10 @@
   "license": "MIT",
   "devDependencies": {
     "@types/geojson": "^7946.0.8",
+    "@types/knockout": "^3.4.71",
     "@types/leaflet": "^1.7.6",
     "http-server": "^14.0.0",
+    "knockout": "^3.5.1",
     "typescript": "^4.5.2"
   }
 }

@@ -1,7 +1,7 @@
-import { map } from "leaflet";
+import { map, popup } from "leaflet";
 import { gameToWorldCoords } from "./coordinates";
 import { BuildingFeature } from "./feature-types";
-import { MarkerPopupElement } from "./marker-popup";
+import { MarkerPopup } from "./marker-popup";
 
 export class GameMap {
     private _domTarget : HTMLElement
@@ -74,7 +74,8 @@ export class GameMap {
                 },
 
                 onEachFeature(feature: BuildingFeature, marker: L.Marker) {
-                    marker.bindPopup(new MarkerPopupElement(`I am a ${feature.properties.building} producing ${feature.properties.Recipe}`));
+                    let popup = new MarkerPopup(feature);
+                    marker.bindPopup(popup);
                 }
             }
         );
