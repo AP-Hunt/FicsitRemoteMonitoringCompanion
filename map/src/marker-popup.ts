@@ -7,12 +7,20 @@ class MarkerPopupViewModel {
 
     public buildingType: KnockoutObservable<string>;
     public recipe: KnockoutObservable<string>;
+    public recipeOutputs: KnockoutReadonlyComputed<string[]>;
 
     constructor(feature: BuildingFeature) {
         this._feature = feature;
 
         this.buildingType = ko.observable(feature.properties.building);
         this.recipe = ko.observable(feature.properties.Recipe);
+        this.recipeOutputs = ko.computed(this._formatRecipeOutputs.bind(this));
+    }
+
+    private _formatRecipeOutputs(): string[] {
+        return this._feature.properties.production.map(p => {
+            return `${p.Name} (${p.CurrentProd}/min, ${p.ProdPercent}% efficiency)`;
+        })
     }
 }
 
@@ -29,7 +37,6 @@ export class MarkerPopupElement extends HTMLElement {
 
         this._shadowRoot = this.attachShadow({mode: 'open'});      
         this._shadowRoot.appendChild(template.cloneNode(true));
-
         
     }
 
@@ -45,7 +52,9 @@ export class MarkerPopupElement extends HTMLElement {
 export class MarkerPopup extends L.Popup {
     private _element: MarkerPopupElement;
 
-    constructor(feature: BuildingFeature, options?: L.PopupOptions, source?: L.Layer){
+    constructor(feature: BuildingFeature, options?: L.PopupOptions, source?: L.Layer){ 
+        options = options || {};
+        (options as any)["minWidth"] = "fit-content";
         super(options, source);
 
         this._element = new MarkerPopupElement(feature);
