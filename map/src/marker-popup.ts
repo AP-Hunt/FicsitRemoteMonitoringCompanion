@@ -1,9 +1,10 @@
-import { LatLngExpression, Map } from "leaflet";
 import { BuildingFeature } from "./feature-types";
-import MarkerTemplate from "./marker-template";
+import MarkerTemplate from "./marker-template";; 
+import { Map } from "leaflet";
 
 class MarkerPopupViewModel {
     private _feature: BuildingFeature;
+    private _chart!: Chart;
 
     public buildingType: KnockoutObservable<string>;
     public recipe: KnockoutObservable<string>;
@@ -15,6 +16,33 @@ class MarkerPopupViewModel {
         this.buildingType = ko.observable(feature.properties.building);
         this.recipe = ko.observable(feature.properties.Recipe);
         this.recipeOutputs = ko.computed(this._formatRecipeOutputs.bind(this));
+    }
+
+    init(root: ShadowRoot){
+        ko.applyBindings(this, root.querySelector("[data-root=true]"));
+
+        const canvas = (root.getElementById("chart") as HTMLCanvasElement).getContext("2d");
+        this._chart = new Chart(canvas as CanvasRenderingContext2D, {
+            type: "line",
+            data: {
+                labels: timestamps(-60 * 1000, 6),
+                datasets: [
+                    {
+                        label: this.recipe(),
+                        data: [100, 120, 80, 75, 75, 99],
+                        fill: false,
+                        borderColor: "#000000"
+                    }
+                ]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        text: this.recipeOutputs()[0]
+                    }
+                }
+            }
+        });
     }
 
     private _formatRecipeOutputs(): string[] {
@@ -41,7 +69,7 @@ export class MarkerPopupElement extends HTMLElement {
     }
 
     init(){
-        ko.applyBindings(this._vm, this._shadowRoot.querySelector("[data-root=true]"));
+        this._vm.init(this._shadowRoot);
     }
 
     loadContent(){
@@ -70,3 +98,17 @@ export class MarkerPopup extends L.Popup {
 }
 
 customElements.define('x-marker-popup', MarkerPopupElement);
+
+function timestamps(interval: number, count: number): string[] {
+    let now = new Date();
+    let current = now;
+    let i = count;
+    let out: string[] = [];
+    while(i > 0) {
+        out.push(`${current.getHours()}:${current.getMinutes()}`);
+        current = new Date(current.valueOf() + interval);
+        i--;
+    }
+
+    return out;
+}
