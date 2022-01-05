@@ -143,8 +143,13 @@ Task("ExternalsDir")
     System.IO.Directory.CreateDirectory("./Externals/");
 });
 
-var bumpMinor = HasArgument("bump-minor") ? Argument<bool>("bump-minor", true) : true;
-var newMajorVersion = HasArgument("new-major-version") ? Argument<bool>("new-major-version", true) : false;
+enum VersionBumpComponent {
+    MAJOR,
+    MINOR,
+    PATCH
+}
+
+var bumpTarget = Argument<string>("bump", "minor");
 Task("CutRelease")
     .Does(() => 
 {
@@ -152,31 +157,43 @@ Task("CutRelease")
     var semVersion = SemVersion.Parse(version, false);
     SemVersion nextVer = null;
 
-    if(newMajorVersion)
+    try 
     {
-        nextVer = semVersion.Change(semVersion.Major + 1, 0, 0);
-        Console.WriteLine("New version is " + nextVer.ToString());
-    }
-    else if(bumpMinor) 
-    {
-        nextVer = semVersion.Change(semVersion.Major, semVersion.Minor + 1, semVersion.Patch);
-        Console.WriteLine("New version is " + nextVer.ToString());
-    }
-    else 
-    {
-        Console.Error.WriteLine("Must bump either major or minor version");
-        return;
-    }
+        VersionBumpComponent component = (VersionBumpComponent)Enum.Parse(typeof(VersionBumpComponent), bumpTarget.ToUpper());
 
-    System.IO.File.WriteAllText("version.txt", nextVer.ToString());
-    GitAdd(".", new FilePath[] { "./version.txt" });
-    var taggedCommit = GitCommit(".", "Andy Hunt", "github@andyhunt.me", "Bump version to " + nextVer.ToString());
-    GitTag(".", nextVer.ToString());
 
-    Console.WriteLine("Version bumped in commit " + taggedCommit.Sha.Substring(0, 12) + "");
-    Console.WriteLine("Run the following to push the new version");
-    Console.WriteLine("\tgit push origin main");
-    Console.WriteLine("\tgit push origin " + nextVer.ToString());
+        switch(component)
+        {
+            case VersionBumpComponent.MAJOR: 
+                nextVer = semVersion.Change(semVersion.Major + 1, 0, 0);
+                Console.WriteLine("New version is " + nextVer.ToString());
+                break;
+
+            case VersionBumpComponent.MINOR:
+                nextVer = semVersion.Change(semVersion.Major, semVersion.Minor + 1, 0);
+                Console.WriteLine("New version is " + nextVer.ToString());
+                break;
+
+            case VersionBumpComponent.PATCH:
+                nextVer = semVersion.Change(semVersion.Major, semVersion.Minor, semVersion.Patch + 1);
+                Console.WriteLine("New version is " + nextVer.ToString());
+                break;
+        }
+
+        System.IO.File.WriteAllText("version.txt", nextVer.ToString());
+        GitAdd(".", new FilePath[] { "./version.txt" });
+        var taggedCommit = GitCommit(".", "Andy Hunt", "github@andyhunt.me", "Bump version to " + nextVer.ToString());
+        GitTag(".", nextVer.ToString());
+
+        Console.WriteLine("Version bumped in commit " + taggedCommit.Sha.Substring(0, 12) + "");
+        Console.WriteLine("Run the following to push the new version");
+        Console.WriteLine("\tgit push origin main");
+        Console.WriteLine("\tgit push origin " + nextVer.ToString());
+    }
+    catch(ArgumentException)
+    {
+        Console.WriteLine("bump argument must be one of: major, minor, patch");
+    }
 }); 
 
 Task("Git-Chglog")

@@ -9,13 +9,13 @@ namespace Companion.Config
 {
     static class ConfigIO
     {
-        public static async Task<ConfigFile> ReadCompanionConfigFile(string path)
+        public static ConfigFile ReadCompanionConfigFile(string path)
         {
             if(!File.Exists(path)){
                 return new ConfigFile();
             }
 
-            string fileText = await File.ReadAllTextAsync(path);
+            string fileText = File.ReadAllText(path);
             return JsonSerializer.Deserialize<ConfigFile>(fileText);
         }
 

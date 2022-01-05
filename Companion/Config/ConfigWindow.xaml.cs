@@ -24,9 +24,7 @@ namespace Companion.Config
         {
             InitializeComponent();
 
-            Task<ConfigFile> t = ConfigIO.ReadCompanionConfigFile(Paths.ConfigFile);
-            t.Wait();
-            this.Config = t.Result;
+            this.Config = ConfigIO.ReadCompanionConfigFile(Paths.ConfigFile);
             this.txtSatisfactoryGameDir.Text = this.Config.SatisfactoryGameDirectory;
         }
 
@@ -48,7 +46,7 @@ namespace Companion.Config
 
         private async void btnOK_Click(object sender, RoutedEventArgs e)
         {
-            ConfigFile cfg = await ConfigIO.ReadCompanionConfigFile(Paths.ConfigFile);
+            ConfigFile cfg = ConfigIO.ReadCompanionConfigFile(Paths.ConfigFile);
             cfg.SatisfactoryGameDirectory = this.txtSatisfactoryGameDir.Text;
 
             if(!cfg.IsValidGamePath())
