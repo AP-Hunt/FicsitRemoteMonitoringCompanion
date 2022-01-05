@@ -8,8 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "tsc -p tsconfig.json",
     "watch": "tsc -p tsconfig.json --watch",
-    "serve": "http-server --cors -a localhost",
-    "proxy-data": "powershell ./Proxy-FactoryData.ps1"
+    "serve": "http-server --cors -a localhost"
   },
   "license": "MIT",
   "devDependencies": {

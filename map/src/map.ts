@@ -3,6 +3,44 @@ import { gameToWorldCoords } from "./coordinates";
 import { BuildingFeature } from "./feature-types";
 import { MarkerPopup } from "./marker-popup";
 
+function requestAsGeJSON(url: string) {
+    return function(success: (featuers: any) => void, error: (error: object, message: string) => void) {
+        return fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                let geo: GeoJSON.FeatureCollection = {
+                    type: "FeatureCollection",
+                    features: [] as Array<GeoJSON.Feature>
+                };
+
+                data.forEach((building: any) => {
+                    let feature = {
+                        type: "Feature",
+                        geometry: {
+                            type: "Point",
+                            coordinates: [
+                                building.location.x,
+                                building.location.y,
+                                building.location.z
+                            ]
+                        }
+                    } as GeoJSON.Feature;
+
+                    delete building.location;
+                    feature.properties = building;
+
+                    geo.features.push(feature)
+                })
+
+                return geo;
+            })
+            .then(success)
+            .catch((reason) => {
+                error({}, reason);
+            });
+        }
+}
+
 export class GameMap {
     private _domTarget : HTMLElement
     private _map! : L.Map
@@ -39,7 +77,7 @@ export class GameMap {
     plotBuildings(url : string) {
         const self = this;
         this._realtime = new L.Realtime<L.LatLng>(
-            url,
+            requestAsGeJSON(url),
             {
                 interval: 3000,
                 getFeatureId(feature : GeoJSON.Feature) {
