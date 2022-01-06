@@ -54,10 +54,12 @@ namespace PrometheusExporter
 
                 PowerMetricsCollector powerCollector = new PowerMetricsCollector(satisfactoryUri);
                 ProductionMetricsCollector productionCollector = new ProductionMetricsCollector(satisfactoryUri);
+                FactoryBuildingMetricsCollector factoryCollector = new FactoryBuildingMetricsCollector(satisfactoryUri);
 
                 Task.WaitAll(
                     powerCollector.BeginCollecting(token),
-                    productionCollector.BeginCollecting(token)
+                    productionCollector.BeginCollecting(token),
+                    factoryCollector.BeginCollecting(token)
                 );
                 Console.WriteLine("Exiting");
             }
