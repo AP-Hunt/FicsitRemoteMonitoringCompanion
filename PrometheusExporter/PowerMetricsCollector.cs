@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -27,6 +28,7 @@ namespace PrometheusExporter
     class PowerMetricsCollector : IMetricCollector
     {
         private readonly Uri frmAddress;
+        private readonly HttpClient httpClient;
 
         public static IEnumerable<Prometheus.Collector> ExposedMetrics
         {
@@ -50,6 +52,7 @@ namespace PrometheusExporter
         public PowerMetricsCollector(Uri frmAddress)
         {
             this.frmAddress = frmAddress;
+            this.httpClient = new HttpClient();
         }
 
         public Task BeginCollecting(CancellationToken token)
@@ -66,7 +69,7 @@ namespace PrometheusExporter
                         await Task.Delay(5 * 1000, token);
                         if (!token.IsCancellationRequested)
                         {
-                            ReadPowerMetrics(powerUrl);
+                            await ReadPowerMetrics(powerUrl);
                         }
                     }
                 }
@@ -76,17 +79,11 @@ namespace PrometheusExporter
             }, token);
         }
 
-        private void ReadPowerMetrics(string powerUrl)
+        private async Task ReadPowerMetrics(string powerUrl)
         {
             try
             {
-                WebRequest req = WebRequest.Create(powerUrl);
-                WebResponse resp = req.GetResponse();
-                Stream responseStream = resp.GetResponseStream();
-                StreamReader rdr = new StreamReader(responseStream);
-                string responseJson = rdr.ReadToEnd();
-                resp.Close();
-
+                string responseJson = await this.httpClient.GetStringAsync(powerUrl);
                 var options = new System.Text.Json.JsonSerializerOptions
                 {
                     AllowTrailingCommas = true,

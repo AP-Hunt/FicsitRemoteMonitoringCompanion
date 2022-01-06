@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace PrometheusExporter
     class ProductionMetricsCollector : IMetricCollector
     {
         private readonly Uri frmAddress;
+        private readonly HttpClient httpClient;
 
         public static IEnumerable<Prometheus.Collector> ExposedMetrics
         {
@@ -31,6 +33,7 @@ namespace PrometheusExporter
         public ProductionMetricsCollector(Uri frmAddress)
         {
             this.frmAddress = frmAddress;
+            this.httpClient = new HttpClient();
         }
 
         public Task BeginCollecting(CancellationToken token)
@@ -46,7 +49,7 @@ namespace PrometheusExporter
                         await Task.Delay(5 * 1000, token);
                         if (!token.IsCancellationRequested)
                         {
-                            ReadProductionMetrics(productionUrl);
+                            await ReadProductionMetrics(productionUrl);
                         }
                     }
                 }
@@ -56,16 +59,11 @@ namespace PrometheusExporter
             }, token);
         }
 
-        private void ReadProductionMetrics(string productionUrl)
+        private async Task ReadProductionMetrics(string productionUrl)
         {
             try
             {
-                WebRequest req = WebRequest.Create(productionUrl);
-                WebResponse resp = req.GetResponse();
-                Stream responseStream = resp.GetResponseStream();
-                StreamReader rdr = new StreamReader(responseStream);
-                string responseJson = rdr.ReadToEnd();
-                resp.Close();
+                string responseJson = await this.httpClient.GetStringAsync(productionUrl);
 
                 List<ProductionDetail> productionDetails = Parsers.ProductionDetailsParser.ParseJSON(responseJson);
 
