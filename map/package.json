@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "tsc -p tsconfig.json",
     "watch": "tsc -p tsconfig.json --watch",
-    "serve": "http-server --cors -a localhost"
+    "serve": "http-server --cors -a localhost",
+    "stub:frm": "node ./stubs/frm/index.js"
   },
   "license": "MIT",
   "devDependencies": {
