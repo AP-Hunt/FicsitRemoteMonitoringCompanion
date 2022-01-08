@@ -7,6 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "tsc -p tsconfig.json",
+    "dev": "concurrently --kill-others npm:watch npm:serve",
     "watch": "tsc -p tsconfig.json --watch",
     "serve": "http-server --cors -a localhost",
     "stubs": "concurrently --kill-others npm:stub:frm npm:stub:prometheus:exporter npm:stub:prometheus:container",
