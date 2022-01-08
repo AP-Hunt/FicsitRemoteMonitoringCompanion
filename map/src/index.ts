@@ -14,9 +14,9 @@ function init()
     });
 
     prom.rangeQuery(
-        'machine_items_produced_per_min{item_name="Iron Ingot"} > 20',
-        new Date("2022-01-06T19:40:00Z"),
-        new Date("2022-01-06T19:44:00Z"),
+        'machine_items_produced_per_min{item_name="Iron Ingot"}',
+        new Date().valueOf() - (5*60*1000),
+        new Date(),
         60,
     ).then((res : any) => {
         const series = res.result;
