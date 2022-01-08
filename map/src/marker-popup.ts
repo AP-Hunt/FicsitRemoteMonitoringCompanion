@@ -1,40 +1,46 @@
 import { BuildingFeature } from "./feature-types";
 import MarkerTemplate from "./marker-template";; 
-import { Map } from "leaflet";
+import { LatLngExpression, Map } from "leaflet";
 
 class MarkerPopupViewModel {
     private _feature: BuildingFeature;
     private _chart!: Chart;
+    private _prom: any; // The prometheus-query library's typescript definitions appear not to be usable (or I'm doing something wrong)
+    private _isInited: boolean;
+    private _chartUpdaterInterval!: number|null;
+
 
     public buildingType: KnockoutObservable<string>;
     public recipe: KnockoutObservable<string>;
     public recipeOutputs: KnockoutReadonlyComputed<string[]>;
+    public isOpen: boolean;
 
     constructor(feature: BuildingFeature) {
         this._feature = feature;
+        this._isInited = false;
 
         this.buildingType = ko.observable(feature.properties.building);
         this.recipe = ko.observable(feature.properties.Recipe);
         this.recipeOutputs = ko.computed(this._formatRecipeOutputs.bind(this));
+        this.isOpen = false;
+
+        // @ts-ignore TS2304
+        this._prom = new Prometheus.PrometheusDriver({
+            endpoint: "http://localhost:9090",
+            baseURL: "/api/v1"
+        });
     }
 
     init(root: ShadowRoot){
+        if(this._isInited) {
+            return;
+        }
+
         ko.applyBindings(this, root.querySelector("[data-root=true]"));
 
         const canvas = (root.getElementById("chart") as HTMLCanvasElement).getContext("2d");
         this._chart = new Chart(canvas as CanvasRenderingContext2D, {
             type: "line",
-            data: {
-                labels: timestamps(-60 * 1000, 6),
-                datasets: [
-                    {
-                        label: this.recipe(),
-                        data: [100, 120, 80, 75, 75, 99],
-                        fill: false,
-                        borderColor: "#000000"
-                    }
-                ]
-            },
             options: {
                 plugins: {
                     title: {
@@ -42,6 +48,62 @@ class MarkerPopupViewModel {
                     }
                 }
             }
+        });
+
+        this._isInited = true;
+    }
+
+    onShow(shadowRoot: ShadowRoot) {
+        this.init(shadowRoot);
+        this.isOpen = true;
+
+        this._updateChart();
+        this._chartUpdaterInterval = setInterval(() => {
+            this._updateChart();
+        }, 10*1000);
+    }
+
+
+    onHide(shadowRoot: ShadowRoot) {
+        this.isOpen = false;
+
+        if(this._chartUpdaterInterval != null) {
+            clearInterval(this._chartUpdaterInterval);
+            this._chartUpdaterInterval = null;
+        }
+    }
+
+    private _updateChart(){
+        let labels = [
+            `machine_name="${this._feature.properties.building}"`, 
+            `item_name="${this._feature.properties.production[0].Name}"`,
+            `x="${this._feature.geometry.coordinates[0]}"`,
+            `y="${this._feature.geometry.coordinates[1]}"`,
+            `z="${this._feature.geometry.coordinates[2]}"`,
+        ]
+
+        this._prom.rangeQuery(
+            `machine_items_produced_per_min{${labels.join(",")}}`,
+            new Date().valueOf() - (5*60*1000),
+            new Date(),
+            60,
+        ).then((res : any) => {
+            const series = res.result;
+            let values = series[0].values.map((v:{time: Date, value: any}) => v.value);
+            let timestamps = series[0].values.map((v:{time: Date, value: any}) => `${v.time.getHours()}:${v.time.getMinutes()}`);
+
+            this._chart.data = {
+                labels: timestamps,
+                datasets: [
+                    {
+                        label: this.recipe(),
+                        data: values,
+                        fill: false,
+                        borderColor: "#000000"
+                    }
+                ]
+            }
+            this._chart.update();
         });
     }
 
@@ -68,8 +130,13 @@ export class MarkerPopupElement extends HTMLElement {
         
     }
 
-    init(){
+    onShow(){
         this._vm.init(this._shadowRoot);
+        this._vm.onShow(this._shadowRoot);
+    }
+
+    onHide() {
+        this._vm.onHide(this._shadowRoot);
     }
 
     loadContent(){
@@ -88,11 +155,29 @@ export class MarkerPopup extends L.Popup {
         this._element = new MarkerPopupElement(feature);
 
         this.setContent(this._element);
+
+        this.on('popupclose', (p) => {
+            console.log("popup closed");
+        });
+
+        this.on('popupopen', (p) => {
+            console.log("popup opened");
+        });
+
+        this.on('remove', (p) => {
+            console.log("popup removed");
+        })
     }
 
     public override onAdd(map: Map): this {
         super.onAdd(map);
-        this._element.init();
+        this._element.onShow();
+        return this;
+    }
+
+    public override onRemove(map: Map): this {
+        super.onRemove(map);
+        this._element.onHide();
         return this;
     }
 }

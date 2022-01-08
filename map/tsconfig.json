@@ -35,8 +35,7 @@
       "@types/leaflet", 
       "@types/geojson", 
       "@types/knockout",
-      "@types/chart.js",
-      "prometheus-query/dist"
+      "@types/chart.js"
     ], 
     "allowUmdGlobalAccess": true,                     /* Allow accessing UMD globals from modules. */
     // "resolveJsonModule": true,                        /* Enable importing .json files */

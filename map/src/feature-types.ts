@@ -12,6 +12,6 @@ export interface BuildingProperties {
     production: RecipeOutput[];
 }
 
-export interface BuildingFeature extends GeoJSON.Feature {
+export interface BuildingFeature extends GeoJSON.Feature<GeoJSON.Point> {
     properties: BuildingProperties
 }

@@ -22,7 +22,9 @@ const template = `
             <!-- /ko -->
         </dl>
 
-        <canvas id="chart" width="200" height="150"></canvas>
+        <canvas id="chart" width="200" height="150">
+            <p>Loading...</p>
+        </canvas>
     </div>
 </template>`;
 
