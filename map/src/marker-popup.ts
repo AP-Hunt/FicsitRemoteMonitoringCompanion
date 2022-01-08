@@ -1,6 +1,7 @@
 import { BuildingFeature } from "./feature-types";
 import MarkerTemplate from "./marker-template";; 
 import { LatLngExpression, Map } from "leaflet";
+import { ChartDataSets } from "chart.js";
 
 class MarkerPopupViewModel {
     private _feature: BuildingFeature;
@@ -89,19 +90,25 @@ class MarkerPopupViewModel {
             60,
         ).then((res : any) => {
             const series = res.result;
-            let values = series[0].values.map((v:{time: Date, value: any}) => v.value);
+            
             let timestamps = series[0].values.map((v:{time: Date, value: any}) => `${v.time.getHours()}:${v.time.getMinutes()}`);
+            let datasets : ChartDataSets[] = [];
+            
+            series.forEach((s : any) => {
+                let itemBeingProduced = s.metric.labels["item_name"];
+                let values = s.values.map((v:{time: Date, value: any}) => v.value);
+                
+                datasets.push({
+                    label: itemBeingProduced,
+                    data: values,
+                    fill: false,
+                    borderColor: "#000000"
+                })
+            })
 
             this._chart.data = {
                 labels: timestamps,
-                datasets: [
-                    {
-                        label: this.recipe(),
-                        data: values,
-                        fill: false,
-                        borderColor: "#000000"
-                    }
-                ]
+                datasets: datasets,
             }
             this._chart.update();
         });
