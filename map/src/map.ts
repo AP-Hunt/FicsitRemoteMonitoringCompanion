@@ -1,6 +1,6 @@
-import { map, popup } from "leaflet";
 import { gameToWorldCoords } from "./coordinates";
 import { BuildingFeature } from "./feature-types";
+import { AssemblerIcon, BlenderIcon, ConstructorIcon, FoundryIcon, ManufacturerIcon, PackagerIcon, RefineryIcon, SmelterIcon } from "./icons";
 import { MarkerPopup } from "./marker-popup";
 
 function requestAsGeJSON(url: string) {
@@ -119,6 +119,43 @@ export class GameMap {
                 onEachFeature(feature: BuildingFeature, marker: L.Marker) {
                     let popup = new MarkerPopup(feature);
                     marker.bindPopup(popup);
+
+                    var icon = new L.Icon.Default();
+                    switch(feature.properties.building) {
+                        case "Assembler":
+                            icon = new AssemblerIcon();
+                            break;
+
+                        case "Blender":
+                            icon = new BlenderIcon();
+                            break;
+
+                        case "Constructor":
+                            icon = new ConstructorIcon();
+                            break;
+
+                        case "Foundry":
+                            icon = new FoundryIcon();
+                            break;
+
+                        case "Manufacturer":
+                            icon = new ManufacturerIcon();
+                            break;
+
+                        case "Packager":
+                            icon = new PackagerIcon();
+                            break;
+
+                        case "Refinery":
+                            icon = new RefineryIcon();
+                            break;
+
+                        case "Smelter":
+                            icon = new SmelterIcon();
+                            break;
+
+                    }
+                    marker.setIcon(icon);
                 }
             }
         );
