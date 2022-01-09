@@ -105,7 +105,9 @@ class MarkerPopupViewModel {
         ).then((res : any) => {
             const series = res.result;
             
-            let timestamps = series[0].values.map((v:{time: Date, value: any}) => `${v.time.getHours()}:${v.time.getMinutes()}`);
+            let timestamps = series[0].values.map((v:{time: Date, value: any}) => 
+                `${v.time.getHours()}:${v.time.getMinutes().toString().padStart(2, "0")}`
+            );
             let datasets : ChartDataSets[] = [];
             
             series.forEach((s : any) => {
@@ -190,17 +192,3 @@ export class MarkerPopup extends L.Popup {
 }
 
 customElements.define('x-marker-popup', MarkerPopupElement);
-
-function timestamps(interval: number, count: number): string[] {
-    let now = new Date();
-    let current = now;
-    let i = count;
-    let out: string[] = [];
-    while(i > 0) {
-        out.push(`${current.getHours()}:${current.getMinutes()}`);
-        current = new Date(current.valueOf() + interval);
-        i--;
-    }
-
-    return out;
-}
