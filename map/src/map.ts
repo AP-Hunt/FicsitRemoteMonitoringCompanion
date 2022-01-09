@@ -1,3 +1,4 @@
+import { MarkerClusterGroup, Realtime } from "leaflet";
 import { gameToWorldCoords } from "./coordinates";
 import { BuildingFeature } from "./feature-types";
 import { AssemblerIcon, BlenderIcon, ConstructorIcon, FoundryIcon, ManufacturerIcon, PackagerIcon, RefineryIcon, SmelterIcon } from "./icons";
@@ -44,8 +45,9 @@ function requestAsGeJSON(url: string) {
 export class GameMap {
     private _domTarget : HTMLElement
     private _map! : L.Map
+    private _cluster! : MarkerClusterGroup
 
-    private _realtime!: any;
+    private _realtime!: Realtime;
 
     private readonly _bounds : L.LatLngBoundsLiteral = [
         [-375e3, -324698.832031],
@@ -69,9 +71,14 @@ export class GameMap {
         this._map.setMaxZoom(this._maxZoom);
         this._map.fitBounds(this._bounds);
         this._map.setView(this._map.getCenter(), this._defaultZoom);
+        this._cluster = L.markerClusterGroup({
+            maxClusterRadius: 100,
+            disableClusteringAtZoom: -6,
+        });
 
         let imgOverlayLayer = new L.ImageOverlay("map-16k.png", this._bounds);
         imgOverlayLayer.addTo(this._map);
+        this._cluster.addTo(this._map);
     }
 
     plotBuildings(url : string) {
@@ -79,9 +86,10 @@ export class GameMap {
         this._realtime = new L.Realtime<L.LatLng>(
             requestAsGeJSON(url),
             {
-                interval: 3000,
+                interval: 10 * 1000,
+                container: self._cluster,
                 getFeatureId(feature : GeoJSON.Feature) {
-                    return (feature.geometry as GeoJSON.Point).coordinates;
+                    return (feature.geometry as GeoJSON.Point).coordinates.join("/");
                 },
 
                 updateFeature(feature: GeoJSON.Feature, marker: L.Marker) {
@@ -92,28 +100,11 @@ export class GameMap {
                     // https://github.com/perliedman/leaflet-realtime/blob/88d364da9dde8aa0c8c01c5b46bc0673832c8965/src/L.Realtime.js#L202
                     if(!marker){return}
 
-                    let addToMap = marker === undefined;
-                    let m = marker || new L.Marker([0, 0]);
-
-                    let geom = feature.geometry as GeoJSON.Point
-                    
-                    m.setLatLng(
-                        gameToWorldCoords(new L.LatLng(
-                            geom.coordinates[1], 
-                            geom.coordinates[0], 
-                            geom.coordinates[2]
-                        ))
-                    );
-
-                    if(addToMap) {
-                        m.addTo(self._map);
+                    if(marker.getPopup() instanceof MarkerPopup){
+                        (marker.getPopup() as MarkerPopup).updateFeature(feature);
                     }
 
-                    if(m.getPopup() instanceof MarkerPopup){
-                        (m.getPopup() as MarkerPopup).updateFeature(feature);
-                    }
-
-                    return m;
+                    return marker;
                 },
 
                 onEachFeature(feature: BuildingFeature, marker: L.Marker) {
@@ -156,6 +147,16 @@ export class GameMap {
 
                     }
                     marker.setIcon(icon);
+
+                    let geom = feature.geometry as GeoJSON.Point
+                    
+                    marker.setLatLng(
+                        gameToWorldCoords(new L.LatLng(
+                            geom.coordinates[1], 
+                            geom.coordinates[0], 
+                            geom.coordinates[2]
+                        ))
+                    );
                 }
             }
         );
