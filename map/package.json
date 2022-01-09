@@ -10,8 +10,9 @@
     "dev": "concurrently --kill-others npm:watch npm:serve",
     "watch": "tsc -p tsconfig.json --watch",
     "serve": "http-server --cors -a localhost",
-    "stubs": "concurrently --kill-others npm:stub:frm npm:stub:prometheus:exporter npm:stub:prometheus:container",
+    "stubs": "concurrently --kill-others npm:stub:frm npm:stub:prometheus",
     "stub:frm": "node ./stubs/frm/index.js",
+    "stub:prometheus": "concurrently --kill-others npm:stub:prometheus:exporter npm:stub:prometheus:container",
     "stub:prometheus:exporter": "node ./stubs/prometheus/exporter.js",
     "stub:prometheus:container": "powershell ./stubs/prometheus/run-container.ps1"
   },

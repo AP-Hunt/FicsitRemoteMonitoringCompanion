@@ -1,7 +1,8 @@
-import { BuildingFeature } from "./feature-types";
+import { BuildingFeature, RecipeOutput } from "./feature-types";
 import MarkerTemplate from "./marker-template";; 
 import { LatLngExpression, Map } from "leaflet";
 import { ChartDataSets } from "chart.js";
+import { Feature, Geometry, GeoJsonProperties } from "geojson";
 
 class MarkerPopupViewModel {
     private _feature: BuildingFeature;
@@ -11,18 +12,16 @@ class MarkerPopupViewModel {
     private _chartUpdaterInterval!: number|null;
 
 
-    public buildingType: KnockoutObservable<string>;
-    public recipe: KnockoutObservable<string>;
-    public recipeOutputs: KnockoutReadonlyComputed<string[]>;
+    public buildingType!: KnockoutObservable<string>;
+    public recipe!: KnockoutObservable<string>;
+    public recipeOutputs!: KnockoutObservable<RecipeOutput[]>;
     public isOpen: boolean;
 
     constructor(feature: BuildingFeature) {
         this._feature = feature;
         this._isInited = false;
 
-        this.buildingType = ko.observable(feature.properties.building);
-        this.recipe = ko.observable(feature.properties.Recipe);
-        this.recipeOutputs = ko.computed(this._formatRecipeOutputs.bind(this));
+        this.updateFeature(feature);
         this.isOpen = false;
 
         // @ts-ignore TS2304
@@ -45,7 +44,7 @@ class MarkerPopupViewModel {
             options: {
                 plugins: {
                     title: {
-                        text: this.recipeOutputs()[0]
+                        text: this.recipeOutputs()[0].Name
                     }
                 }
             }
@@ -72,6 +71,21 @@ class MarkerPopupViewModel {
             clearInterval(this._chartUpdaterInterval);
             this._chartUpdaterInterval = null;
         }
+    }
+
+    updateFeature(feature: BuildingFeature) {
+        if(!this._isInited)
+        {
+            this.buildingType = ko.observable("");
+            this.recipe = ko.observable("");
+            this.recipeOutputs = ko.observable([]);
+        }
+
+        this._feature = feature;
+
+        this.buildingType(feature.properties.building);
+        this.recipe(feature.properties.Recipe);
+        this.recipeOutputs(feature.properties.production)
     }
 
     private _updateChart(){
@@ -113,12 +127,6 @@ class MarkerPopupViewModel {
             this._chart.update();
         });
     }
-
-    private _formatRecipeOutputs(): string[] {
-        return this._feature.properties.production.map(p => {
-            return `${p.Name} (${p.CurrentProd}/min, ${p.ProdPercent}% efficiency)`;
-        })
-    }
 }
 
 export class MarkerPopupElement extends HTMLElement {
@@ -146,8 +154,8 @@ export class MarkerPopupElement extends HTMLElement {
         this._vm.onHide(this._shadowRoot);
     }
 
-    loadContent(){
-        console.log("I'm loading content");
+    updateFeature(feature: GeoJSON.Feature) {
+        this._vm.updateFeature(feature as BuildingFeature);
     }
 }
 
@@ -162,18 +170,6 @@ export class MarkerPopup extends L.Popup {
         this._element = new MarkerPopupElement(feature);
 
         this.setContent(this._element);
-
-        this.on('popupclose', (p) => {
-            console.log("popup closed");
-        });
-
-        this.on('popupopen', (p) => {
-            console.log("popup opened");
-        });
-
-        this.on('remove', (p) => {
-            console.log("popup removed");
-        })
     }
 
     public override onAdd(map: Map): this {
@@ -186,6 +182,10 @@ export class MarkerPopup extends L.Popup {
         super.onRemove(map);
         this._element.onHide();
         return this;
+    }
+
+    public updateFeature(feature: GeoJSON.Feature): void {
+        this._element.updateFeature(feature);
     }
 }
 

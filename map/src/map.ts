@@ -108,6 +108,11 @@ export class GameMap {
                     if(addToMap) {
                         m.addTo(self._map);
                     }
+
+                    if(m.getPopup() instanceof MarkerPopup){
+                        (m.getPopup() as MarkerPopup).updateFeature(feature);
+                    }
+
                     return m;
                 },
 

@@ -18,7 +18,9 @@ const template = `
 
             <dt>Producing</dt>
             <!-- ko foreach: recipeOutputs -->
-            <dd data-bind="text: $data"></dd>
+            <dd>
+                <span data-bind="text: $data.Name"></span> (<span data-bind="text: $data.CurrentProd"></span>/min, <span data-bind="text: $data.ProdPercent"></span>% efficiency)
+            </dd>
             <!-- /ko -->
         </dl>
 
