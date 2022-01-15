@@ -46,6 +46,7 @@ export class GameMap {
     private _domTarget : HTMLElement
     private _map! : L.Map
     private _cluster! : MarkerClusterGroup
+    private _slider! : any;
 
     private _realtime!: Realtime;
 
@@ -79,6 +80,26 @@ export class GameMap {
         let imgOverlayLayer = new L.ImageOverlay("map-16k.png", this._bounds);
         imgOverlayLayer.addTo(this._map);
         this._cluster.addTo(this._map);
+
+        this._slider = (L.control as any).slider(
+            function(value : number){
+                console.log("Slider value: " + value);
+            },
+            {
+                max: 1000,
+                min: 0,
+                value: 75,
+                size: "500px",
+                orientation: "vertical",
+                collapsed: false,
+                title: "Elevation",
+                step: 20,
+                getValue(value : string): string {
+                    return `${value}m to ${parseInt(value) + 50}m`;
+                }
+            }
+        );
+        this._slider.addTo(this._map);
     }
 
     plotBuildings(url : string) {
