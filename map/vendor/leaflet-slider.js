@@ -59,6 +59,9 @@ L.Control.Slider = L.Control.extend({
         this._sliderLink.setAttribute("title", this.options.title);
         this._sliderLink.innerHTML = this.options.logo;
 
+        this._sliderTitle = L.DomUtil.create("p", className+"-title", this._container);
+        this._sliderTitle.innerHTML = this.options.title;
+
         if (this.options.showValue){
             this._sliderValue = L.DomUtil.create('p', className+'-value', this._container);
             this._sliderValue.innerHTML = this.options.getValue(this.options.value);

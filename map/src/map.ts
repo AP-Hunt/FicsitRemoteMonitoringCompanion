@@ -1,54 +1,32 @@
-import { MarkerClusterGroup, Realtime } from "leaflet";
+import { Realtime, Slider } from "leaflet";
 import { gameToWorldCoords } from "./coordinates";
+import { ElevationLayerGroups } from "./elevation-layer-group";
 import { BuildingFeature } from "./feature-types";
 import { AssemblerIcon, BlenderIcon, ConstructorIcon, FoundryIcon, ManufacturerIcon, PackagerIcon, RefineryIcon, SmelterIcon } from "./icons";
 import { MarkerPopup } from "./marker-popup";
+import { requestAsGeJSON } from "./realtime-helpers";
 
-function requestAsGeJSON(url: string) {
-    return function(success: (featuers: any) => void, error: (error: object, message: string) => void) {
-        return fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                let geo: GeoJSON.FeatureCollection = {
-                    type: "FeatureCollection",
-                    features: [] as Array<GeoJSON.Feature>
-                };
+const Z_MAX = metresToGameUnits(2000);
+const Z_MIN = metresToGameUnits(-250);
+const Z_STEP = metresToGameUnits(15);
+const Z_DEFAULT = metresToGameUnits(-25);
 
-                data.forEach((building: any) => {
-                    let feature = {
-                        type: "Feature",
-                        geometry: {
-                            type: "Point",
-                            coordinates: [
-                                building.location.x,
-                                building.location.y,
-                                building.location.z
-                            ]
-                        }
-                    } as GeoJSON.Feature;
+function metresToGameUnits(x: number) : number {
+    return x * 100;
+}
 
-                    delete building.location;
-                    feature.properties = building;
-
-                    geo.features.push(feature)
-                })
-
-                return geo;
-            })
-            .then(success)
-            .catch((reason) => {
-                error({}, reason);
-            });
-        }
+function gameUnitsToMetres(x: number): number {
+    return x * 0.01;
 }
 
 export class GameMap {
     private _domTarget : HTMLElement
     private _map! : L.Map
-    private _cluster! : MarkerClusterGroup
-    private _slider! : any;
-
     private _realtime!: Realtime;
+    private _elevationGroups!: ElevationLayerGroups;
+    
+    private _slider! : Slider;
+    private _elevation: number = Z_DEFAULT;
 
     private readonly _bounds : L.LatLngBoundsLiteral = [
         [-375e3, -324698.832031],
@@ -72,30 +50,30 @@ export class GameMap {
         this._map.setMaxZoom(this._maxZoom);
         this._map.fitBounds(this._bounds);
         this._map.setView(this._map.getCenter(), this._defaultZoom);
-        this._cluster = L.markerClusterGroup({
-            maxClusterRadius: 100,
-            disableClusteringAtZoom: -6,
-        });
 
         let imgOverlayLayer = new L.ImageOverlay("map-16k.png", this._bounds);
         imgOverlayLayer.addTo(this._map);
-        this._cluster.addTo(this._map);
 
-        this._slider = (L.control as any).slider(
-            function(value : number){
-                console.log("Slider value: " + value);
+        
+        this._elevationGroups = new ElevationLayerGroups(Z_MIN, Z_MAX, Z_STEP);
+        this._elevationGroups.addTo(this._map);
+
+        this._slider = L.control.slider(
+            (value : string) => {
+                this._updateElevation(parseInt(value));
             },
             {
-                max: 1000,
-                min: 0,
-                value: 75,
+                min: gameUnitsToMetres(Z_MIN),
+                max: gameUnitsToMetres(Z_MAX),
+                value: gameUnitsToMetres(Z_DEFAULT),
                 size: "500px",
                 orientation: "vertical",
                 collapsed: false,
                 title: "Elevation",
-                step: 20,
+                increment: true,
+                step: gameUnitsToMetres(Z_STEP),
                 getValue(value : string): string {
-                    return `${value}m to ${parseInt(value) + 50}m`;
+                    return `From ${value}m <br /> To: ${parseInt(value) + gameUnitsToMetres(Z_STEP)}m`;
                 }
             }
         );
@@ -108,7 +86,7 @@ export class GameMap {
             requestAsGeJSON(url),
             {
                 interval: 10 * 1000,
-                container: self._cluster,
+                container: self._elevationGroups,
                 getFeatureId(feature : GeoJSON.Feature) {
                     return (feature.geometry as GeoJSON.Point).coordinates.join("/");
                 },
@@ -185,4 +163,10 @@ export class GameMap {
         this._realtime.addTo(this._map);
         this._realtime.start();
     }
+
+    private _updateElevation(elevation : number) {
+        this._elevation = metresToGameUnits(elevation);
+        this._elevationGroups.showElevation(this._elevation);
+    }
+
 }

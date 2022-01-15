@@ -26,13 +26,14 @@ a.leaflet-control-slider-toggle {
     font-weight: bold;
     font-size: 1.1em;
     display:none;
+    width: 100%;
+    padding: 0 5px;
 }
 .leaflet-control-slider.leaflet-control-slider-horizontal p.leaflet-control-slider-value {
     line-height: 36px;
     height: 36px;
     margin: 0px 0px 0px 0px;
     border-right: 1px solid #CCC;
-    width: 50px;
     float :left;
     clear:none;
 }
@@ -41,7 +42,6 @@ a.leaflet-control-slider-toggle {
     line-height: 26px;
     margin: 0px 0px 5px 0px;
     border-bottom: 1px solid #CCC;
-    width: 50px;
     height: fit-content;
 }
 .leaflet-control-slider input.leaflet-slider {
@@ -101,12 +101,39 @@ a.leaflet-control-slider-toggle {
   outline: none;
 }
 
+.leaflet-control-slider input[type=range][orient="vertical"] {
+    -webkit-appearance: none;
+    writing-mode: bt-lr;
+    -webkit-appearance: slider-vertical;
+}
+
+.leaflet-control-slider input[type=range]::-moz-focus-outer {
+    border: 0;
+}
+ 
+.leaflet-control-slider input[type=range][orient="vertical"]::-moz-range-track {
+    background: #ccc;
+    border: 0;
+    width: 6px;
+}
+
+.leaflet-control-slider input[type=range][orient="vertical"]::-moz-focus-inner { 
+    border: 0; 
+}
+
+.leaflet-control-slider .leaflet-control-slider-title {
+    font-weight: bold;
+    padding: 0 5px;
+    width: 100%;
+    text-align: center;
+}
+
 
 /*increment/decrement*/
 
 
 .leaflet-control-slider-plus, .leaflet-control-slider-minus{
-    width: 36px;
+    width: 100%;
     height: 36px;
     background-position: 50% 50%;
     background-repeat: no-repeat;
@@ -127,9 +154,3 @@ a.leaflet-control-slider-toggle {
 .leaflet-control-slider.leaflet-control-slider-horizontal .leaflet-control-slider-plus, .leaflet-control-slider.leaflet-control-slider-horizontal .leaflet-control-slider-minus{
     float:right;   
 }
-
-.leaflet-control-slider input[type=range]::-moz-focus-outer {
-    border: 0;
-}
-
-/* Fixes as per https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/range#using_transform */
