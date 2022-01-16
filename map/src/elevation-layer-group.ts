@@ -1,5 +1,6 @@
 import { BuildingFeature } from "./feature-types";
 import { MarkerClusterGroup } from "leaflet";
+import { BuildingClusterGroup } from "./building-cluster-group";
 
 type ElevationGroup = {min: number, max: number, layer: MarkerClusterGroup}
 
@@ -13,10 +14,7 @@ export class ElevationLayerGroups extends L.FeatureGroup {
             this._groups.push({
                 min: z,
                 max: z + step,
-                layer: L.markerClusterGroup({
-                    maxClusterRadius: 100,
-                    disableClusteringAtZoom: -6,
-                })
+                layer: new BuildingClusterGroup()
             });
 
             z += step;
