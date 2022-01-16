@@ -71,4 +71,20 @@ export class ElevationLayerGroups extends L.FeatureGroup {
             }
         });
     }
+
+    public updateLayer(layer: L.Marker) {
+        this._groups.forEach((group: ElevationGroup) => {
+            if(group.layer.hasLayer(layer)) {
+                group.layer.refreshClusters(layer);
+            }
+        })
+    }
+
+    public refresh() {
+        this._groups.forEach((group: ElevationGroup) => {
+            if(this._map.hasLayer(group.layer)){
+                group.layer.refreshClusters();
+            }
+        });
+    }
 }

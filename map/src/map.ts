@@ -161,6 +161,10 @@ export class GameMap {
         );
 
         this._realtime.addTo(this._map);
+        this._realtime.on("update", (evt: L.LeafletEvent) => {
+            this._elevationGroups.refresh();
+        })
+
         this._realtime.start();
     }
 
