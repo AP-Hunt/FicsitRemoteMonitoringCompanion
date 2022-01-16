@@ -194,6 +194,13 @@ Task("CutRelease")
 
         System.IO.File.WriteAllText("version.txt", nextVer.ToString());
         GitAdd(".", new FilePath[] { "./version.txt" });
+
+        NpmBumpVersion(settings => { 
+            settings.WorkingDirectory = "./map";
+            settings.Version = nextVer.ToString(); 
+        });
+        GitAdd(".", new FilePath[] { "./map/package.json", "./map/package-lock.json"});
+
         var taggedCommit = GitCommit(".", "Andy Hunt", "github@andyhunt.me", "Bump version to " + nextVer.ToString());
         GitTag(".", nextVer.ToString());
 
