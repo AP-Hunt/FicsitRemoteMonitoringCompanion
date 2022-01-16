@@ -1,5 +1,6 @@
 #addin nuget:?package=semver&version=2.0.4
 #addin nuget:?package=Cake.Git&version=1.0.1
+#addin nuget:?package=Cake.Npm&version=1.0.0
 
 using Semver; 
 using Cake.Core.IO;
@@ -58,7 +59,7 @@ Task("Publish")
     .IsDependentOn("Build")
     .Does(() =>
 {
-
+    // Build dotnet code
     DotNetCorePublish("./Companion/Companion.csproj", new DotNetCorePublishSettings
     {
         Configuration = configuration,
@@ -82,6 +83,17 @@ Task("Publish")
     CopyFile($"./Externals/Prometheus/prometheus-{prometheusVersion}.windows-amd64/prometheus.exe", $"./bin/publish/{configuration}/prometheus.exe");
     CopyDirectory($"./Externals/Grafana/grafana-{grafanaVersion}", $"./bin/publish/{configuration}/grafana");
 
+    // Build javascript code
+    NpmInstall(settings => settings.WorkingDirectory = "./map/");
+    NpmRunScript("compile", settings => settings.WorkingDirectory = "./map/");
+    CreateDirectory($"bin/publish/{configuration}/map");
+    CopyDirectory("./map/vendor", $"bin/publish/{configuration}/map/vendor");
+    CopyDirectory("./map/js", $"bin/publish/{configuration}/map/js");
+    CopyDirectory("./map/img", $"bin/publish/{configuration}/map/img");
+    CopyFile("./map/index.html", $"bin/publish/{configuration}/map/index.html");
+    CopyFile("./map/map-16k.png", $"bin/publish/{configuration}/map/map-16k.png");
+
+    // Package
     string version = System.IO.File.ReadAllText("version.txt");
     Zip($"bin/publish/{configuration}", $"./bin/publish/FicsitRemoteMonitoringCompanion-v{version}.zip");
 });
