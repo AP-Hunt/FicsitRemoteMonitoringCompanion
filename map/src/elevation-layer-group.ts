@@ -1,5 +1,5 @@
 import { BuildingFeature } from "./feature-types";
-import { MarkerClusterGroup } from "leaflet";
+import { Layer, MarkerClusterGroup } from "leaflet";
 import { BuildingClusterGroup } from "./building-cluster-group";
 
 type ElevationGroup = {min: number, max: number, layer: MarkerClusterGroup}
@@ -44,6 +44,33 @@ export class ElevationLayerGroups extends L.FeatureGroup {
         }
 
         targetGroup.layer.addLayer(layer);
+
+        return this;
+    }
+
+    public override removeLayer(layer: number | Layer): this {
+        if(!(layer instanceof L.Marker)){
+            console.error("can only add instances of L.Marker");
+            return this;
+        }
+
+        let marker = layer as L.Marker;
+        let feature = marker.feature as BuildingFeature;
+        if(!feature) {
+            console.error("marker feature must be an instance of BuildingFeature");
+            return this;
+        }
+
+        let targetGroup: ElevationGroup = this._groups[0];
+        let z = feature.geometry.coordinates[2];
+        for (const group of this._groups) {
+            if(z > group.min && z <= group.max){
+                targetGroup = group;
+                break;
+            }
+        }
+
+        targetGroup.layer.removeLayer(layer);
 
         return this;
     }
