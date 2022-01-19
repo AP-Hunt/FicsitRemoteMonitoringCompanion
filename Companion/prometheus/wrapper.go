@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"syscall"
 )
 
 type PrometheusWrapper struct {
@@ -42,6 +43,7 @@ func NewPrometheusWrapper() (*PrometheusWrapper, error) {
 	cmd := exec.Command(promPath, "--config.file", cfgPath)
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr
+	cmd.SysProcAttr = &syscall.SysProcAttr{CreationFlags: 0x08000000} // CREATE_NO_WINDOW
 
 	return &PrometheusWrapper{
 		cmd:    cmd,
