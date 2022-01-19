@@ -6,12 +6,15 @@
 SHELL := powershell.exe
 .SHELLFLAGS := -Command
 .ONESHELL:
+.DEFAULT_GOAL := bin/Companion.exe
 
 GRAFANA_VERSION := 7.5.7
 PROMETHEUS_VERSION := 2.27.1
 
+GO_SRC := $(shell Get-ChildItem -Recurse -Filter "*.go" -Exclude "*test.go" -Name)
+
 .PHONY: companion
-companion: bin/prometheus/prometheus.exe bin/prometheus/prometheus.yml
+bin/Companion.exe: $(GO_SRC) bin/prometheus/prometheus.exe bin/prometheus/prometheus.yml
 	go build -o bin/Companion.exe
 
 bin/prometheus/prometheus.exe:
@@ -22,3 +25,7 @@ bin/prometheus/prometheus.exe:
 
 bin/prometheus/prometheus.yml:
 	@Copy-Item -Path "prometheus.yml" -Destination "bin/prometheus/prometheus.yml"
+
+.PHONY: test
+test: 
+	go test ./...
