@@ -4,19 +4,22 @@
 ## specific things. Don't expect it to work on Linux.
 
 SHELL := powershell.exe
+MAKESHELL := powershell.exe
+
 .SHELLFLAGS := -Command
-.ONESHELL:
 .DEFAULT_GOAL := bin/Companion.exe
 
 GRAFANA_VERSION := 7.5.7
 PROMETHEUS_VERSION := 2.27.1
 FRMC_VERSION := $(shell Get-Content -Path "../version.txt")
 
-GO_SRC := $(shell Get-ChildItem -Recurse -Filter "*.go" -Exclude "*test.go" -Name)
+GO_SRC := $(shell Get-ChildItem -Recurse -Filter "*.go" -Exclude "*test.go" -Name | where {$$_ -notlike "vendor*" })
+GO_BUILD_ENV := $$Env:GOOS = "windows"; $$Env:GOARCH = "amd64";
+
 
 .PHONY: companion
 bin/Companion.exe: $(GO_SRC) bin/prometheus/prometheus.exe bin/prometheus/prometheus.yml bin/map/
-	go build -ldflags="-X 'main.Version=${FRMC_VERSION}'" -o bin/Companion.exe
+	${GO_BUILD_ENV} go build -ldflags="-X 'main.Version=${FRMC_VERSION}'" -o bin/Companion.exe
 
 bin/prometheus/prometheus.exe:
 	@New-Item -Path "../Externals/Prometheus/" -ItemType Directory -Force > $$null

@@ -1,20 +1,33 @@
 on: pull_request
 name: Pull Request
+defaults:
+  run:
+    shell: powershell
 jobs:
   test:
     name: test
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-dotnet@v1
+      - uses: actions/setup-node@v2
         with:
-          dotnet-version: '6.0.x'
+          node-version: '16'
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.17'
 
       - name: Install dependencies
         run: |
-          dotnet restore
-          dotnet tool restore
+          cd Companion
+          go mod vendor
 
       - name: Build
+        shell: sh
         run: |
-            dotnet cake build.cake --target Build --configuration Release
+          cd Companion
+          make
+
+      - name: Test
+        run: |
+          cd Companion
+          make test
