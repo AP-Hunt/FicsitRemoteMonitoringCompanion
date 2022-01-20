@@ -10,6 +10,7 @@ import (
 
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/prometheus"
+	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/realtime_map"
 )
 
 func main() {
@@ -30,6 +31,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Create map server
+	mapServ, err := realtime_map.NewMapServer()
+	if err != nil {
+		fmt.Printf("error preparing dynamic map: %s", err)
+		os.Exit(1)
+	}
+
 	// Start prometheus
 	err = prom.Start()
 	if err != nil {
@@ -40,8 +48,14 @@ func main() {
 	// Start exporter
 	promExporter.Start()
 
+	// Start map
+	mapServ.Start()
+
 	fmt.Print(`
 Ficsit Remote Monitoring Companion
+
+To access the realtime map visit:
+http://localhost:8000/
 
 To access metrics in Prometheus visit:
 http://localhost:9090/
@@ -65,6 +79,9 @@ Press Ctrl + C to exit.
 	if err != nil {
 		fmt.Printf("error stopping prometheus: %s", err)
 	}
+
+	// Stop map
+	mapServ.Stop()
 
 	fmt.Println("Exiting.")
 	os.Exit(0)

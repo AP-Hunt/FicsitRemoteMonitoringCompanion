@@ -14,7 +14,7 @@ PROMETHEUS_VERSION := 2.27.1
 GO_SRC := $(shell Get-ChildItem -Recurse -Filter "*.go" -Exclude "*test.go" -Name)
 
 .PHONY: companion
-bin/Companion.exe: $(GO_SRC) bin/prometheus/prometheus.exe bin/prometheus/prometheus.yml
+bin/Companion.exe: $(GO_SRC) bin/prometheus/prometheus.exe bin/prometheus/prometheus.yml bin/map/
 	go build -o bin/Companion.exe
 
 bin/prometheus/prometheus.exe:
@@ -25,6 +25,11 @@ bin/prometheus/prometheus.exe:
 
 bin/prometheus/prometheus.yml:
 	@Copy-Item -Path "prometheus.yml" -Destination "bin/prometheus/prometheus.yml"
+
+bin/map/:
+	@New-Item -Path "./bin/map" -ItemType Directory -Force > $$null
+	@cd ../map/; npm install; npm run compile
+	@cd ../map/; Copy-Item -Path "index.html","map-16k.png","vendor","img","js" -Destination "../Companion/bin/map/" -Recurse -Force
 
 .PHONY: test
 test: 
