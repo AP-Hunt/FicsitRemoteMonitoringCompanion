@@ -29,3 +29,7 @@ bin/prometheus/prometheus.yml:
 .PHONY: test
 test: 
 	go test ./...
+
+.PHONY: clean
+clean: 
+	Remove-Item -Recurse -Force "./bin"
