@@ -10,12 +10,13 @@ SHELL := powershell.exe
 
 GRAFANA_VERSION := 7.5.7
 PROMETHEUS_VERSION := 2.27.1
+FRMC_VERSION := $(shell Get-Content -Path "../version.txt")
 
 GO_SRC := $(shell Get-ChildItem -Recurse -Filter "*.go" -Exclude "*test.go" -Name)
 
 .PHONY: companion
 bin/Companion.exe: $(GO_SRC) bin/prometheus/prometheus.exe bin/prometheus/prometheus.yml bin/map/
-	go build -o bin/Companion.exe
+	go build -ldflags="-X 'main.Version=${FRMC_VERSION}'" -o bin/Companion.exe
 
 bin/prometheus/prometheus.exe:
 	@New-Item -Path "../Externals/Prometheus/" -ItemType Directory -Force > $$null

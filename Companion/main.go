@@ -13,6 +13,8 @@ import (
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/realtime_map"
 )
 
+var Version = "0.0.0-dev"
+
 func main() {
 	logFile, err := createLogFile()
 	if err != nil {
@@ -51,8 +53,8 @@ func main() {
 	// Start map
 	mapServ.Start()
 
-	fmt.Print(`
-Ficsit Remote Monitoring Companion
+	fmt.Printf(`
+Ficsit Remote Monitoring Companion (v%s)
 
 To access the realtime map visit:
 http://localhost:8000/
@@ -61,7 +63,7 @@ To access metrics in Prometheus visit:
 http://localhost:9090/
 
 Press Ctrl + C to exit.
-`)
+`, Version)
 
 	// Wait for an interrupt signal
 	sigChan := make(chan os.Signal, 1)
