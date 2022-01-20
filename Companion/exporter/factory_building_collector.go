@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -45,7 +46,7 @@ func (c *FactoryBuildingCollector) Collect() {
 	resp, err := http.Get(c.FRMAddress)
 
 	if err != nil {
-		fmt.Printf("error fetching factory buildings from FRM: %s\n", err)
+		log.Printf("error fetching factory buildings from FRM: %s\n", err)
 		return
 	}
 
@@ -56,7 +57,7 @@ func (c *FactoryBuildingCollector) Collect() {
 
 	err = decoder.Decode(&details)
 	if err != nil {
-		fmt.Printf("error reading factory buildings from FRM: %s\n", err)
+		log.Printf("error reading factory buildings from FRM: %s\n", err)
 		return
 	}
 

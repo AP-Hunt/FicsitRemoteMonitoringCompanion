@@ -2,14 +2,24 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
+	"path"
+	"path/filepath"
 
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/prometheus"
 )
 
 func main() {
+	logFile, err := createLogFile()
+	if err != nil {
+		fmt.Printf("error creating log file: %s", err)
+		os.Exit(1)
+	}
+	log.Default().SetOutput(logFile)
+
 	// Create exporter
 	promExporter := exporter.NewPrometheusExporter("http://localhost:8090")
 
@@ -58,4 +68,19 @@ Press Ctrl + C to exit.
 
 	fmt.Println("Exiting.")
 	os.Exit(0)
+}
+
+func createLogFile() (*os.File, error) {
+	curExePath, err := os.Executable()
+	if err != nil {
+		return nil, err
+	}
+
+	curExeDir := filepath.Dir(curExePath)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return os.Create(path.Join(curExeDir, "frmc.log"))
 }

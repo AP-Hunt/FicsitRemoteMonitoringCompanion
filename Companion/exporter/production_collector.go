@@ -3,7 +3,7 @@ package exporter
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -112,7 +112,7 @@ func (c *ProductionCollector) Collect() {
 	resp, err := http.Get(c.FRMAddress)
 
 	if err != nil {
-		fmt.Printf("error fetching production statistics from FRM: %s\n", err)
+		log.Printf("error fetching production statistics from FRM: %s\n", err)
 		return
 	}
 
@@ -123,7 +123,7 @@ func (c *ProductionCollector) Collect() {
 
 	err = decoder.Decode(&details)
 	if err != nil {
-		fmt.Printf("error reading production statistics from FRM: %s\n", err)
+		log.Printf("error reading production statistics from FRM: %s\n", err)
 		return
 	}
 
