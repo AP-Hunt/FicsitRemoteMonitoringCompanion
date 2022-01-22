@@ -9,7 +9,7 @@ on:
     push:
         tags:
             # Tags that look like a semantic version
-            - "[0-9]+.[0-9]+.[0-9]+"
+            - "[0-9]+.[0-9]+.[0-9]+*"
 defaults:
   run:
     shell: powershell

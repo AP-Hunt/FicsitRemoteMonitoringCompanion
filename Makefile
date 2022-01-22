@@ -26,11 +26,13 @@ $(GOBIN)\git-chglog.exe:
 
 
 BUMP=minor
+PRERELEASE=
 .PHONY: cut-release
 cut-release: $(GOBIN)\semver-cli.exe
 	@if(!@("major", "minor", "patch").Contains("${BUMP}")){ echo "BUMP=major|minor|patch"; exit 1;}
 	@echo "Current version is ${FRMC_VERSION}"
 	semver-cli inc "${BUMP}" "${FRMC_VERSION}" > version.txt
+	if("${PRERELEASE}" -ne "") { semver-cli set prerelease "$$(cat ./version.txt)" "${PRERELEASE}" > version.txt;}
 	@echo "New version is $$(cat ./version.txt)"
 	@cd map/; npm version "$$(cat ../version.txt)"
 	git add "version.txt" "./map/package.json" "./map/package-lock.json"
