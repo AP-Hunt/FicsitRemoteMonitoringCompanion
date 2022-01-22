@@ -3,7 +3,6 @@ package exporter
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -66,9 +65,9 @@ func (c *FactoryBuildingCollector) Collect() {
 			MachineItemsProducedPerMin.WithLabelValues(
 				prod.Name,
 				building.Building,
-				fmt.Sprintf("%.5f", building.Location.X),
-				fmt.Sprintf("%.5f", building.Location.Y),
-				fmt.Sprintf("%.5f", building.Location.Z),
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
 			).Set(prod.CurrentProd)
 
 			efficiency := float64(0.0)
@@ -79,9 +78,9 @@ func (c *FactoryBuildingCollector) Collect() {
 			MachineItemsProducedEffiency.WithLabelValues(
 				prod.Name,
 				building.Building,
-				fmt.Sprintf("%.5f", building.Location.X),
-				fmt.Sprintf("%.5f", building.Location.Y),
-				fmt.Sprintf("%.5f", building.Location.Z),
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
 			).Set(efficiency)
 		}
 	}
