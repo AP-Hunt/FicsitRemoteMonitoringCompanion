@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"os"
 	"os/signal"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/prometheus"
@@ -16,6 +18,11 @@ import (
 var Version = "0.0.0-dev"
 
 func main() {
+	if len(os.Args) >= 2 && os.Args[1] == "-ShowMetrics" {
+		exportMetrics()
+		os.Exit(0)
+	}
+
 	logFile, err := createLogFile()
 	if err != nil {
 		fmt.Printf("error creating log file: %s", err)
@@ -102,4 +109,45 @@ func createLogFile() (*os.File, error) {
 	}
 
 	return os.Create(path.Join(curExeDir, "frmc.log"))
+}
+
+func exportMetrics() {
+	tpl := template.New("metrics_table")
+	tpl.Funcs(template.FuncMap{
+		"List": strings.Join,
+	})
+
+	tpl, err := tpl.Parse(`
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Labels</th>
+        </tr>
+    </thead>
+    <tbody>
+		{{range .Metrics}}
+        <tr>
+            <td>{{.Name}}</td>
+            <td>{{.Help}}</td>
+            <td>{{List .Labels ", "}}</td>
+        </tr>
+		{{ end -}}
+	</tbody>
+</table>
+`)
+	if err != nil {
+		fmt.Printf("Error generating metrics table: %s", err)
+		os.Exit(1)
+	}
+
+	tpl.Execute(
+		os.Stdout,
+		struct {
+			Metrics []exporter.MetricVectorDetails
+		}{
+			Metrics: exporter.RegisteredMetricVectors,
+		},
+	)
 }
