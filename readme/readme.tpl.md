@@ -30,3 +30,21 @@ __METRICS_TABLE__
 
 ## How it works
 Ficsit Remote Monitoring Companion reads metric data from the Ficsit Remote Montioring mod, stores it in a local Prometheus instance, and enables to users to visualise it using a realtime map or the Prometheus query interface.
+
+## Building FRMC
+To build FRMC, run `make` from the `Companion/` directory. This will download all the necessary dependencies and build FRMC.
+
+## Commit guidlines
+Commits should contain a title on the first line, followed by a blank line, followed by as much detail as necessary to undertstand what the commit does and why. Lines should avoid being more than 80 characters wide.
+
+Commit titles prefixed with `feat:`, `fix:` or `improvement:` will appear in the release notes. If a change sensibly spans multiple commits, either use the last commit to add informationt to the release notes, or use en empty commit.
+
+An example of a good commit looks like this
+
+```
+Update building data in marker popups on each request
+
+Previously, the map was requesting new data regularly but wasn't
+updating the marker contents. This meant that if a building's recipe
+changed, it would never be reflected in the map.
+```

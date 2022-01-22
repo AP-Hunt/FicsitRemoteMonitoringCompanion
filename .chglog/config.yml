@@ -15,6 +15,7 @@ options:
     title_maps:
       feat: 🎉 Features
       fix: 🐛 Bug Fixes
+      improvement: ✨ Improvement
   header:
     pattern: "^(\\w*)\\:\\s(.*)$"
     pattern_maps:
