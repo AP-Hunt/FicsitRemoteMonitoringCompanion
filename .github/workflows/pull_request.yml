@@ -27,7 +27,11 @@ jobs:
           cd Companion
           make
 
-      - name: Test
+      - name: Test Companion
         run: |
           cd Companion
           make test
+
+      - name: Test README generation
+        run: |
+          make readme
