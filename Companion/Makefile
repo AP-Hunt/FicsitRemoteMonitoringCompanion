@@ -18,7 +18,7 @@ GO_BUILD_ENV := $$Env:GOOS = "windows"; $$Env:GOARCH = "amd64";
 
 
 .PHONY: companion
-bin/Companion.exe: $(GO_SRC) bin/prometheus/prometheus.exe bin/prometheus/prometheus.yml bin/map/
+bin/Companion.exe: $(GO_SRC) bin/prometheus/prometheus.exe bin/prometheus/prometheus.yml bin/map/ vendor/
 	${GO_BUILD_ENV} go build -ldflags="-X 'main.Version=${FRMC_VERSION}'" -o bin/Companion.exe
 
 bin/prometheus/prometheus.exe:
@@ -34,6 +34,9 @@ bin/map/:
 	@New-Item -Path "./bin/map" -ItemType Directory -Force > $$null
 	@cd ../map/; npm install; npm run compile
 	@cd ../map/; Copy-Item -Path "index.html","map-16k.png","vendor","img","js" -Destination "../Companion/bin/map/" -Recurse -Force
+
+vendor/: go.mod go.sum
+	@go mod vendor
 
 .PHONY: test
 test: 
