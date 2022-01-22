@@ -10,7 +10,9 @@ on:
         tags:
             # Tags that look like a semantic version
             - "[0-9]+.[0-9]+.[0-9]+"
-
+defaults:
+  run:
+    shell: powershell
 name: Release new version
 jobs:
     increment_minor_version:
@@ -21,14 +23,12 @@ jobs:
               with:
                 fetch-depth: 0
 
-            - uses: actions/setup-dotnet@v1
+            - uses: actions/setup-node@v2
               with:
-                dotnet-version: '6.0.x'
-
-            - name: Install dependencies
-              run: |
-                dotnet restore
-                dotnet tool restore
+                node-version: '16'
+            - uses: actions/setup-go@v2
+              with:
+                go-version: '^1.17'
 
             - name: Set version
               run: |
@@ -36,11 +36,12 @@ jobs:
 
             - name: Compile release
               run: |
-                dotnet cake build.cake --target Publish --configuration Release
+                cd Companion
+                make release
 
             - name: Generate release notes
               run: |
-                dotnet cake build.cake --target ReleaseNotes
+                make release-notes
 
             - name: Create release
               id: create_release
@@ -59,4 +60,4 @@ jobs:
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                gh release upload "${{ env.NEW_VERSION }}" "./bin/publish/FicsitRemoteMonitoringCompanion-v${{env.NEW_VERSION}}.zip"
+                gh release upload "${{ env.NEW_VERSION }}" "./Companion/FicsitRemoteMonitoringCompanion-v${{env.NEW_VERSION}}.zip"

@@ -42,3 +42,7 @@ test:
 .PHONY: clean
 clean: 
 	Remove-Item -Recurse -Force "./bin"
+
+.PHONY: release
+release: bin/Companion.exe
+	Compress-Archive -Path "./bin/*" -DestinationPath "./FicsitRemoteMonitoringCompanion-v${FRMC_VERSION}.zip"
