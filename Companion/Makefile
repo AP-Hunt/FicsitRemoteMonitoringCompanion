@@ -27,8 +27,9 @@ bin/prometheus/prometheus.exe:
 	@Expand-Archive -Path "../Externals/Prometheus/prometheus.zip" -DestinationPath "./bin/" -Force
 	@Rename-Item -Path "./bin/prometheus-${PROMETHEUS_VERSION}.windows-amd64" -NewName "prometheus"
 
-bin/prometheus/prometheus.yml:
-	@Copy-Item -Path "prometheus.yml" -Destination "bin/prometheus/prometheus.yml"
+bin/prometheus/prometheus.yml: FORCE
+	@Copy-Item -Path "./prometheus.yml" -Destination "bin/prometheus/prometheus.yml" -Force
+FORCE:
 
 bin/map/:
 	@New-Item -Path "./bin/map" -ItemType Directory -Force > $$null
