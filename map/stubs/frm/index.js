@@ -11,8 +11,8 @@ http.createServer((req, res) => {
             defaultRoute(req, res);
             break;
     }
-}).listen(8090, () => {
-    console.log("FRM stub is listening on 8090");
+}).listen(8080, () => {
+    console.log("FRM stub is listening on 8080");
 });
 
 function getFactoryHandler(req, res) {
