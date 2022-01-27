@@ -64,7 +64,12 @@ func main() {
 Ficsit Remote Monitoring Companion (v%s)
 
 To access the realtime map visit:
-http://localhost:8000/
+http://localhost:8000/?frmport=8080
+
+    If you have configured Ficsit Remote Monitoring 
+    to use a port other than 8080 for its web server, 
+    change the "frmport" query string parameter to 
+    match the port you chose and refresh the page.
 
 To access metrics in Prometheus visit:
 http://localhost:9090/
