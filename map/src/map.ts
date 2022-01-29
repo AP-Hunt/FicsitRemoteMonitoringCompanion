@@ -1,8 +1,8 @@
 import { Realtime, Slider } from "leaflet";
 import { gameToWorldCoords } from "./coordinates";
 import { ElevationLayerGroups } from "./elevation-layer-group";
-import { BuildingFeature } from "./feature-types";
-import { AssemblerIcon, BlenderIcon, ConstructorIcon, FoundryIcon, ManufacturerIcon, PackagerIcon, RefineryIcon, SmelterIcon } from "./icons";
+import { BuildingFeature, TrainFeature } from "./feature-types";
+import { AssemblerIcon, BlenderIcon, ConstructorIcon, FoundryIcon, LocomotiveIcon, ManufacturerIcon, PackagerIcon, RefineryIcon, SmelterIcon } from "./icons";
 import { MarkerPopup } from "./marker-popup";
 import { requestAsGeJSON } from "./realtime-helpers";
 
@@ -22,7 +22,8 @@ function gameUnitsToMetres(x: number): number {
 export class GameMap {
     private _domTarget : HTMLElement
     private _map! : L.Map
-    private _realtime!: Realtime;
+    private _realtimeBuildingsLayer!: Realtime;
+    private _realtimeTrainsLayer!: Realtime;
     private _elevationGroups!: ElevationLayerGroups;
     
     private _slider! : Slider;
@@ -82,7 +83,7 @@ export class GameMap {
 
     plotBuildings(url : string) {
         const self = this;
-        this._realtime = new L.Realtime<L.LatLng>(
+        this._realtimeBuildingsLayer = new L.Realtime<L.LatLng>(
             requestAsGeJSON(url),
             {
                 interval: 10 * 1000,
@@ -160,12 +161,51 @@ export class GameMap {
             }
         );
 
-        this._realtime.addTo(this._map);
-        this._realtime.on("update", (evt: L.LeafletEvent) => {
+        this._realtimeBuildingsLayer.addTo(this._map);
+        this._realtimeBuildingsLayer.on("update", (evt: L.LeafletEvent) => {
             this._elevationGroups.refresh();
         })
 
-        this._realtime.start();
+        this._realtimeBuildingsLayer.start();
+    }
+
+    plotTrains(url: string) {
+        const self = this;
+        this._realtimeTrainsLayer = new L.Realtime<L.LatLng>(
+            requestAsGeJSON(url),
+            {
+                interval: 5 * 1000,
+                getFeatureId(feature : TrainFeature) {
+                    return feature.properties.TrainName;
+                },
+
+                updateFeature(feature: TrainFeature, marker: L.Marker) {
+                    if(!marker){return undefined;}
+
+                    return marker;
+                },
+
+                onEachFeature(feature: TrainFeature, marker: L.Marker) {
+                    marker.setIcon(new L.Icon.Default());
+                    let geom = feature.geometry as GeoJSON.Point
+                    marker.setLatLng(
+                        gameToWorldCoords(new L.LatLng(
+                            geom.coordinates[1], 
+                            geom.coordinates[0], 
+                            geom.coordinates[2]
+                        ))
+                    );
+
+                    marker.setIcon(new LocomotiveIcon());
+                    marker.options.title = feature.properties.TrainName;
+
+                    return marker
+                }
+            }
+        );
+
+        this._realtimeTrainsLayer.addTo(this._map);
+        this._realtimeTrainsLayer.start();
     }
 
     private _updateElevation(elevation : number) {

@@ -21,7 +21,6 @@ export function requestAsGeJSON(url: string) {
                         }
                     } as GeoJSON.Feature;
 
-                    delete building.location;
                     feature.properties = building;
 
                     geo.features.push(feature)

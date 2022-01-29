@@ -15,5 +15,6 @@ function init()
 
     let map = new GameMap(document.getElementById("map")!);
     map.plotBuildings(`http://localhost:${frmPort}/getFactory`);
+    map.plotTrains(`http://localhost:${frmPort}/getTrains`);
 }
 init();

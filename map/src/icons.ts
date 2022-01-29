@@ -34,6 +34,15 @@ export const FoundryIcon = L.Icon.extend({
     }
 });
 
+export const LocomotiveIcon = L.Icon.extend({
+    options: {
+        iconUrl: "/img/Locomotive_32.png",
+        shadowUrl: null,
+        iconSize: [32, 32],
+        shadowSize: null,
+    }
+})
+
 export const ManufacturerIcon = L.Icon.extend({
     options: {
         iconUrl: "/img/Manufacturer_32.png",
