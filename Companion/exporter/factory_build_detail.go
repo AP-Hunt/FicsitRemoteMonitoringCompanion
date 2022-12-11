@@ -24,12 +24,12 @@ type Production struct {
 	Name        string  `json:"Name"`
 	CurrentProd float64 `json:"CurrentProd"`
 	MaxProd     float64 `json:"MaxProd"`
-	ProdPercent string  `json:"ProdPercent"`
+	ProdPercent float64 `json:"ProdPercent"`
 }
 
 type Ingredient struct {
 	Name            string  `json:"Name"`
 	CurrentConsumed float64 `json:"CurrentConsumed"`
 	MaxConsumed     float64 `json:"MaxConsumed"`
-	ConsPercent     string  `json:"ConsPercent"`
+	ConsPercent     float64 `json:"ConsPercent"`
 }

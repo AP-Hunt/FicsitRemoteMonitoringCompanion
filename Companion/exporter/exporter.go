@@ -13,6 +13,7 @@ type PrometheusExporter struct {
 	ctx                 context.Context
 	cancel              context.CancelFunc
 	productionCollector *ProductionCollector
+	powerCollector      *PowerCollector
 	buildingCollector   *FactoryBuildingCollector
 }
 
@@ -27,6 +28,7 @@ func NewPrometheusExporter(frmApiHost string) *PrometheusExporter {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	productionCollector := NewProductionCollector(ctx, frmApiHost+"/getProdStats")
+	powerCollector := NewPowerCollector(ctx, frmApiHost+"/getPower")
 	buildingCollector := NewFactoryBuildingCollector(ctx, frmApiHost+"/getFactory")
 
 	return &PrometheusExporter{
@@ -34,12 +36,14 @@ func NewPrometheusExporter(frmApiHost string) *PrometheusExporter {
 		ctx:                 ctx,
 		cancel:              cancel,
 		productionCollector: productionCollector,
+		powerCollector:      powerCollector,
 		buildingCollector:   buildingCollector,
 	}
 }
 
 func (e *PrometheusExporter) Start() {
 	go e.productionCollector.Start()
+	go e.powerCollector.Start()
 	go e.buildingCollector.Start()
 	go func() {
 		log.Fatal(e.server.ListenAndServe())

@@ -70,18 +70,13 @@ func (c *FactoryBuildingCollector) Collect() {
 				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
 			).Set(prod.CurrentProd)
 
-			efficiency := float64(0.0)
-			if e, err := strconv.ParseFloat(prod.ProdPercent, 64); err == nil {
-				efficiency = e
-			}
-
 			MachineItemsProducedEffiency.WithLabelValues(
 				prod.Name,
 				building.Building,
 				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
-			).Set(efficiency)
+			).Set(prod.ProdPercent)
 		}
 	}
 }
