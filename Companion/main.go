@@ -31,7 +31,7 @@ func main() {
 	log.Default().SetOutput(logFile)
 
 	// Create exporter
-	promExporter := exporter.NewPrometheusExporter("http://localhost:8090")
+	promExporter := exporter.NewPrometheusExporter("http://localhost:8080")
 
 	// Create prometheus
 	prom, err := prometheus.NewPrometheusWrapper()

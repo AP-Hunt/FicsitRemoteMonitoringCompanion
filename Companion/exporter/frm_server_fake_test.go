@@ -2,7 +2,6 @@ package exporter_test
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
@@ -11,6 +10,7 @@ import (
 type FRMServerFake struct {
 	server           *http.Server
 	productionData   []exporter.ProductionDetails
+	powerData        []exporter.PowerDetails
 	factoryBuildings []exporter.BuildingDetail
 }
 
@@ -26,6 +26,7 @@ func NewFRMServerFake() *FRMServerFake {
 	}
 
 	mux.Handle("/getProdStats", http.HandlerFunc(fake.productionStatsHandler))
+	mux.Handle("/getPower", http.HandlerFunc(fake.powerStatsHandler))
 	mux.Handle("/getFactory", http.HandlerFunc(fake.factoryBuildingsHandler))
 
 	return fake
@@ -34,7 +35,7 @@ func NewFRMServerFake() *FRMServerFake {
 func (f *FRMServerFake) Start() {
 
 	go func() {
-		log.Fatal(f.server.ListenAndServe())
+		f.server.ListenAndServe()
 	}()
 }
 
@@ -46,6 +47,7 @@ func (e *FRMServerFake) Stop() error {
 
 func (e *FRMServerFake) Reset() {
 	e.productionData = nil
+	e.powerData = nil
 
 	exporter.ItemConsumptionCapacityPerMinute.Reset()
 	exporter.ItemConsumptionCapacityPercent.Reset()
@@ -53,10 +55,23 @@ func (e *FRMServerFake) Reset() {
 	exporter.ItemProductionCapacityPercent.Reset()
 	exporter.ItemsConsumedPerMin.Reset()
 	exporter.ItemsProducedPerMin.Reset()
+	exporter.PowerConsumed.Reset()
+	exporter.PowerCapacity.Reset()
+	exporter.PowerMaxConsumed.Reset()
+	exporter.BatteryDifferential.Reset()
+	exporter.BatteryPercent.Reset()
+	exporter.BatteryCapacity.Reset()
+	exporter.BatterySecondsEmpty.Reset()
+	exporter.BatterySecondsFull.Reset()
+	exporter.FuseTriggered.Reset()
 }
 
 func (e *FRMServerFake) ReturnsProductionData(data []exporter.ProductionDetails) {
 	e.productionData = data
+}
+
+func (e *FRMServerFake) ReturnsPowerData(data []exporter.PowerDetails) {
+	e.powerData = data
 }
 
 func (e *FRMServerFake) ReturnsFactoryBuildings(data []exporter.BuildingDetail) {
@@ -65,6 +80,17 @@ func (e *FRMServerFake) ReturnsFactoryBuildings(data []exporter.BuildingDetail) 
 
 func (e *FRMServerFake) productionStatsHandler(w http.ResponseWriter, r *http.Request) {
 	jsonBytes, err := json.Marshal(e.productionData)
+
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+
+	w.Write(jsonBytes)
+}
+
+func (e *FRMServerFake) powerStatsHandler(w http.ResponseWriter, r *http.Request) {
+	jsonBytes, err := json.Marshal(e.powerData)
 
 	if err != nil {
 		w.WriteHeader(500)

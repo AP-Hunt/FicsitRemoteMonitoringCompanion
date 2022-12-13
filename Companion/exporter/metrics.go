@@ -46,6 +46,70 @@ var (
 	}, []string{
 		"item_name",
 	})
+
+
+	PowerConsumed = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "power_consumed",
+		Help: "Power consumed on selected power circuit",
+	}, []string{
+		"circuit_id",
+	})
+
+	PowerCapacity = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "power_capacity",
+		Help: "Power capacity on selected power circuit",
+	}, []string{
+		"circuit_id",
+	})
+
+	PowerMaxConsumed = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "power_max_consumed",
+		Help: "Maximum Power that can be consumed on selected power circuit",
+	}, []string{
+		"circuit_id",
+	})
+
+	BatteryDifferential = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "battery_differential",
+		Help: "Amount of power in excess/deficit going into or out of the battery bank(s). Positive = Charges batteries, Negative = Drains batteries",
+	}, []string{
+		"circuit_id",
+	})
+
+	BatteryPercent = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "battery_percent",
+		Help: "Percentage of battery bank(s) charge",
+	}, []string{
+		"circuit_id",
+	})
+
+	BatteryCapacity = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "battery_capacity",
+		Help: "Total capacity of battery bank(s)",
+	}, []string{
+		"circuit_id",
+	})
+
+	BatterySecondsEmpty = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "battery_seconds_empty",
+		Help: "Seconds until Batteries are empty",
+	}, []string{
+		"circuit_id",
+	})
+
+	BatterySecondsFull = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "battery_seconds_full",
+		Help: "Seconds until Batteries are full",
+	}, []string{
+		"circuit_id",
+	})
+
+	FuseTriggered = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "fuse_triggered",
+		Help: "Has the fuse been triggered",
+	}, []string{
+		"circuit_id",
+	})
 )
 
 func ReportAllMetrics() []*prometheus.MetricVec {
@@ -58,5 +122,14 @@ func ReportAllMetrics() []*prometheus.MetricVec {
 		ItemsConsumedPerMin.MetricVec,
 		MachineItemsProducedPerMin.MetricVec,
 		MachineItemsProducedEffiency.MetricVec,
+		PowerConsumed.MetricVec,
+		PowerCapacity.MetricVec,
+		PowerMaxConsumed.MetricVec,
+		BatteryDifferential.MetricVec,
+		BatteryPercent.MetricVec,
+		BatteryCapacity.MetricVec,
+		BatterySecondsEmpty.MetricVec,
+		BatterySecondsFull.MetricVec,
+		FuseTriggered.MetricVec,
 	}
 }
