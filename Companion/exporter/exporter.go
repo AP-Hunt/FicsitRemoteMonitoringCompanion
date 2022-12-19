@@ -46,7 +46,8 @@ func (e *PrometheusExporter) Start() {
 	go e.powerCollector.Start()
 	go e.buildingCollector.Start()
 	go func() {
-		log.Fatal(e.server.ListenAndServe())
+		e.server.ListenAndServe()
+		log.Println("stopping exporter")
 	}()
 }
 

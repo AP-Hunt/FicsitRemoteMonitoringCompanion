@@ -77,13 +77,13 @@ func NewPowerCollector(ctx context.Context, frmAddress string) *PowerCollector {
 }
 
 func (c *PowerCollector) Start() {
+	c.Collect()
 	for {
 		select {
 		case <-c.ctx.Done():
 			return
-		default:
+		case <-time.After(5 * time.Second):
 			c.Collect()
-			time.Sleep(5 * time.Second)
 		}
 	}
 }

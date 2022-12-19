@@ -1,11 +1,12 @@
-//go:build linux
+//go:build !windows
+// +build !windows
 
 package prometheus
 
 import (
+	"errors"
 	"os"
 	"os/exec"
-	"errors"
 )
 
 type PrometheusWrapper struct {

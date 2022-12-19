@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"html/template"
 	"log"
@@ -8,7 +9,10 @@ import (
 	"os/signal"
 	"path"
 	"path/filepath"
+	"runtime"
+	"strconv"
 	"strings"
+	"syscall"
 
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/prometheus"
@@ -18,7 +22,18 @@ import (
 var Version = "0.0.0-dev"
 
 func main() {
-	if len(os.Args) >= 2 && os.Args[1] == "-ShowMetrics" {
+
+	var frmHostname string
+	flag.StringVar(&frmHostname, "hostname", "localhost", "hostname of Ficsit Remote Monitoring webserver")
+	var frmPort int
+	flag.IntVar(&frmPort, "port", 8080, "port of Ficsit Remote Monitoring webserver")
+	var showMetrics bool
+	flag.BoolVar(&showMetrics, "ShowMetrics", false, "Show metrics and exit")
+	var noProm bool
+	flag.BoolVar(&noProm, "noprom", false, "Do not run prometheus with the app.")
+	flag.Parse()
+
+	if showMetrics {
 		exportMetrics()
 		os.Exit(0)
 	}
@@ -31,13 +46,16 @@ func main() {
 	log.Default().SetOutput(logFile)
 
 	// Create exporter
-	promExporter := exporter.NewPrometheusExporter("http://localhost:8080")
+	promExporter := exporter.NewPrometheusExporter("http://" + frmHostname + ":" + strconv.Itoa(frmPort))
 
-	// Create prometheus
-	prom, err := prometheus.NewPrometheusWrapper()
-	if err != nil {
-		fmt.Printf("error preparing prometheus: %s", err)
-		os.Exit(1)
+	var prom *prometheus.PrometheusWrapper
+	if runtime.GOOS == "windows" && !noProm {
+		// Create prometheus
+		prom, err = prometheus.NewPrometheusWrapper()
+		if err != nil {
+			fmt.Printf("error preparing prometheus: %s", err)
+			os.Exit(1)
+		}
 	}
 
 	// Create map server
@@ -48,10 +66,12 @@ func main() {
 	}
 
 	// Start prometheus
-	err = prom.Start()
-	if err != nil {
-		fmt.Printf("error starting prometheus: %s", err)
-		os.Exit(1)
+	if runtime.GOOS == "windows" && !noProm {
+		err = prom.Start()
+		if err != nil {
+			fmt.Printf("error starting prometheus: %s", err)
+			os.Exit(1)
+		}
 	}
 
 	// Start exporter
@@ -79,7 +99,12 @@ Press Ctrl + C to exit.
 
 	// Wait for an interrupt signal
 	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
+	if runtime.GOOS == "windows" {
+		signal.Notify(sigChan, os.Interrupt)
+	} else {
+		signal.Notify(sigChan, syscall.SIGTERM)
+		signal.Notify(sigChan, syscall.SIGINT)
+	}
 	<-sigChan
 
 	// Stop the exporter
@@ -89,9 +114,11 @@ Press Ctrl + C to exit.
 	}
 
 	// Stop prometheus
-	err = prom.Stop()
-	if err != nil {
-		fmt.Printf("error stopping prometheus: %s", err)
+	if runtime.GOOS == "windows" && !noProm {
+		err = prom.Stop()
+		if err != nil {
+			fmt.Printf("error stopping prometheus: %s", err)
+		}
 	}
 
 	// Stop map
