@@ -9,12 +9,10 @@ import (
 )
 
 type PrometheusExporter struct {
-	server              *http.Server
-	ctx                 context.Context
-	cancel              context.CancelFunc
-	productionCollector *ProductionCollector
-	powerCollector      *PowerCollector
-	buildingCollector   *FactoryBuildingCollector
+	server          *http.Server
+	ctx             context.Context
+	cancel          context.CancelFunc
+	collectorRunner *CollectorRunner
 }
 
 func NewPrometheusExporter(frmApiHost string) *PrometheusExporter {
@@ -27,24 +25,24 @@ func NewPrometheusExporter(frmApiHost string) *PrometheusExporter {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	productionCollector := NewProductionCollector(ctx, frmApiHost+"/getProdStats")
-	powerCollector := NewPowerCollector(ctx, frmApiHost+"/getPower")
-	buildingCollector := NewFactoryBuildingCollector(ctx, frmApiHost+"/getFactory")
+	productionCollector := NewProductionCollector(frmApiHost + "/getProdStats")
+	powerCollector := NewPowerCollector(frmApiHost + "/getPower")
+	buildingCollector := NewFactoryBuildingCollector(frmApiHost + "/getFactory")
+	vehicleCollector := NewVehicleCollector(frmApiHost + "/getVehicles")
+	trainCollector := NewTrainCollector(frmApiHost + "/getTrains")
+	droneCollector := NewDroneStationCollector(frmApiHost + "/getDroneStation")
+	collectorRunner := NewCollectorRunner(ctx, productionCollector, powerCollector, buildingCollector, vehicleCollector, trainCollector, droneCollector)
 
 	return &PrometheusExporter{
-		server:              server,
-		ctx:                 ctx,
-		cancel:              cancel,
-		productionCollector: productionCollector,
-		powerCollector:      powerCollector,
-		buildingCollector:   buildingCollector,
+		server:          server,
+		ctx:             ctx,
+		cancel:          cancel,
+		collectorRunner: collectorRunner,
 	}
 }
 
 func (e *PrometheusExporter) Start() {
-	go e.productionCollector.Start()
-	go e.powerCollector.Start()
-	go e.buildingCollector.Start()
+	go e.collectorRunner.Start()
 	go func() {
 		e.server.ListenAndServe()
 		log.Println("stopping exporter")

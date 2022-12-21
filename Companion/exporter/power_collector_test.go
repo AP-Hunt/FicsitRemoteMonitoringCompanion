@@ -1,8 +1,6 @@
 package exporter_test
 
 import (
-	"context"
-
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -13,32 +11,32 @@ var _ = Describe("PowerCollector", func() {
 
 	BeforeEach(func() {
 		FRMServer.Reset()
-		collector = exporter.NewPowerCollector(context.Background(), "http://localhost:9080/getPower")
+		collector = exporter.NewPowerCollector("http://localhost:9080/getPower")
 
 		FRMServer.ReturnsPowerData([]exporter.PowerDetails{
 			{
-				CircuitId: 1,
-				PowerConsumed: 30,
-				PowerCapacity: 44,
-				PowerMaxConsumed: 50,
+				CircuitId:           1,
+				PowerConsumed:       30,
+				PowerCapacity:       44,
+				PowerMaxConsumed:    50,
 				BatteryDifferential: 12,
-				BatteryPercent: 60,
-				BatteryCapacity: 100,
-				BatteryTimeEmpty: "00:00:00",
-				BatteryTimeFull: "33:22:11",
-				FuseTriggered: false,
+				BatteryPercent:      60,
+				BatteryCapacity:     100,
+				BatteryTimeEmpty:    "00:00:00",
+				BatteryTimeFull:     "33:22:11",
+				FuseTriggered:       false,
 			},
 			{
-				CircuitId: 2,
-				PowerConsumed: 55,
-				PowerCapacity: 44,
-				PowerMaxConsumed: 60,
+				CircuitId:           2,
+				PowerConsumed:       55,
+				PowerCapacity:       44,
+				PowerMaxConsumed:    60,
 				BatteryDifferential: -12,
-				BatteryPercent: 60,
-				BatteryCapacity: 100,
-				BatteryTimeEmpty: "00:3:00",
-				BatteryTimeFull: "00:00:00",
-				FuseTriggered: true,
+				BatteryPercent:      60,
+				BatteryCapacity:     100,
+				BatteryTimeEmpty:    "00:3:00",
+				BatteryTimeFull:     "00:00:00",
+				FuseTriggered:       true,
 			},
 		})
 	})

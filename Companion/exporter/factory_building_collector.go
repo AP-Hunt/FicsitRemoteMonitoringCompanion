@@ -1,60 +1,23 @@
 package exporter
 
 import (
-	"context"
-	"encoding/json"
 	"log"
-	"net/http"
 	"strconv"
-	"time"
 )
 
 type FactoryBuildingCollector struct {
 	FRMAddress string
-	ctx        context.Context
-	cancel     context.CancelFunc
 }
 
-func NewFactoryBuildingCollector(ctx context.Context, frmAddress string) *FactoryBuildingCollector {
-	ctx, cancel := context.WithCancel(ctx)
-
+func NewFactoryBuildingCollector(frmAddress string) *FactoryBuildingCollector {
 	return &FactoryBuildingCollector{
 		FRMAddress: frmAddress,
-		ctx:        ctx,
-		cancel:     cancel,
 	}
-}
-
-func (c *FactoryBuildingCollector) Start() {
-	c.Collect()
-	for {
-		select {
-		case <-c.ctx.Done():
-			return
-		case <-time.After(5 * time.Second):
-			c.Collect()
-		}
-	}
-}
-
-func (c *FactoryBuildingCollector) Stop() {
-	c.cancel()
 }
 
 func (c *FactoryBuildingCollector) Collect() {
-	resp, err := http.Get(c.FRMAddress)
-
-	if err != nil {
-		log.Printf("error fetching factory buildings from FRM: %s\n", err)
-		return
-	}
-
-	defer resp.Body.Close()
-
 	details := []BuildingDetail{}
-	decoder := json.NewDecoder(resp.Body)
-
-	err = decoder.Decode(&details)
+	err := retrieveData(c.FRMAddress, &details)
 	if err != nil {
 		log.Printf("error reading factory buildings from FRM: %s\n", err)
 		return

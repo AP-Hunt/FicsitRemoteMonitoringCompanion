@@ -1,7 +1,6 @@
 package exporter_test
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
@@ -23,7 +22,7 @@ var _ = Describe("ProductionCollector", func() {
 
 	BeforeEach(func() {
 		FRMServer.Reset()
-		collector = exporter.NewProductionCollector(context.Background(), "http://localhost:9080/getProdStats")
+		collector = exporter.NewProductionCollector("http://localhost:9080/getProdStats")
 
 		FRMServer.ReturnsProductionData([]exporter.ProductionDetails{
 			{

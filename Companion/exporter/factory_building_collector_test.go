@@ -1,8 +1,6 @@
 package exporter_test
 
 import (
-	"context"
-
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -14,7 +12,7 @@ var _ = Describe("FactoryBuildingCollector", func() {
 
 	BeforeEach(func() {
 		FRMServer.Reset()
-		collector = exporter.NewFactoryBuildingCollector(context.Background(), "http://localhost:9080/getFactory")
+		collector = exporter.NewFactoryBuildingCollector("http://localhost:9080/getFactory")
 
 		FRMServer.ReturnsFactoryBuildings([]exporter.BuildingDetail{
 			{

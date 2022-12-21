@@ -12,6 +12,7 @@ type MetricVectorDetails struct {
 }
 
 var RegisteredMetricVectors = []MetricVectorDetails{}
+var RegisteredMetrics = []*prometheus.GaugeVec{}
 
 func RegisterNewGaugeVec(opts prometheus.GaugeOpts, labelNames []string) *prometheus.GaugeVec {
 	RegisteredMetricVectors = append(RegisteredMetricVectors, MetricVectorDetails{
@@ -20,5 +21,7 @@ func RegisterNewGaugeVec(opts prometheus.GaugeOpts, labelNames []string) *promet
 		Labels: labelNames,
 	})
 
-	return promauto.NewGaugeVec(opts, labelNames)
+	metric := promauto.NewGaugeVec(opts, labelNames)
+	RegisteredMetrics = append(RegisteredMetrics, metric)
+	return metric
 }
