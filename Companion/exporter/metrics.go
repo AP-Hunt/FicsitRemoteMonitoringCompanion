@@ -47,7 +47,6 @@ var (
 		"item_name",
 	})
 
-
 	PowerConsumed = RegisterNewGaugeVec(prometheus.GaugeOpts{
 		Name: "power_consumed",
 		Help: "Power consumed on selected power circuit",
@@ -111,25 +110,3 @@ var (
 		"circuit_id",
 	})
 )
-
-func ReportAllMetrics() []*prometheus.MetricVec {
-	return []*prometheus.MetricVec{
-		ItemProductionCapacityPerMinute.MetricVec,
-		ItemProductionCapacityPercent.MetricVec,
-		ItemConsumptionCapacityPerMinute.MetricVec,
-		ItemConsumptionCapacityPercent.MetricVec,
-		ItemsProducedPerMin.MetricVec,
-		ItemsConsumedPerMin.MetricVec,
-		MachineItemsProducedPerMin.MetricVec,
-		MachineItemsProducedEffiency.MetricVec,
-		PowerConsumed.MetricVec,
-		PowerCapacity.MetricVec,
-		PowerMaxConsumed.MetricVec,
-		BatteryDifferential.MetricVec,
-		BatteryPercent.MetricVec,
-		BatteryCapacity.MetricVec,
-		BatterySecondsEmpty.MetricVec,
-		BatterySecondsFull.MetricVec,
-		FuseTriggered.MetricVec,
-	}
-}

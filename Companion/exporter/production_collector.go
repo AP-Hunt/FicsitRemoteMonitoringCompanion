@@ -1,19 +1,13 @@
 package exporter
 
 import (
-	"context"
-	"encoding/json"
 	"log"
-	"net/http"
 	"regexp"
 	"strconv"
-	"time"
 )
 
 type ProductionCollector struct {
 	FRMAddress string
-	ctx        context.Context
-	cancel     context.CancelFunc
 }
 
 var prodPerMinRegex = regexp.MustCompile(`P: (?P<prod_current>[\d.]+)/(?P<prod_capacity>[\d.]+)/min - C: (?P<cons_current>[\d.]+)/(?P<cons_capacity>[\d.]+)/min`)
@@ -82,46 +76,15 @@ func (pd *ProductionDetails) ItemConsumptionCapacity() *float64 {
 	return &v
 }
 
-func NewProductionCollector(ctx context.Context, frmAddress string) *ProductionCollector {
-	ctx, cancel := context.WithCancel(ctx)
-
+func NewProductionCollector(frmAddress string) *ProductionCollector {
 	return &ProductionCollector{
 		FRMAddress: frmAddress,
-		ctx:        ctx,
-		cancel:     cancel,
 	}
-}
-
-func (c *ProductionCollector) Start() {
-	for {
-		select {
-		case <-c.ctx.Done():
-			return
-		default:
-			c.Collect()
-			time.Sleep(5 * time.Second)
-		}
-	}
-}
-
-func (c *ProductionCollector) Stop() {
-	c.cancel()
 }
 
 func (c *ProductionCollector) Collect() {
-	resp, err := http.Get(c.FRMAddress)
-
-	if err != nil {
-		log.Printf("error fetching production statistics from FRM: %s\n", err)
-		return
-	}
-
-	defer resp.Body.Close()
-
 	details := []ProductionDetails{}
-	decoder := json.NewDecoder(resp.Body)
-
-	err = decoder.Decode(&details)
+	err := retrieveData(c.FRMAddress, &details)
 	if err != nil {
 		log.Printf("error reading production statistics from FRM: %s\n", err)
 		return

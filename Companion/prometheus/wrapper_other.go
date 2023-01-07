@@ -1,13 +1,14 @@
-//go:build linux
+//go:build !windows
+// +build !windows
 
 package prometheus
 
 import (
 	"os"
 	"os/exec"
-	"errors"
 )
 
+// a no-op prometheus wrapper. Not implemented.
 type PrometheusWrapper struct {
 	cmd    *exec.Cmd
 	stdout os.File
@@ -15,13 +16,13 @@ type PrometheusWrapper struct {
 }
 
 func NewPrometheusWrapper() (*PrometheusWrapper, error) {
-	return nil, errors.New("Not Implemented")
+	return nil, nil
 }
 
 func (pw *PrometheusWrapper) Start() error {
-	return errors.New("Not Implemented")
+	return nil
 }
 
 func (pw *PrometheusWrapper) Stop() error {
-	return errors.New("Not Implemented")
+	return nil
 }

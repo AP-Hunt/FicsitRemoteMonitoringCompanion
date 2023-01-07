@@ -13,13 +13,6 @@ type BuildingDetail struct {
 	CircuitID    int          `json:"CircuitID"`
 }
 
-type Location struct {
-	X        float64 `json:"x"`
-	Y        float64 `json:"y"`
-	Z        float64 `json:"z"`
-	Rotation int     `json:"rotation"`
-}
-
 type Production struct {
 	Name        string  `json:"Name"`
 	CurrentProd float64 `json:"CurrentProd"`

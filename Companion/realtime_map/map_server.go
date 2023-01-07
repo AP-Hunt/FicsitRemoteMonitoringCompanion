@@ -37,7 +37,8 @@ func NewMapServer() (*MapServer, error) {
 
 func (ms *MapServer) Start() {
 	go func() {
-		log.Fatal(ms.httpServer.ListenAndServe())
+		ms.httpServer.ListenAndServe()
+		log.Println("stopping map server")
 	}()
 }
 
