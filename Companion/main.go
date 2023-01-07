@@ -49,7 +49,7 @@ func main() {
 	promExporter := exporter.NewPrometheusExporter("http://" + frmHostname + ":" + strconv.Itoa(frmPort))
 
 	var prom *prometheus.PrometheusWrapper
-	if runtime.GOOS == "windows" && !noProm {
+	if !noProm {
 		// Create prometheus
 		prom, err = prometheus.NewPrometheusWrapper()
 		if err != nil {
@@ -66,7 +66,7 @@ func main() {
 	}
 
 	// Start prometheus
-	if runtime.GOOS == "windows" && !noProm {
+	if !noProm {
 		err = prom.Start()
 		if err != nil {
 			fmt.Printf("error starting prometheus: %s", err)
@@ -99,12 +99,7 @@ Press Ctrl + C to exit.
 
 	// Wait for an interrupt signal
 	sigChan := make(chan os.Signal, 1)
-	if runtime.GOOS == "windows" {
-		signal.Notify(sigChan, os.Interrupt)
-	} else {
-		signal.Notify(sigChan, syscall.SIGTERM)
-		signal.Notify(sigChan, syscall.SIGINT)
-	}
+	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 	<-sigChan
 
 	// Stop the exporter
@@ -114,7 +109,7 @@ Press Ctrl + C to exit.
 	}
 
 	// Stop prometheus
-	if runtime.GOOS == "windows" && !noProm {
+	if !noProm {
 		err = prom.Stop()
 		if err != nil {
 			fmt.Printf("error stopping prometheus: %s", err)
