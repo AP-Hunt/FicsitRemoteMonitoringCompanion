@@ -12,7 +12,7 @@ type VehicleCollector struct {
 
 type VehicleDetails struct {
 	Id            string   `json:"ID"`
-	VehicleType   string   `json:"VehicleType"`
+	VehicleType   string   `json:"Name"`
 	Location      Location `json:"location"`
 	ForwardSpeed  float64  `json:"ForwardSpeed"`
 	AutoPilot     bool     `json:"AutoPilot"`

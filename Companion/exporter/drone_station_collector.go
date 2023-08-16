@@ -10,7 +10,7 @@ type DroneStationCollector struct {
 
 type DroneStationDetails struct {
 	Id                     string  `json:"ID"`
-	HomeStation            string  `json:"HomeStation"`
+	HomeStation            string  `json:"Name"`
 	PairedStation          string  `json:"PairedStation"`
 	DroneStatus            string  `json:"DroneStatus"`
 	AvgIncRate             float64 `json:"AvgIncRate"`

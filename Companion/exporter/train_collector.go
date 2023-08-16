@@ -14,7 +14,7 @@ type TimeTable struct {
 	StationName string `json:"StationName"`
 }
 type TrainDetails struct {
-	TrainName        string      `json:"TrainName"`
+	TrainName        string      `json:"Name"`
 	PowerConsumed    float64     `json:"PowerConsumed"`
 	TrainStation     string      `json:"TrainStation"`
 	Derailed         bool        `json:"Derailed"`

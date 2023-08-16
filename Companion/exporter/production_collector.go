@@ -9,7 +9,7 @@ type ProductionCollector struct {
 }
 
 type ProductionDetails struct {
-	ItemName           string   `json:"ItemName"`
+	ItemName           string   `json:"Name"`
 	ProdPercent        float64 `json:"ProdPercent"`
 	ConsPercent        float64 `json:"ConsPercent"`
 	CurrentProduction  float64  `json:"CurrentProd"`
