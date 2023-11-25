@@ -18,7 +18,7 @@ type TrainDetails struct {
 	PowerConsumed    float64     `json:"PowerConsumed"`
 	TrainStation     string      `json:"TrainStation"`
 	Derailed         bool        `json:"Derailed"`
-	Status           string      `json:"Status"` //"TS_SelfDriving",
+	Status           string      `json:"Status"` //"Self-Driving",
 	TimeTable        []TimeTable `json:"TimeTable"`
 	ArrivalTime      time.Time
 	StationCounter   int
@@ -78,7 +78,7 @@ func (t *TrainDetails) startTracking(trackedTrains map[string]*TrainDetails) {
 
 func (d *TrainDetails) handleTimingUpdates(trackedTrains map[string]*TrainDetails) {
 	// track self driving train timing
-	if d.Status == "TS_SelfDriving" {
+	if d.Status == "Self-Driving" {
 		train, exists := trackedTrains[d.TrainName]
 		if exists && !train.FirstArrivalTime.IsZero() {
 			train.recordNextStation(d)

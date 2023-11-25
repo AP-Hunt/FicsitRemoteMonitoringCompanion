@@ -16,7 +16,7 @@ func updateTrain(station string) {
 			PowerConsumed: 0,
 			TrainStation:  station,
 			Derailed:      false,
-			Status:        "TS_SelfDriving",
+			Status:        "Self-Driving",
 			TimeTable: []exporter.TimeTable{
 				{StationName: "First"},
 				{StationName: "Second"},
@@ -28,7 +28,7 @@ func updateTrain(station string) {
 			PowerConsumed: 0,
 			TrainStation:  "Offsite",
 			Derailed:      false,
-			Status:        "TS_Parked",
+			Status:        "Parked",
 			TimeTable: []exporter.TimeTable{
 				{StationName: "Offsite"},
 			},
@@ -49,7 +49,7 @@ var _ = Describe("TrainCollector", func() {
 				PowerConsumed: 67,
 				TrainStation:  "NextStation",
 				Derailed:      false,
-				Status:        "TS_SelfDriving",
+				Status:        "Self-Driving",
 				TimeTable: []exporter.TimeTable{
 					{StationName: "First"},
 					{StationName: "Second"},
