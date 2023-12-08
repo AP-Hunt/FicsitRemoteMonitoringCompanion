@@ -22,10 +22,9 @@ func updateLocation(x float64, y float64, rotation int) {
 				Rotation: rotation,
 			},
 			AutoPilot: true,
-			Fuel: exporter.Fuel{
-				Name:   "Coal",
+			Fuel: []exporter.Fuel{{Name: "Coal",
 				Amount: 23,
-			},
+			}},
 			PathName: "Path",
 		},
 		{
@@ -39,10 +38,9 @@ func updateLocation(x float64, y float64, rotation int) {
 				Rotation: rotation,
 			},
 			AutoPilot: false,
-			Fuel: exporter.Fuel{
-				Name:   "Coal",
+			Fuel: []exporter.Fuel{{Name: "Coal",
 				Amount: 23,
-			},
+			}},
 			PathName: "no path",
 		},
 	})
@@ -67,10 +65,9 @@ var _ = Describe("VehicleCollector", func() {
 					Rotation: 60,
 				},
 				AutoPilot: true,
-				Fuel: exporter.Fuel{
-					Name:   "Coal",
+				Fuel: []exporter.Fuel{{Name: "Coal",
 					Amount: 23,
-				},
+				}},
 				PathName: "Path",
 			},
 		})

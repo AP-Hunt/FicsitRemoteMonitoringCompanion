@@ -16,7 +16,7 @@ type VehicleDetails struct {
 	Location     Location `json:"location"`
 	ForwardSpeed float64  `json:"ForwardSpeed"`
 	AutoPilot    bool     `json:"AutoPilot"`
-	Fuel         Fuel     `json:Fuel`
+	Fuel         []Fuel   `json:Fuel`
 	PathName     string   `json:"PathName"`
 	DepartTime   time.Time
 	Departed     bool
@@ -95,7 +95,9 @@ func (c *VehicleCollector) Collect() {
 	}
 
 	for _, d := range details {
-		VehicleFuel.WithLabelValues(d.Id, d.VehicleType, d.Fuel.Name).Set(d.Fuel.Amount)
+		if len(d.Fuel) > 0 {
+			VehicleFuel.WithLabelValues(d.Id, d.VehicleType, d.Fuel[0].Name).Set(d.Fuel[0].Amount)
+		}
 
 		d.handleTimingUpdates(c.TrackedVehicles)
 	}
