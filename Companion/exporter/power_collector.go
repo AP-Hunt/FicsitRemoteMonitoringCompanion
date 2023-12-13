@@ -5,6 +5,11 @@ import (
 	"strconv"
 )
 
+type PowerInfo struct {
+	CircuitId     float64 `json:"ID"`
+	PowerConsumed float64 `json:"PowerConsumed"`
+}
+
 type PowerCollector struct {
 	FRMAddress string
 }

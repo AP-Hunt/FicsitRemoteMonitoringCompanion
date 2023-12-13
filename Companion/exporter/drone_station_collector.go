@@ -2,6 +2,7 @@ package exporter
 
 import (
 	"log"
+	"strconv"
 )
 
 type DroneStationCollector struct {
@@ -9,34 +10,35 @@ type DroneStationCollector struct {
 }
 
 type DroneStationDetails struct {
-	Id                     string  `json:"ID"`
-	HomeStation            string  `json:"Name"`
-	PairedStation          string  `json:"PairedStation"`
-	DroneStatus            string  `json:"DroneStatus"`
-	AvgIncRate             float64 `json:"AvgIncRate"`
-	AvgIncStack            float64 `json:"AvgIncStack"`
-	AvgOutRate             float64 `json:"AvgOutRate"`
-	AvgOutStack            float64 `json"AvgOutStack"`
-	AvgRndTrip             string  `json:"AvgRndTrip"`
-	AvgTotalIncRate        float64 `json:"AvgTotalIncRate"`
-	AvgTotalIncStack       float64 `json:"AvgTotalIncStack"`
-	AvgTotalOutRate        float64 `json:"AvgTotalOutRate"`
-	AvgTotalOutStack       float64 `json:"AvgTotalOutStack"`
-	AvgTripIncAmt          float64 `json:"AvgTripIncAmt"`
-	EstRndTrip             string  `json:"EstRndTrip"`
-	EstTotalTransRate      float64 `json:"EstTotalTransRate"`
-	EstTransRate           float64 `json:"EstTransRate"`
-	EstLatestTotalIncStack float64 `json:"EstLatestTotalIncStack"`
-	EstLatestTotalOutStack float64 `json:"EstLatestTotalOutStack"`
-	LatestIncStack         float64 `json:"LatestIncStack"`
-	LatestOutStack         float64 `json:"LatestOutStack"`
-	LatestRndTrip          string  `json:"LatestRndTrip"`
-	LatestTripIncAmt       float64 `json:"LatestTripIncAmt"`
-	LatestTripOutAmt       float64 `json:"LatestTripOutAmt"`
-	MedianRndTrip          string  `json:"MedianRndTrip"`
-	MedianTripIncAmt       float64 `json:"MedianTripIncAmt"`
-	MedianTripOutAmt       float64 `json:"MedianTripOutAmt"`
-	EstBatteryRate         float64 `json:"EstBatteryRate"`
+	Id                     string    `json:"ID"`
+	HomeStation            string    `json:"Name"`
+	PairedStation          string    `json:"PairedStation"`
+	DroneStatus            string    `json:"DroneStatus"`
+	AvgIncRate             float64   `json:"AvgIncRate"`
+	AvgIncStack            float64   `json:"AvgIncStack"`
+	AvgOutRate             float64   `json:"AvgOutRate"`
+	AvgOutStack            float64   `json"AvgOutStack"`
+	AvgRndTrip             string    `json:"AvgRndTrip"`
+	AvgTotalIncRate        float64   `json:"AvgTotalIncRate"`
+	AvgTotalIncStack       float64   `json:"AvgTotalIncStack"`
+	AvgTotalOutRate        float64   `json:"AvgTotalOutRate"`
+	AvgTotalOutStack       float64   `json:"AvgTotalOutStack"`
+	AvgTripIncAmt          float64   `json:"AvgTripIncAmt"`
+	EstRndTrip             string    `json:"EstRndTrip"`
+	EstTotalTransRate      float64   `json:"EstTotalTransRate"`
+	EstTransRate           float64   `json:"EstTransRate"`
+	EstLatestTotalIncStack float64   `json:"EstLatestTotalIncStack"`
+	EstLatestTotalOutStack float64   `json:"EstLatestTotalOutStack"`
+	LatestIncStack         float64   `json:"LatestIncStack"`
+	LatestOutStack         float64   `json:"LatestOutStack"`
+	LatestRndTrip          string    `json:"LatestRndTrip"`
+	LatestTripIncAmt       float64   `json:"LatestTripIncAmt"`
+	LatestTripOutAmt       float64   `json:"LatestTripOutAmt"`
+	MedianRndTrip          string    `json:"MedianRndTrip"`
+	MedianTripIncAmt       float64   `json:"MedianTripIncAmt"`
+	MedianTripOutAmt       float64   `json:"MedianTripOutAmt"`
+	EstBatteryRate         float64   `json:"EstBatteryRate"`
+	PowerInfo              PowerInfo `json:"PowerInfo"`
 }
 
 func NewDroneStationCollector(frmAddress string) *DroneStationCollector {
@@ -58,6 +60,9 @@ func (c *DroneStationCollector) Collect() {
 		paired := d.PairedStation
 
 		DronePortBatteryRate.WithLabelValues(id, home, paired).Set(d.EstBatteryRate)
+
+		circuitId := strconv.FormatFloat(d.PowerInfo.CircuitId, 'f', -1, 64)
+		DronePortPower.WithLabelValues(id, home, paired, circuitId).Set(d.PowerInfo.PowerConsumed)
 
 		roundTrip := parseTimeSeconds(d.LatestRndTrip)
 		if roundTrip != nil {

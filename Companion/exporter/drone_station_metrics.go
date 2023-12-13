@@ -21,4 +21,13 @@ var (
 		"home_station",
 		"paired_station",
 	})
+	DronePortPower = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "drone_port_power",
+		Help: "Drone port power in MW",
+	}, []string{
+		"id",
+		"home_station",
+		"paired_station",
+		"circuit_id",
+	})
 )
