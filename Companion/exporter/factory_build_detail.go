@@ -11,6 +11,7 @@ type BuildingDetail struct {
 	IsProducing  bool         `json:"IsProducing"`
 	IsPaused     bool         `json:"IsPaused"`
 	CircuitID    int          `json:"CircuitID"`
+	PowerInfo    PowerInfo    `json:"PowerInfo"`
 }
 
 type Production struct {

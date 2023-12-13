@@ -23,6 +23,7 @@ func (c *FactoryBuildingCollector) Collect() {
 		return
 	}
 
+	powerInfo := map[float64]float64{}
 	for _, building := range details {
 		for _, prod := range building.Production {
 			MachineItemsProducedPerMin.WithLabelValues(
@@ -41,5 +42,16 @@ func (c *FactoryBuildingCollector) Collect() {
 				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
 			).Set(prod.ProdPercent)
 		}
+
+		val, ok := powerInfo[building.PowerInfo.CircuitId]
+		if ok {
+			powerInfo[building.PowerInfo.CircuitId] = val + building.PowerInfo.PowerConsumed
+		} else {
+			powerInfo[building.PowerInfo.CircuitId] = building.PowerInfo.PowerConsumed
+		}
+	}
+	for circuitId, powerConsumed := range powerInfo {
+		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
+		FactoryPower.WithLabelValues(cid).Set(powerConsumed)
 	}
 }

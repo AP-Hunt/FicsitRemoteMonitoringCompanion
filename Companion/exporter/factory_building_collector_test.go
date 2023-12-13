@@ -51,12 +51,26 @@ var _ = Describe("FactoryBuildingCollector", func() {
 				IsProducing:  false,
 				IsPaused:     false,
 				CircuitID:    0,
+				PowerInfo: exporter.PowerInfo{
+					CircuitId:     1,
+					PowerConsumed: 23,
+				},
 			},
 		})
 	})
 
 	AfterEach(func() {
 		collector = nil
+	})
+
+	Describe("Factory Power", func() {
+
+		It("Records power per circuit", func() {
+			collector.Collect()
+			val, err := gaugeValue(exporter.FactoryPower, "1")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(23.0))
+		})
 	})
 
 	Describe("Machine item production metrics", func() {
