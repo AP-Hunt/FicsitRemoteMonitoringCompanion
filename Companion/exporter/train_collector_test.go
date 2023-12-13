@@ -1,7 +1,7 @@
 package exporter_test
 
 import (
-	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
+	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/exporter"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 

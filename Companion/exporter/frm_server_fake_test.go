@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
+	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/exporter"
 )
 
 type FRMServerFake struct {
