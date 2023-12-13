@@ -32,6 +32,24 @@ var _ = Describe("DroneStationCollector", func() {
 					PowerConsumed: 100,
 				},
 			},
+			{
+				Id:               "2",
+				HomeStation:      "home2",
+				PairedStation:    "remote station2",
+				DroneStatus:      "EDS_EN_ROUTE",
+				AvgIncRate:       1,
+				AvgOutRate:       1,
+				LatestIncStack:   0.2,
+				LatestOutStack:   0.3,
+				LatestRndTrip:    "00:04:24",
+				LatestTripIncAmt: 82,
+				LatestTripOutAmt: 50,
+				EstBatteryRate:   30,
+				PowerInfo: exporter.PowerInfo{
+					CircuitId:     1.0,
+					PowerConsumed: 100,
+				},
+			},
 		})
 	})
 
@@ -59,8 +77,8 @@ var _ = Describe("DroneStationCollector", func() {
 		It("sets the 'drone_port_power' metric with the right labels", func() {
 			collector.Collect()
 
-			val, _ := gaugeValue(exporter.DronePortPower, "1", "home", "remote station", "1")
-			Expect(val).To(Equal(100.0))
+			val, _ := gaugeValue(exporter.DronePortPower, "1")
+			Expect(val).To(Equal(200.0))
 		})
 	})
 })

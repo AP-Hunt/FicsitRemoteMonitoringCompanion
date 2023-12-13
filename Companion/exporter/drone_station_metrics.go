@@ -25,9 +25,6 @@ var (
 		Name: "drone_port_power",
 		Help: "Drone port power in MW",
 	}, []string{
-		"id",
-		"home_station",
-		"paired_station",
 		"circuit_id",
 	})
 )

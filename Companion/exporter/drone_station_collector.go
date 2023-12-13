@@ -54,6 +54,8 @@ func (c *DroneStationCollector) Collect() {
 		log.Printf("error reading drone station statistics from FRM: %s\n", err)
 		return
 	}
+
+	powerInfo := map[float64]float64{}
 	for _, d := range details {
 		id := d.Id
 		home := d.HomeStation
@@ -61,12 +63,21 @@ func (c *DroneStationCollector) Collect() {
 
 		DronePortBatteryRate.WithLabelValues(id, home, paired).Set(d.EstBatteryRate)
 
-		circuitId := strconv.FormatFloat(d.PowerInfo.CircuitId, 'f', -1, 64)
-		DronePortPower.WithLabelValues(id, home, paired, circuitId).Set(d.PowerInfo.PowerConsumed)
-
 		roundTrip := parseTimeSeconds(d.LatestRndTrip)
 		if roundTrip != nil {
 			DronePortRndTrip.WithLabelValues(id, home, paired).Set(*roundTrip)
 		}
+
+		val, ok := powerInfo[d.PowerInfo.CircuitId]
+		if ok {
+			powerInfo[d.PowerInfo.CircuitId] = val + d.PowerInfo.PowerConsumed
+		} else {
+			powerInfo[d.PowerInfo.CircuitId] = d.PowerInfo.PowerConsumed
+		}
+	}
+
+	for circuitId, powerConsumed := range powerInfo {
+		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
+		DronePortPower.WithLabelValues(cid).Set(powerConsumed)
 	}
 }
