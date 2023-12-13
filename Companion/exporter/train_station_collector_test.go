@@ -11,7 +11,8 @@ var _ = Describe("TrainStationCollector", func() {
 
 	BeforeEach(func() {
 		FRMServer.Reset()
-		collector = exporter.NewTrainStationCollector("http://localhost:9080/getTrainStation")
+		trackedStations := &(map[string]exporter.TrainStationDetails{})
+		collector = exporter.NewTrainStationCollector("http://localhost:9080/getTrainStation", trackedStations)
 
 		FRMServer.ReturnsTrainStationData([]exporter.TrainStationDetails{
 			{
@@ -63,7 +64,7 @@ var _ = Describe("TrainStationCollector", func() {
 		collector = nil
 	})
 
-	Describe("Truck station metrics collection", func() {
+	Describe("Train station metrics collection", func() {
 		It("sets the 'train_station_power' metric with the right labels", func() {
 			collector.Collect()
 

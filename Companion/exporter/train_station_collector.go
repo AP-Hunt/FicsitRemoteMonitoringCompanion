@@ -6,7 +6,8 @@ import (
 )
 
 type TrainStationCollector struct {
-	FRMAddress string
+	FRMAddress      string
+	TrackedStations *map[string]TrainStationDetails
 }
 
 type CargoPlatform struct {
@@ -23,9 +24,10 @@ type TrainStationDetails struct {
 	PowerInfo      PowerInfo       `json:"PowerInfo"`
 }
 
-func NewTrainStationCollector(frmAddress string) *TrainStationCollector {
+func NewTrainStationCollector(frmAddress string, trackedStations *map[string]TrainStationDetails) *TrainStationCollector {
 	return &TrainStationCollector{
-		FRMAddress: frmAddress,
+		FRMAddress:      frmAddress,
+		TrackedStations: trackedStations,
 	}
 }
 
@@ -57,6 +59,9 @@ func (c *TrainStationCollector) Collect() {
 		} else {
 			powerInfo[d.PowerInfo.CircuitId] = totalPowerConsumed
 		}
+
+		//also cache stations so other metrics can figure out a circuit id from a station name
+		(*c.TrackedStations)[d.Name] = d
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)

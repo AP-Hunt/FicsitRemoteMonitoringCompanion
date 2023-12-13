@@ -2,12 +2,14 @@ package exporter
 
 import (
 	"log"
+	"strconv"
 	"time"
 )
 
 type TrainCollector struct {
-	FRMAddress    string
-	TrackedTrains map[string]*TrainDetails
+	FRMAddress      string
+	TrackedTrains   map[string]*TrainDetails
+	TrackedStations *map[string]TrainStationDetails
 }
 
 type TimeTable struct {
@@ -34,10 +36,11 @@ type TrainDetails struct {
 	FirstArrivalTime time.Time
 }
 
-func NewTrainCollector(frmAddress string) *TrainCollector {
+func NewTrainCollector(frmAddress string, trackedStations *map[string]TrainStationDetails) *TrainCollector {
 	return &TrainCollector{
-		FRMAddress:    frmAddress,
-		TrackedTrains: make(map[string]*TrainDetails),
+		FRMAddress:      frmAddress,
+		TrackedTrains:   make(map[string]*TrainDetails),
+		TrackedStations: trackedStations,
 	}
 }
 
@@ -113,6 +116,7 @@ func (c *TrainCollector) Collect() {
 		return
 	}
 
+	powerInfo := map[float64]float64{}
 	for _, d := range details {
 		totalMass := 0.0
 		payloadMass := 0.0
@@ -128,7 +132,10 @@ func (c *TrainCollector) Collect() {
 			maxPayloadMass = maxPayloadMass + car.MaxPayloadMass
 		}
 
-		TrainPower.WithLabelValues(d.TrainName).Set(d.PowerConsumed * locomotives) // for now, the total power consumed is a multiple of the reported power consumed by the number of locomotives
+		// for now, the total power consumed is a multiple of the reported power consumed by the number of locomotives
+		trainPowerConsumed := d.PowerConsumed * locomotives
+
+		TrainPower.WithLabelValues(d.TrainName).Set(trainPowerConsumed)
 		TrainTotalMass.WithLabelValues(d.TrainName).Set(totalMass)
 		TrainPayloadMass.WithLabelValues(d.TrainName).Set(payloadMass)
 		TrainMaxPayloadMass.WithLabelValues(d.TrainName).Set(maxPayloadMass)
@@ -137,5 +144,22 @@ func (c *TrainCollector) Collect() {
 		TrainDerailed.WithLabelValues(d.TrainName).Set(isDerailed)
 
 		d.handleTimingUpdates(c.TrackedTrains)
+
+		if len(d.TimeTable) > 0 {
+			station, ok := (*c.TrackedStations)[d.TimeTable[0].StationName]
+			if ok {
+				circuitId := station.PowerInfo.CircuitId
+				val, ok := powerInfo[circuitId]
+				if ok {
+					powerInfo[circuitId] = val + trainPowerConsumed
+				} else {
+					powerInfo[circuitId] = trainPowerConsumed
+				}
+			}
+		}
+	}
+	for circuitId, powerConsumed := range powerInfo {
+		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
+		TrainCircuitPower.WithLabelValues(cid).Set(powerConsumed)
 	}
 }
