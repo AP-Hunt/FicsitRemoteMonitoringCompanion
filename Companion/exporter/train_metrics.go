@@ -31,4 +31,22 @@ var (
 	}, []string{
 		"name",
 	})
+	TrainTotalMass = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "train_total_mass",
+		Help: "Total mass of the train",
+	}, []string{
+		"name",
+	})
+	TrainPayloadMass = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "train_payload_mass",
+		Help: "Current payload mass of the train",
+	}, []string{
+		"name",
+	})
+	TrainMaxPayloadMass = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "train_max_payload_mass",
+		Help: "Max payload mass of the train",
+	}, []string{
+		"name",
+	})
 )

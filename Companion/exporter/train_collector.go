@@ -13,6 +13,14 @@ type TrainCollector struct {
 type TimeTable struct {
 	StationName string `json:"StationName"`
 }
+
+type TrainCar struct {
+	Name           string  `json:"Name"`
+	TotalMass      float64 `json:"TotalMass"`
+	PayloadMass    float64 `json:"PayloadMass"`
+	MaxPayloadMass float64 `json:"MaxPayloadMass"`
+}
+
 type TrainDetails struct {
 	TrainName        string      `json:"Name"`
 	PowerConsumed    float64     `json:"PowerConsumed"`
@@ -20,6 +28,7 @@ type TrainDetails struct {
 	Derailed         bool        `json:"Derailed"`
 	Status           string      `json:"Status"` //"Self-Driving",
 	TimeTable        []TimeTable `json:"TimeTable"`
+	TrainConsist     []TrainCar  `json:"TrainConsist"`
 	ArrivalTime      time.Time
 	StationCounter   int
 	FirstArrivalTime time.Time
@@ -105,7 +114,24 @@ func (c *TrainCollector) Collect() {
 	}
 
 	for _, d := range details {
-		TrainPower.WithLabelValues(d.TrainName).Set(d.PowerConsumed)
+		totalMass := 0.0
+		payloadMass := 0.0
+		maxPayloadMass := 0.0
+		locomotives := 0.0
+
+		for _, car := range d.TrainConsist {
+			if car.Name == "Electric Locomotive" {
+				locomotives = locomotives + 1
+			}
+			totalMass = totalMass + car.TotalMass
+			payloadMass = payloadMass + car.PayloadMass
+			maxPayloadMass = maxPayloadMass + car.MaxPayloadMass
+		}
+
+		TrainPower.WithLabelValues(d.TrainName).Set(d.PowerConsumed * locomotives) // for now, the total power consumed is a multiple of the reported power consumed by the number of locomotives
+		TrainTotalMass.WithLabelValues(d.TrainName).Set(totalMass)
+		TrainPayloadMass.WithLabelValues(d.TrainName).Set(payloadMass)
+		TrainMaxPayloadMass.WithLabelValues(d.TrainName).Set(maxPayloadMass)
 
 		isDerailed := parseBool(d.Derailed)
 		TrainDerailed.WithLabelValues(d.TrainName).Set(isDerailed)

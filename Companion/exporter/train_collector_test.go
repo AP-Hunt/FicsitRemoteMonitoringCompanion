@@ -22,6 +22,10 @@ func updateTrain(station string) {
 				{StationName: "Second"},
 				{StationName: "Third"},
 			},
+			TrainConsist: []exporter.TrainCar{
+				{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
+				{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
+			},
 		},
 		{
 			TrainName:     "Not In Use",
@@ -31,6 +35,10 @@ func updateTrain(station string) {
 			Status:        "Parked",
 			TimeTable: []exporter.TimeTable{
 				{StationName: "Offsite"},
+			},
+			TrainConsist: []exporter.TrainCar{
+				{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
+				{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
 			},
 		},
 	})
@@ -54,6 +62,12 @@ var _ = Describe("TrainCollector", func() {
 					{StationName: "First"},
 					{StationName: "Second"},
 				},
+				TrainConsist: []exporter.TrainCar{
+					{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
+					{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
+					{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
+					{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
+				},
 			},
 			{
 				TrainName:     "DerailedTrain",
@@ -61,6 +75,7 @@ var _ = Describe("TrainCollector", func() {
 				TrainStation:  "NextStation",
 				Derailed:      true,
 				Status:        "Derailed",
+				TrainConsist:  []exporter.TrainCar{},
 			},
 		})
 	})
@@ -85,7 +100,18 @@ var _ = Describe("TrainCollector", func() {
 			val, err := gaugeValue(exporter.TrainPower, "Train1")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(Equal(float64(67)))
+			Expect(val).To(Equal(float64(67 * 2))) //expects reported power to be per train, so multiply by # of trains
+		})
+
+		It("sets the mass metrics with the right labels", func() {
+			collector.Collect()
+
+			val, _ := gaugeValue(exporter.TrainTotalMass, "Train1")
+			Expect(val).To(Equal(3000.0 + 3000.0 + 47584.0 + 47584.0))
+			val, _ = gaugeValue(exporter.TrainPayloadMass, "Train1")
+			Expect(val).To(Equal(17584.0 + 17584.0))
+			val, _ = gaugeValue(exporter.TrainMaxPayloadMass, "Train1")
+			Expect(val).To(Equal(70000.0 * 2))
 		})
 
 		It("sets 'train_segment_trip_seconds' metric with the right labels", func() {
