@@ -148,6 +148,15 @@ var _ = Describe("TrainCollector", func() {
 			Expect(val).To(Equal((67.0 * 2) + 22.0))
 		})
 
+		It("sets the 'train_power_circuit_consumed_max' metric with the right labels", func() {
+			collector.Collect()
+
+			val, err := gaugeValue(exporter.TrainCircuitPowerMax, "1")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(exporter.MaxTrainPowerConsumption * 3))
+		})
+
 		It("sets the mass metrics with the right labels", func() {
 			collector.Collect()
 

@@ -28,6 +28,13 @@ var _ = Describe("VehicleStationCollector", func() {
 					PowerConsumed: 20,
 				},
 			},
+			{
+				Name: "Truck Station",
+				PowerInfo: exporter.PowerInfo{
+					CircuitId:     1,
+					PowerConsumed: 0.1,
+				},
+			},
 		})
 	})
 
@@ -42,7 +49,15 @@ var _ = Describe("VehicleStationCollector", func() {
 			val, err := gaugeValue(exporter.VehicleStationPower, "1")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(Equal(float64(40)))
+			Expect(val).To(Equal(40.1))
+		})
+		It("sets the 'vehicle_station_power_max' metric with the right labels", func() {
+			collector.Collect()
+
+			val, err := gaugeValue(exporter.VehicleStationPowerMax, "1")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(60.0))
 		})
 	})
 })

@@ -32,4 +32,11 @@ var (
 	}, []string{
 		"circuit_id",
 	})
+
+	FactoryPowerMax = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "factory_power_max",
+		Help: "Max power draw from factory machines in MW. Does not include extractors.",
+	}, []string{
+		"circuit_id",
+	})
 )

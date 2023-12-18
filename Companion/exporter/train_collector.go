@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+var MaxTrainPowerConsumption = 110.0
+
 type TrainCollector struct {
 	FRMAddress      string
 	TrackedTrains   map[string]*TrainDetails
@@ -117,6 +119,7 @@ func (c *TrainCollector) Collect() {
 	}
 
 	powerInfo := map[float64]float64{}
+	maxPowerInfo := map[float64]float64{}
 	for _, d := range details {
 		totalMass := 0.0
 		payloadMass := 0.0
@@ -134,6 +137,7 @@ func (c *TrainCollector) Collect() {
 
 		// for now, the total power consumed is a multiple of the reported power consumed by the number of locomotives
 		trainPowerConsumed := d.PowerConsumed * locomotives
+		maxTrainPowerConsumed := MaxTrainPowerConsumption * locomotives
 
 		TrainPower.WithLabelValues(d.TrainName).Set(trainPowerConsumed)
 		TrainTotalMass.WithLabelValues(d.TrainName).Set(totalMass)
@@ -155,11 +159,21 @@ func (c *TrainCollector) Collect() {
 				} else {
 					powerInfo[circuitId] = trainPowerConsumed
 				}
+				val, ok = maxPowerInfo[circuitId]
+				if ok {
+					maxPowerInfo[circuitId] = val + maxTrainPowerConsumed
+				} else {
+					maxPowerInfo[circuitId] = maxTrainPowerConsumed
+				}
 			}
 		}
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
 		TrainCircuitPower.WithLabelValues(cid).Set(powerConsumed)
+	}
+	for circuitId, powerConsumed := range maxPowerInfo {
+		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
+		TrainCircuitPowerMax.WithLabelValues(cid).Set(powerConsumed)
 	}
 }

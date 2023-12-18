@@ -7,7 +7,14 @@ import (
 var (
 	VehicleStationPower = RegisterNewGaugeVec(prometheus.GaugeOpts{
 		Name: "vehicle_station_power",
-		Help: "Vehicle station power in MW",
+		Help: "Vehicle station power use in MW",
+	}, []string{
+		"circuit_id",
+	})
+
+	VehicleStationPowerMax = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "vehicle_station_power_max",
+		Help: "Vehicle station max power use in MW",
 	}, []string{
 		"circuit_id",
 	})

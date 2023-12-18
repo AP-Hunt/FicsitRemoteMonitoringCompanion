@@ -37,6 +37,12 @@ var (
 	}, []string{
 		"circuit_id",
 	})
+	TrainCircuitPowerMax = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "train_power_circuit_consumed_max",
+		Help: "Maximum power all trains can consume on a circuit",
+	}, []string{
+		"circuit_id",
+	})
 	TrainTotalMass = RegisterNewGaugeVec(prometheus.GaugeOpts{
 		Name: "train_total_mass",
 		Help: "Total mass of the train",

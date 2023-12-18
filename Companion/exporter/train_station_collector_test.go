@@ -73,5 +73,14 @@ var _ = Describe("TrainStationCollector", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(150.3)))
 		})
+
+		It("sets the 'train_station_power_max' metric with the right labels", func() {
+			collector.Collect()
+
+			val, err := gaugeValue(exporter.TrainStationPowerMax, "1")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(float64(200.2)))
+		})
 	})
 })

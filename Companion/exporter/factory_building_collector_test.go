@@ -46,7 +46,7 @@ var _ = Describe("FactoryBuildingCollector", func() {
 						ConsPercent:     1.0,
 					},
 				},
-				ManuSpeed:    1.0,
+				ManuSpeed:    100.0,
 				IsConfigured: false,
 				IsProducing:  false,
 				IsPaused:     false,
@@ -70,6 +70,8 @@ var _ = Describe("FactoryBuildingCollector", func() {
 			val, err := gaugeValue(exporter.FactoryPower, "1")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(23.0))
+			val2, _ := gaugeValue(exporter.FactoryPowerMax, "1")
+			Expect(val2).To(Equal(exporter.SmelterPower))
 		})
 	})
 
