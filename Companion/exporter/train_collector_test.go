@@ -1,7 +1,7 @@
 package exporter_test
 
 import (
-	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
+	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/exporter"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -16,11 +16,15 @@ func updateTrain(station string) {
 			PowerConsumed: 0,
 			TrainStation:  station,
 			Derailed:      false,
-			Status:        "TS_SelfDriving",
+			Status:        "Self-Driving",
 			TimeTable: []exporter.TimeTable{
 				{StationName: "First"},
 				{StationName: "Second"},
 				{StationName: "Third"},
+			},
+			TrainConsist: []exporter.TrainCar{
+				{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
+				{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
 			},
 		},
 		{
@@ -28,9 +32,13 @@ func updateTrain(station string) {
 			PowerConsumed: 0,
 			TrainStation:  "Offsite",
 			Derailed:      false,
-			Status:        "TS_Parked",
+			Status:        "Parked",
 			TimeTable: []exporter.TimeTable{
 				{StationName: "Offsite"},
+			},
+			TrainConsist: []exporter.TrainCar{
+				{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
+				{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
 			},
 		},
 	})
@@ -41,7 +49,27 @@ var _ = Describe("TrainCollector", func() {
 
 	BeforeEach(func() {
 		FRMServer.Reset()
-		collector = exporter.NewTrainCollector("http://localhost:9080/getTrains")
+		trackedStations := &(map[string]exporter.TrainStationDetails{
+			"First": {
+				Name: "First",
+				PowerInfo: exporter.PowerInfo{
+					CircuitId: 1,
+				},
+			},
+			"Second": {
+				Name: "Second",
+				PowerInfo: exporter.PowerInfo{
+					CircuitId: 1,
+				},
+			},
+			"Third": {
+				Name: "Third",
+				PowerInfo: exporter.PowerInfo{
+					CircuitId: 1,
+				},
+			},
+		})
+		collector = exporter.NewTrainCollector("http://localhost:9080/getTrains", trackedStations)
 
 		FRMServer.ReturnsTrainData([]exporter.TrainDetails{
 			{
@@ -49,10 +77,32 @@ var _ = Describe("TrainCollector", func() {
 				PowerConsumed: 67,
 				TrainStation:  "NextStation",
 				Derailed:      false,
-				Status:        "TS_SelfDriving",
+				Status:        "Self-Driving",
 				TimeTable: []exporter.TimeTable{
 					{StationName: "First"},
 					{StationName: "Second"},
+				},
+				TrainConsist: []exporter.TrainCar{
+					{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
+					{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
+					{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
+					{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
+				},
+			},
+			{
+				TrainName:     "Train2",
+				PowerConsumed: 22,
+				TrainStation:  "NextStation",
+				Derailed:      false,
+				Status:        "Self-Driving",
+				TimeTable: []exporter.TimeTable{
+					{StationName: "Second"},
+					{StationName: "Third"},
+				},
+				TrainConsist: []exporter.TrainCar{
+					{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
+					{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
+					{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
 				},
 			},
 			{
@@ -61,6 +111,7 @@ var _ = Describe("TrainCollector", func() {
 				TrainStation:  "NextStation",
 				Derailed:      true,
 				Status:        "Derailed",
+				TrainConsist:  []exporter.TrainCar{},
 			},
 		})
 	})
@@ -85,7 +136,36 @@ var _ = Describe("TrainCollector", func() {
 			val, err := gaugeValue(exporter.TrainPower, "Train1")
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(Equal(float64(67)))
+			Expect(val).To(Equal(float64(67 * 2))) //expects reported power to be per train, so multiply by # of trains
+		})
+
+		It("sets the 'train_power_circuit_consumed' metric with the right labels", func() {
+			collector.Collect()
+
+			val, err := gaugeValue(exporter.TrainCircuitPower, "1")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal((67.0 * 2) + 22.0))
+		})
+
+		It("sets the 'train_power_circuit_consumed_max' metric with the right labels", func() {
+			collector.Collect()
+
+			val, err := gaugeValue(exporter.TrainCircuitPowerMax, "1")
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(exporter.MaxTrainPowerConsumption * 3))
+		})
+
+		It("sets the mass metrics with the right labels", func() {
+			collector.Collect()
+
+			val, _ := gaugeValue(exporter.TrainTotalMass, "Train1")
+			Expect(val).To(Equal(3000.0 + 3000.0 + 47584.0 + 47584.0))
+			val, _ = gaugeValue(exporter.TrainPayloadMass, "Train1")
+			Expect(val).To(Equal(17584.0 + 17584.0))
+			val, _ = gaugeValue(exporter.TrainMaxPayloadMass, "Train1")
+			Expect(val).To(Equal(70000.0 * 2))
 		})
 
 		It("sets 'train_segment_trip_seconds' metric with the right labels", func() {

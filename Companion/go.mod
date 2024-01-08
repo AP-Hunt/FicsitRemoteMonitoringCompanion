@@ -1,4 +1,4 @@
-module github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2
+module github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion
 
 go 1.18
 

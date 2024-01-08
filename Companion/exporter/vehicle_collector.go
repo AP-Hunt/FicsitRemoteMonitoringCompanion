@@ -11,16 +11,20 @@ type VehicleCollector struct {
 }
 
 type VehicleDetails struct {
-	Id            string   `json:"ID"`
-	VehicleType   string   `json:"VehicleType"`
-	Location      Location `json:"location"`
-	ForwardSpeed  float64  `json:"ForwardSpeed"`
-	AutoPilot     bool     `json:"AutoPilot"`
-	FuelType      string   `json:"FuelType"`
-	FuelInventory float64  `json"FuelInventory"`
-	PathName      string   `json:"PathName"`
-	DepartTime    time.Time
-	Departed      bool
+	Id           string   `json:"ID"`
+	VehicleType  string   `json:"Name"`
+	Location     Location `json:"location"`
+	ForwardSpeed float64  `json:"ForwardSpeed"`
+	AutoPilot    bool     `json:"AutoPilot"`
+	Fuel         []Fuel   `json:Fuel`
+	PathName     string   `json:"PathName"`
+	DepartTime   time.Time
+	Departed     bool
+}
+
+type Fuel struct {
+	Name   string  `json:Name`
+	Amount float64 `json:Amount`
 }
 
 func (v *VehicleDetails) recordElapsedTime() {
@@ -91,7 +95,9 @@ func (c *VehicleCollector) Collect() {
 	}
 
 	for _, d := range details {
-		VehicleFuel.WithLabelValues(d.Id, d.VehicleType, d.FuelType).Set(d.FuelInventory)
+		if len(d.Fuel) > 0 {
+			VehicleFuel.WithLabelValues(d.Id, d.VehicleType, d.Fuel[0].Name).Set(d.Fuel[0].Amount)
+		}
 
 		d.handleTimingUpdates(c.TrackedVehicles)
 	}

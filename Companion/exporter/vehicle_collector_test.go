@@ -1,7 +1,7 @@
 package exporter_test
 
 import (
-	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
+	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/exporter"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
@@ -21,10 +21,11 @@ func updateLocation(x float64, y float64, rotation int) {
 				Z:        0,
 				Rotation: rotation,
 			},
-			AutoPilot:     true,
-			FuelType:      "Coal",
-			FuelInventory: 23,
-			PathName:      "Path",
+			AutoPilot: true,
+			Fuel: []exporter.Fuel{{Name: "Coal",
+				Amount: 23,
+			}},
+			PathName: "Path",
 		},
 		{
 			Id:           "2",
@@ -36,10 +37,11 @@ func updateLocation(x float64, y float64, rotation int) {
 				Z:        0,
 				Rotation: rotation,
 			},
-			AutoPilot:     false,
-			FuelType:      "Coal",
-			FuelInventory: 23,
-			PathName:      "no path",
+			AutoPilot: false,
+			Fuel: []exporter.Fuel{{Name: "Coal",
+				Amount: 23,
+			}},
+			PathName: "no path",
 		},
 	})
 }
@@ -62,10 +64,11 @@ var _ = Describe("VehicleCollector", func() {
 					Z:        1000,
 					Rotation: 60,
 				},
-				AutoPilot:     true,
-				FuelType:      "Coal",
-				FuelInventory: 23,
-				PathName:      "Path",
+				AutoPilot: true,
+				Fuel: []exporter.Fuel{{Name: "Coal",
+					Amount: 23,
+				}},
+				PathName: "Path",
 			},
 		})
 	})

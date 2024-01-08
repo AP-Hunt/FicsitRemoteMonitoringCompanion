@@ -1,7 +1,7 @@
 package exporter_test
 
 import (
-	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/m/v2/exporter"
+	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/exporter"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -46,17 +46,33 @@ var _ = Describe("FactoryBuildingCollector", func() {
 						ConsPercent:     1.0,
 					},
 				},
-				ManuSpeed:    1.0,
+				ManuSpeed:    100.0,
 				IsConfigured: false,
 				IsProducing:  false,
 				IsPaused:     false,
 				CircuitID:    0,
+				PowerInfo: exporter.PowerInfo{
+					CircuitId:     1,
+					PowerConsumed: 23,
+				},
 			},
 		})
 	})
 
 	AfterEach(func() {
 		collector = nil
+	})
+
+	Describe("Factory Power", func() {
+
+		It("Records power per circuit", func() {
+			collector.Collect()
+			val, err := gaugeValue(exporter.FactoryPower, "1")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(23.0))
+			val2, _ := gaugeValue(exporter.FactoryPowerMax, "1")
+			Expect(val2).To(Equal(exporter.SmelterPower))
+		})
 	})
 
 	Describe("Machine item production metrics", func() {

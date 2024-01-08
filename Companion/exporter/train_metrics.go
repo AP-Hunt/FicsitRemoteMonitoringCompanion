@@ -31,4 +31,34 @@ var (
 	}, []string{
 		"name",
 	})
+	TrainCircuitPower = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "train_power_circuit_consumed",
+		Help: "How much power all trains are consuming in a circuit",
+	}, []string{
+		"circuit_id",
+	})
+	TrainCircuitPowerMax = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "train_power_circuit_consumed_max",
+		Help: "Maximum power all trains can consume on a circuit",
+	}, []string{
+		"circuit_id",
+	})
+	TrainTotalMass = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "train_total_mass",
+		Help: "Total mass of the train",
+	}, []string{
+		"name",
+	})
+	TrainPayloadMass = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "train_payload_mass",
+		Help: "Current payload mass of the train",
+	}, []string{
+		"name",
+	})
+	TrainMaxPayloadMass = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "train_max_payload_mass",
+		Help: "Max payload mass of the train",
+	}, []string{
+		"name",
+	})
 )
