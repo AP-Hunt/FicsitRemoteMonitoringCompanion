@@ -12,10 +12,10 @@ type PrometheusExporter struct {
 	server          *http.Server
 	ctx             context.Context
 	cancel          context.CancelFunc
-	collectorRunner *CollectorRunner
+	collectorRunners []*CollectorRunner
 }
 
-func NewPrometheusExporter(frmApiHost string) *PrometheusExporter {
+func NewPrometheusExporter(frmApiHosts []string) *PrometheusExporter {
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", promhttp.Handler())
 
@@ -25,29 +25,35 @@ func NewPrometheusExporter(frmApiHost string) *PrometheusExporter {
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	productionCollector := NewProductionCollector(frmApiHost + "/getProdStats")
-	powerCollector := NewPowerCollector(frmApiHost + "/getPower")
-	buildingCollector := NewFactoryBuildingCollector(frmApiHost + "/getFactory")
-	vehicleCollector := NewVehicleCollector(frmApiHost + "/getVehicles")
-	droneCollector := NewDroneStationCollector(frmApiHost + "/getDroneStation")
-	vehicleStationCollector := NewVehicleStationCollector(frmApiHost + "/getTruckStation")
 
+	collectorRunners := []*CollectorRunner{}
 
-	trackedStations := &(map[string]TrainStationDetails{})
-	trainCollector := NewTrainCollector(frmApiHost + "/getTrains", trackedStations)
-	trainStationCollector := NewTrainStationCollector(frmApiHost + "/getTrainStation", trackedStations)
-	collectorRunner := NewCollectorRunner(ctx, productionCollector, powerCollector, buildingCollector, vehicleCollector, trainCollector, droneCollector, vehicleStationCollector, trainStationCollector)
+	for _, frmApiHost := range frmApiHosts {
+		productionCollector := NewProductionCollector(frmApiHost + "/getProdStats")
+		powerCollector := NewPowerCollector(frmApiHost + "/getPower")
+		buildingCollector := NewFactoryBuildingCollector(frmApiHost + "/getFactory")
+		vehicleCollector := NewVehicleCollector(frmApiHost + "/getVehicles")
+		droneCollector := NewDroneStationCollector(frmApiHost + "/getDroneStation")
+		vehicleStationCollector := NewVehicleStationCollector(frmApiHost + "/getTruckStation")
+
+		trackedStations := &(map[string]TrainStationDetails{})
+		trainCollector := NewTrainCollector(frmApiHost + "/getTrains", trackedStations)
+		trainStationCollector := NewTrainStationCollector(frmApiHost + "/getTrainStation", trackedStations)
+		collectorRunners = append(collectorRunners, NewCollectorRunner(ctx, productionCollector, powerCollector, buildingCollector, vehicleCollector, trainCollector, droneCollector, vehicleStationCollector, trainStationCollector))
+	}
 
 	return &PrometheusExporter{
 		server:          server,
 		ctx:             ctx,
 		cancel:          cancel,
-		collectorRunner: collectorRunner,
+		collectorRunners: collectorRunners,
 	}
 }
 
 func (e *PrometheusExporter) Start() {
-	go e.collectorRunner.Start()
+	for _, collectorRunner := range e.collectorRunners {
+		go collectorRunner.Start()
+	}
 	go func() {
 		e.server.ListenAndServe()
 		log.Println("stopping exporter")
