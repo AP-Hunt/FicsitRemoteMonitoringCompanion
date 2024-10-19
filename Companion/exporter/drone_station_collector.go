@@ -31,7 +31,7 @@ type DroneStationDetails struct {
 	EstLatestTotalOutStack float64   `json:"EstLatestTotalOutStack"`
 	LatestIncStack         float64   `json:"LatestIncStack"`
 	LatestOutStack         float64   `json:"LatestOutStack"`
-	LatestRndTrip          string    `json:"LatestRndTrip"`
+	LatestRndTrip          float64 `json:"LatestRndTrip"`
 	LatestTripIncAmt       float64   `json:"LatestTripIncAmt"`
 	LatestTripOutAmt       float64   `json:"LatestTripOutAmt"`
 	MedianRndTrip          string    `json:"MedianRndTrip"`
@@ -63,10 +63,7 @@ func (c *DroneStationCollector) Collect(frmAddress string, saveName string) {
 
 		DronePortBatteryRate.WithLabelValues(id, home, paired, frmAddress, saveName).Set(d.EstBatteryRate)
 
-		roundTrip := parseTimeSeconds(d.LatestRndTrip)
-		if roundTrip != nil {
-			DronePortRndTrip.WithLabelValues(id, home, paired, frmAddress, saveName).Set(*roundTrip)
-		}
+		DronePortRndTrip.WithLabelValues(id, home, paired, frmAddress, saveName).Set(d.LatestRndTrip)
 
 		val, ok := powerInfo[d.PowerInfo.CircuitId]
 		if ok {
