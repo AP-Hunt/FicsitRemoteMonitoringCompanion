@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func updateLocation(x float64, y float64, rotation int) {
+func updateLocation(x float64, y float64, rotation float64) {
 	FRMServer.ReturnsVehicleData([]exporter.VehicleDetails{
 		{
 			Id:           "1",

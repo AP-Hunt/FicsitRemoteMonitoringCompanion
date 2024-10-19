@@ -8,7 +8,7 @@ type Location struct {
 	X        float64 `json:"x"`
 	Y        float64 `json:"y"`
 	Z        float64 `json:"z"`
-	Rotation int     `json:"rotation"`
+	Rotation float64 `json:"rotation"`
 }
 
 // Calculates if a location is nearby another.
@@ -24,6 +24,6 @@ func (l *Location) isNearby(other Location) bool {
 
 // Calculates if this location is roughly facing the same way as another
 func (l *Location) isSameDirection(other Location) bool {
-	diff := math.Abs(float64(l.Rotation - other.Rotation))
+	diff := math.Abs(l.Rotation - other.Rotation)
 	return diff <= 90
 }
