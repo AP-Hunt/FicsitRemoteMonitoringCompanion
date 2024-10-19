@@ -51,7 +51,7 @@ var _ = Describe("PowerCollector", func() {
 		It("sets the 'power_consumed' metric with the right labels", func() {
 			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.PowerConsumed, "1")
+			val, err := gaugeValue(exporter.PowerConsumed, "1", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(30)))
@@ -59,7 +59,7 @@ var _ = Describe("PowerCollector", func() {
 		It("sets the 'battery_seconds_full' metric with the right labels", func() {
 			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.BatterySecondsFull, "1")
+			val, err := gaugeValue(exporter.BatterySecondsFull, "1", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(120131)))
@@ -67,23 +67,23 @@ var _ = Describe("PowerCollector", func() {
 		It("sets the 'fuse_triggered' metric with the right labels", func() {
 			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.FuseTriggered, "1")
+			val, err := gaugeValue(exporter.FuseTriggered, "1", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
 
-			val2, err := gaugeValue(exporter.FuseTriggered, "2")
+			val2, err := gaugeValue(exporter.FuseTriggered, "2", url, saveName)
 			Expect(val2).To(Equal(float64(1)))
 		})
 		It("sets the 'battery_differential' metric with the right labels", func() {
 			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.BatteryDifferential, "1")
+			val, err := gaugeValue(exporter.BatteryDifferential, "1", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(12)))
 
-			val2, err := gaugeValue(exporter.BatteryDifferential, "2")
+			val2, err := gaugeValue(exporter.BatteryDifferential, "2", url, saveName)
 			Expect(val2).To(Equal(float64(-12)))
 		})
 	})

@@ -69,10 +69,10 @@ var _ = Describe("FactoryBuildingCollector", func() {
 
 		It("Records power per circuit", func() {
 			collector.Collect(url, saveName)
-			val, err := gaugeValue(exporter.FactoryPower, "1")
+			val, err := gaugeValue(exporter.FactoryPower, "1", url, saveName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(23.0))
-			val2, _ := gaugeValue(exporter.FactoryPowerMax, "1")
+			val2, _ := gaugeValue(exporter.FactoryPowerMax, "1", url, saveName)
 			Expect(val2).To(Equal(exporter.SmelterPower))
 		})
 	})
@@ -80,7 +80,7 @@ var _ = Describe("FactoryBuildingCollector", func() {
 	Describe("Machine item production metrics", func() {
 		It("records a metric with labels for the produced item name, machine type, and x, y, z coordinates", func() {
 			collector.Collect(url, saveName)
-			metric, err := getMetric(exporter.MachineItemsProducedPerMin, "Iron Ingot", "Smelter", "100", "200", "-300")
+			metric, err := getMetric(exporter.MachineItemsProducedPerMin, "Iron Ingot", "Smelter", "100", "200", "-300", url, saveName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(metric).ToNot(BeNil())
 		})
@@ -88,7 +88,7 @@ var _ = Describe("FactoryBuildingCollector", func() {
 		It("records the current production figure as the metric value", func() {
 			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Ingot", "Smelter", "100", "200", "-300")
+			val, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Ingot", "Smelter", "100", "200", "-300", url, saveName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(10.0)))
 		})
@@ -97,11 +97,11 @@ var _ = Describe("FactoryBuildingCollector", func() {
 			It("records a metric per item", func() {
 				collector.Collect(url, saveName)
 
-				ironIngots, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Ingot", "Smelter", "100", "200", "-300")
+				ironIngots, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Ingot", "Smelter", "100", "200", "-300", url, saveName)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(ironIngots).To(Equal(float64(10.0)))
 
-				ironNothing, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Nothing", "Smelter", "100", "200", "-300")
+				ironNothing, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Nothing", "Smelter", "100", "200", "-300", url, saveName)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(ironNothing).To(Equal(float64(1000.0)))
 			})
@@ -111,7 +111,7 @@ var _ = Describe("FactoryBuildingCollector", func() {
 	Describe("Machine item production efficiency metrics", func() {
 		It("records a metric with labels for the produced item name, machine type, and x, y, z coordinates", func() {
 			collector.Collect(url, saveName)
-			metric, err := getMetric(exporter.MachineItemsProducedEffiency, "Iron Ingot", "Smelter", "100", "200", "-300")
+			metric, err := getMetric(exporter.MachineItemsProducedEffiency, "Iron Ingot", "Smelter", "100", "200", "-300", url, saveName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(metric).ToNot(BeNil())
 		})
@@ -119,7 +119,7 @@ var _ = Describe("FactoryBuildingCollector", func() {
 		It("records the current production efficiency as the metric value", func() {
 			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Ingot", "Smelter", "100", "200", "-300")
+			val, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Ingot", "Smelter", "100", "200", "-300", url, saveName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0.5)))
 		})
@@ -128,11 +128,11 @@ var _ = Describe("FactoryBuildingCollector", func() {
 			It("records a metric per item", func() {
 				collector.Collect(url, saveName)
 
-				ironIngots, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Ingot", "Smelter", "100", "200", "-300")
+				ironIngots, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Ingot", "Smelter", "100", "200", "-300", url, saveName)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(ironIngots).To(Equal(float64(0.5)))
 
-				ironNothing, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Nothing", "Smelter", "100", "200", "-300")
+				ironNothing, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Nothing", "Smelter", "100", "200", "-300", url, saveName)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(ironNothing).To(Equal(float64(0.25)))
 			})

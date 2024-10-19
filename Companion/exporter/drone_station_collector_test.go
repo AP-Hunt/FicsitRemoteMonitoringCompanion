@@ -63,7 +63,7 @@ var _ = Describe("DroneStationCollector", func() {
 		It("sets the 'drone_port_battery_rate' metric with the right labels", func() {
 			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.DronePortBatteryRate, "1", "home", "remote station")
+			val, err := gaugeValue(exporter.DronePortBatteryRate, "1", "home", "remote station", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(30)))
@@ -71,7 +71,7 @@ var _ = Describe("DroneStationCollector", func() {
 		It("sets the 'drone_port_round_trip_seconds' metric with the right labels", func() {
 			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.DronePortRndTrip, "1", "home", "remote station")
+			val, err := gaugeValue(exporter.DronePortRndTrip, "1", "home", "remote station", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(264)))
@@ -79,7 +79,7 @@ var _ = Describe("DroneStationCollector", func() {
 		It("sets the 'drone_port_power' metric with the right labels", func() {
 			collector.Collect(url, saveName)
 
-			val, _ := gaugeValue(exporter.DronePortPower, "1")
+			val, _ := gaugeValue(exporter.DronePortPower, "1", url, saveName)
 			Expect(val).To(Equal(200.0))
 		})
 	})

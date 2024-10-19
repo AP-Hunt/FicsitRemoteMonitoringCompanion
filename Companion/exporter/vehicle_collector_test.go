@@ -83,7 +83,7 @@ var _ = Describe("VehicleCollector", func() {
 		It("sets the 'vehicle_fuel' metric with the right labels", func() {
 			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.VehicleFuel, "1", "Truck", "Coal")
+			val, err := gaugeValue(exporter.VehicleFuel, "1", "Truck", "Coal", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(23)))
@@ -95,7 +95,7 @@ var _ = Describe("VehicleCollector", func() {
 			exporter.Clock = testTime
 			// truck will be too fast here, nothing recorded
 			collector.Collect(url, saveName)
-			val, err := gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path")
+			val, err := gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path", url, saveName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
 
@@ -103,7 +103,7 @@ var _ = Describe("VehicleCollector", func() {
 			updateLocation(0, 0, 0)
 			// first time collecting stats, nothing yet but it does set start location to 0,0,0
 			collector.Collect(url, saveName)
-			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path")
+			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path", url, saveName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
 
@@ -111,7 +111,7 @@ var _ = Describe("VehicleCollector", func() {
 			updateLocation(8000, 2000, 0)
 			//go to a far away location now, star the timer
 			collector.Collect(url, saveName)
-			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path")
+			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path", url, saveName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
 
@@ -119,7 +119,7 @@ var _ = Describe("VehicleCollector", func() {
 			updateLocation(1000, 2000, 180)
 			//We are near but not facing the right way. Do not record this until we face near the right direction
 			collector.Collect(url, saveName)
-			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path")
+			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path", url, saveName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
 
@@ -127,7 +127,7 @@ var _ = Describe("VehicleCollector", func() {
 			updateLocation(1000, 2000, 0)
 			//Now we are back near enough to where we began recording, and facing near the same way end recording
 			collector.Collect(url, saveName)
-			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path")
+			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path", url, saveName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(30)))
 		})
