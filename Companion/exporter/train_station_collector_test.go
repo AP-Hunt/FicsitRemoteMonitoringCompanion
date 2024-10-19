@@ -7,12 +7,14 @@ import (
 )
 
 var _ = Describe("TrainStationCollector", func() {
+	var url = "http://localhost:9080"
+	var saveName = "default"
 	var collector *exporter.TrainStationCollector
 
 	BeforeEach(func() {
 		FRMServer.Reset()
 		trackedStations := &(map[string]exporter.TrainStationDetails{})
-		collector = exporter.NewTrainStationCollector("http://localhost:9080/getTrainStation", trackedStations)
+		collector = exporter.NewTrainStationCollector("/getTrainStation", trackedStations)
 
 		FRMServer.ReturnsTrainStationData([]exporter.TrainStationDetails{
 			{
@@ -66,7 +68,7 @@ var _ = Describe("TrainStationCollector", func() {
 
 	Describe("Train station metrics collection", func() {
 		It("sets the 'train_station_power' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
 			val, err := gaugeValue(exporter.TrainStationPower, "1")
 
@@ -75,7 +77,7 @@ var _ = Describe("TrainStationCollector", func() {
 		})
 
 		It("sets the 'train_station_power_max' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
 			val, err := gaugeValue(exporter.TrainStationPowerMax, "1")
 

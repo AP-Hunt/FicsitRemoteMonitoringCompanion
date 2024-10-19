@@ -8,10 +8,12 @@ import (
 
 var _ = Describe("DroneStationCollector", func() {
 	var collector *exporter.DroneStationCollector
+	var url = "http://localhost:9080"
+	var saveName = "default"
 
 	BeforeEach(func() {
 		FRMServer.Reset()
-		collector = exporter.NewDroneStationCollector("http://localhost:9080/getDroneStation")
+		collector = exporter.NewDroneStationCollector("/getDroneStation")
 
 		FRMServer.ReturnsDroneStationData([]exporter.DroneStationDetails{
 			{
@@ -59,7 +61,7 @@ var _ = Describe("DroneStationCollector", func() {
 
 	Describe("Drone metrics collection", func() {
 		It("sets the 'drone_port_battery_rate' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
 			val, err := gaugeValue(exporter.DronePortBatteryRate, "1", "home", "remote station")
 
@@ -67,7 +69,7 @@ var _ = Describe("DroneStationCollector", func() {
 			Expect(val).To(Equal(float64(30)))
 		})
 		It("sets the 'drone_port_round_trip_seconds' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
 			val, err := gaugeValue(exporter.DronePortRndTrip, "1", "home", "remote station")
 
@@ -75,7 +77,7 @@ var _ = Describe("DroneStationCollector", func() {
 			Expect(val).To(Equal(float64(264)))
 		})
 		It("sets the 'drone_port_power' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
 			val, _ := gaugeValue(exporter.DronePortPower, "1")
 			Expect(val).To(Equal(200.0))

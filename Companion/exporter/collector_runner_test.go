@@ -19,11 +19,12 @@ func NewTestCollector() *TestCollector {
 		counter: 0,
 	}
 }
-func (t *TestCollector) Collect() {
+func (t *TestCollector) Collect(url string, saveName string) {
 	t.counter = t.counter + 1
 }
 
 var _ = Describe("CollectorRunner", func() {
+	var url = "http://localhost:9080"
 	Describe("Basic Functionality", func() {
 		It("runs on init and on each timeout", func() {
 			ctx, cancel := context.WithCancel(context.Background())
@@ -32,7 +33,7 @@ var _ = Describe("CollectorRunner", func() {
 
 			c1 := NewTestCollector()
 			c2 := NewTestCollector()
-			runner := exporter.NewCollectorRunner(ctx, c1, c2)
+			runner := exporter.NewCollectorRunner(ctx, url, c1, c2)
 			go runner.Start()
 			testTime.Add(5 * time.Second)
 			testTime.Add(5 * time.Second)
@@ -48,7 +49,7 @@ var _ = Describe("CollectorRunner", func() {
 			exporter.Clock = testTime
 
 			c1 := NewTestCollector()
-			runner := exporter.NewCollectorRunner(ctx, c1)
+			runner := exporter.NewCollectorRunner(ctx, url, c1)
 			go runner.Start()
 			testTime.Add(5 * time.Second)
 			cancel()

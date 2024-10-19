@@ -48,10 +48,12 @@ func updateLocation(x float64, y float64, rotation int) {
 
 var _ = Describe("VehicleCollector", func() {
 	var collector *exporter.VehicleCollector
+	var url = "http://localhost:9080"
+	var saveName = "default"
 
 	BeforeEach(func() {
 		FRMServer.Reset()
-		collector = exporter.NewVehicleCollector("http://localhost:9080/getVehicles")
+		collector = exporter.NewVehicleCollector("/getVehicles")
 
 		FRMServer.ReturnsVehicleData([]exporter.VehicleDetails{
 			{
@@ -79,7 +81,7 @@ var _ = Describe("VehicleCollector", func() {
 
 	Describe("Vehicle metrics collection", func() {
 		It("sets the 'vehicle_fuel' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
 			val, err := gaugeValue(exporter.VehicleFuel, "1", "Truck", "Coal")
 
@@ -92,7 +94,7 @@ var _ = Describe("VehicleCollector", func() {
 			testTime := clock.NewMock()
 			exporter.Clock = testTime
 			// truck will be too fast here, nothing recorded
-			collector.Collect()
+			collector.Collect(url, saveName)
 			val, err := gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
@@ -100,7 +102,7 @@ var _ = Describe("VehicleCollector", func() {
 			testTime.Add(30 * time.Second)
 			updateLocation(0, 0, 0)
 			// first time collecting stats, nothing yet but it does set start location to 0,0,0
-			collector.Collect()
+			collector.Collect(url, saveName)
 			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
@@ -108,7 +110,7 @@ var _ = Describe("VehicleCollector", func() {
 			testTime.Add(30 * time.Second)
 			updateLocation(8000, 2000, 0)
 			//go to a far away location now, star the timer
-			collector.Collect()
+			collector.Collect(url, saveName)
 			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
@@ -116,7 +118,7 @@ var _ = Describe("VehicleCollector", func() {
 			testTime.Add(10 * time.Second)
 			updateLocation(1000, 2000, 180)
 			//We are near but not facing the right way. Do not record this until we face near the right direction
-			collector.Collect()
+			collector.Collect(url, saveName)
 			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
@@ -124,7 +126,7 @@ var _ = Describe("VehicleCollector", func() {
 			testTime.Add(20 * time.Second)
 			updateLocation(1000, 2000, 0)
 			//Now we are back near enough to where we began recording, and facing near the same way end recording
-			collector.Collect()
+			collector.Collect(url, saveName)
 			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path")
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(30)))
