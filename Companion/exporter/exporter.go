@@ -9,9 +9,9 @@ import (
 )
 
 type PrometheusExporter struct {
-	server          *http.Server
-	ctx             context.Context
-	cancel          context.CancelFunc
+	server           *http.Server
+	ctx              context.Context
+	cancel           context.CancelFunc
 	collectorRunners []*CollectorRunner
 }
 
@@ -29,23 +29,23 @@ func NewPrometheusExporter(frmApiHosts []string) *PrometheusExporter {
 	collectorRunners := []*CollectorRunner{}
 
 	for _, frmApiHost := range frmApiHosts {
-		productionCollector := NewProductionCollector(frmApiHost + "/getProdStats")
-		powerCollector := NewPowerCollector(frmApiHost + "/getPower")
-		buildingCollector := NewFactoryBuildingCollector(frmApiHost + "/getFactory")
-		vehicleCollector := NewVehicleCollector(frmApiHost + "/getVehicles")
-		droneCollector := NewDroneStationCollector(frmApiHost + "/getDroneStation")
-		vehicleStationCollector := NewVehicleStationCollector(frmApiHost + "/getTruckStation")
+		productionCollector := NewProductionCollector("/getProdStats")
+		powerCollector := NewPowerCollector("/getPower")
+		buildingCollector := NewFactoryBuildingCollector("/getFactory")
+		vehicleCollector := NewVehicleCollector("/getVehicles")
+		droneCollector := NewDroneStationCollector("/getDroneStation")
+		vehicleStationCollector := NewVehicleStationCollector("/getTruckStation")
 
 		trackedStations := &(map[string]TrainStationDetails{})
-		trainCollector := NewTrainCollector(frmApiHost + "/getTrains", trackedStations)
-		trainStationCollector := NewTrainStationCollector(frmApiHost + "/getTrainStation", trackedStations)
-		collectorRunners = append(collectorRunners, NewCollectorRunner(ctx, productionCollector, powerCollector, buildingCollector, vehicleCollector, trainCollector, droneCollector, vehicleStationCollector, trainStationCollector))
+		trainCollector := NewTrainCollector("/getTrains", trackedStations)
+		trainStationCollector := NewTrainStationCollector("/getTrainStation", trackedStations)
+		collectorRunners = append(collectorRunners, NewCollectorRunner(ctx, frmApiHost, productionCollector, powerCollector, buildingCollector, vehicleCollector, trainCollector, droneCollector, vehicleStationCollector, trainStationCollector))
 	}
 
 	return &PrometheusExporter{
-		server:          server,
-		ctx:             ctx,
-		cancel:          cancel,
+		server:           server,
+		ctx:              ctx,
+		cancel:           cancel,
 		collectorRunners: collectorRunners,
 	}
 }

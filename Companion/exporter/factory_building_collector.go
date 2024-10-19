@@ -2,23 +2,23 @@ package exporter
 
 import (
 	"log"
-	"strconv"
 	"math"
+	"strconv"
 )
 
 type FactoryBuildingCollector struct {
-	FRMAddress string
+	endpoint string
 }
 
-func NewFactoryBuildingCollector(frmAddress string) *FactoryBuildingCollector {
+func NewFactoryBuildingCollector(endpoint string) *FactoryBuildingCollector {
 	return &FactoryBuildingCollector{
-		FRMAddress: frmAddress,
+		endpoint: endpoint,
 	}
 }
 
-func (c *FactoryBuildingCollector) Collect() {
+func (c *FactoryBuildingCollector) Collect(frmAddress string, saveName string) {
 	details := []BuildingDetail{}
-	err := retrieveData(c.FRMAddress, &details)
+	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading factory buildings from FRM: %s\n", err)
 		return
@@ -34,6 +34,7 @@ func (c *FactoryBuildingCollector) Collect() {
 				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, saveName,
 			).Set(prod.CurrentProd)
 
 			MachineItemsProducedEffiency.WithLabelValues(
@@ -42,6 +43,7 @@ func (c *FactoryBuildingCollector) Collect() {
 				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, saveName,
 			).Set(prod.ProdPercent)
 		}
 
@@ -78,7 +80,7 @@ func (c *FactoryBuildingCollector) Collect() {
 		}
 		//update max power from clock speed
 		// see https://satisfactory.wiki.gg/wiki/Clock_speed#Clock_speed_for_production_buildings for power info
-		maxBuildingPower = maxBuildingPower * (math.Pow(building.ManuSpeed / 100, 1.321928))
+		maxBuildingPower = maxBuildingPower * (math.Pow(building.ManuSpeed/100, 1.321928))
 		if ok {
 			maxPowerInfo[building.PowerInfo.CircuitId] = val + maxBuildingPower
 		} else {
@@ -87,10 +89,10 @@ func (c *FactoryBuildingCollector) Collect() {
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		FactoryPower.WithLabelValues(cid).Set(powerConsumed)
+		FactoryPower.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
 	}
 	for circuitId, powerConsumed := range maxPowerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		FactoryPowerMax.WithLabelValues(cid).Set(powerConsumed)
+		FactoryPowerMax.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
 	}
 }
