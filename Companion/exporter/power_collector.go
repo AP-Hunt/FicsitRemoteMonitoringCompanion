@@ -6,7 +6,7 @@ import (
 )
 
 type PowerInfo struct {
-	CircuitId     float64 `json:"ID"`
+	CircuitId     float64 `json:"CircuitID"`
 	PowerConsumed float64 `json:"PowerConsumed"`
 }
 
