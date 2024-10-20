@@ -8,7 +8,7 @@ import (
 var VehicleStationPowerConsumption = 20.0
 
 type VehicleStationCollector struct {
-	FRMAddress string
+	endpoint string
 }
 
 type VehicleStationDetails struct {
@@ -17,15 +17,15 @@ type VehicleStationDetails struct {
 	PowerInfo PowerInfo `json:"PowerInfo"`
 }
 
-func NewVehicleStationCollector(frmAddress string) *VehicleStationCollector {
+func NewVehicleStationCollector(endpoint string) *VehicleStationCollector {
 	return &VehicleStationCollector{
-		FRMAddress: frmAddress,
+		endpoint: endpoint,
 	}
 }
 
-func (c *VehicleStationCollector) Collect() {
+func (c *VehicleStationCollector) Collect(frmAddress string, saveName string) {
 	details := []VehicleStationDetails{}
-	err := retrieveData(c.FRMAddress, &details)
+	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading vehicle station statistics from FRM: %s\n", err)
 		return
@@ -49,10 +49,10 @@ func (c *VehicleStationCollector) Collect() {
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		VehicleStationPower.WithLabelValues(cid).Set(powerConsumed)
+		VehicleStationPower.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
 	}
 	for circuitId, powerConsumed := range maxPowerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		VehicleStationPowerMax.WithLabelValues(cid).Set(powerConsumed)
+		VehicleStationPowerMax.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
 	}
 }

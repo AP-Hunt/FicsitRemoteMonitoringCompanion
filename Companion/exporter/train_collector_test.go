@@ -46,6 +46,8 @@ func updateTrain(station string) {
 
 var _ = Describe("TrainCollector", func() {
 	var collector *exporter.TrainCollector
+	var url = "http://localhost:9080"
+	var saveName = "default"
 
 	BeforeEach(func() {
 		FRMServer.Reset()
@@ -69,7 +71,7 @@ var _ = Describe("TrainCollector", func() {
 				},
 			},
 		})
-		collector = exporter.NewTrainCollector("http://localhost:9080/getTrains", trackedStations)
+		collector = exporter.NewTrainCollector("/getTrains", trackedStations)
 
 		FRMServer.ReturnsTrainData([]exporter.TrainDetails{
 			{
@@ -122,49 +124,49 @@ var _ = Describe("TrainCollector", func() {
 
 	Describe("Train metrics collection", func() {
 		It("sets the 'train_derailed' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.TrainDerailed, "DerailedTrain")
+			val, err := gaugeValue(exporter.TrainDerailed, "DerailedTrain", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(1)))
 		})
 
 		It("sets the 'train_power_consumed' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.TrainPower, "Train1")
+			val, err := gaugeValue(exporter.TrainPower, "Train1", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(67 * 2))) //expects reported power to be per train, so multiply by # of trains
 		})
 
 		It("sets the 'train_power_circuit_consumed' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.TrainCircuitPower, "1")
+			val, err := gaugeValue(exporter.TrainCircuitPower, "1", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal((67.0 * 2) + 22.0))
 		})
 
 		It("sets the 'train_power_circuit_consumed_max' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.TrainCircuitPowerMax, "1")
+			val, err := gaugeValue(exporter.TrainCircuitPowerMax, "1", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(exporter.MaxTrainPowerConsumption * 3))
 		})
 
 		It("sets the mass metrics with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
-			val, _ := gaugeValue(exporter.TrainTotalMass, "Train1")
+			val, _ := gaugeValue(exporter.TrainTotalMass, "Train1", url, saveName)
 			Expect(val).To(Equal(3000.0 + 3000.0 + 47584.0 + 47584.0))
-			val, _ = gaugeValue(exporter.TrainPayloadMass, "Train1")
+			val, _ = gaugeValue(exporter.TrainPayloadMass, "Train1", url, saveName)
 			Expect(val).To(Equal(17584.0 + 17584.0))
-			val, _ = gaugeValue(exporter.TrainMaxPayloadMass, "Train1")
+			val, _ = gaugeValue(exporter.TrainMaxPayloadMass, "Train1", url, saveName)
 			Expect(val).To(Equal(70000.0 * 2))
 		})
 
@@ -174,49 +176,49 @@ var _ = Describe("TrainCollector", func() {
 			exporter.Clock = testTime
 			updateTrain("First")
 
-			collector.Collect()
-			val, err := gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second")
+			collector.Collect(url, saveName)
+			val, err := gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second", url, saveName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
 			testTime.Add(5 * time.Second)
-			collector.Collect()
-			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second")
+			collector.Collect(url, saveName)
+			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second", url, saveName)
 			Expect(val).To(Equal(float64(0)))
 			testTime.Add(25 * time.Second)
 
 			// Start timing the trains here - No metrics yet because we just got our first "start" marker from the station change.
 			updateTrain("Second")
-			collector.Collect()
-			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second")
+			collector.Collect(url, saveName)
+			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second", url, saveName)
 			Expect(val).To(Equal(float64(0)))
 
 			testTime.Add(15 * time.Second)
-			collector.Collect()
+			collector.Collect(url, saveName)
 			testTime.Add(10 * time.Second)
-			collector.Collect()
+			collector.Collect(url, saveName)
 			// No stats again since train is still "en route"
-			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second")
+			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second", url, saveName)
 			Expect(val).To(Equal(float64(0)))
 
 			testTime.Add(5 * time.Second)
 
 			// Can record elapsed time between Second and Third stations
 			updateTrain("Third")
-			collector.Collect()
-			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "Second", "Third")
+			collector.Collect(url, saveName)
+			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "Second", "Third", url, saveName)
 			Expect(val).To(Equal(float64(30)))
 
 			testTime.Add(30 * time.Second)
 			updateTrain("First")
-			collector.Collect()
-			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "Third", "First")
+			collector.Collect(url, saveName)
+			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "Third", "First", url, saveName)
 			Expect(val).To(Equal(float64(30)))
 
 			testTime.Add(30 * time.Second)
 			updateTrain("Second")
-			collector.Collect()
+			collector.Collect(url, saveName)
 
-			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second")
+			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second", url, saveName)
 			Expect(val).To(Equal(float64(30)))
 
 		})
@@ -226,43 +228,43 @@ var _ = Describe("TrainCollector", func() {
 			exporter.Clock = testTime
 			updateTrain("Third")
 
-			collector.Collect()
-			val, err := gaugeValue(exporter.TrainRoundTrip, "Train1")
+			collector.Collect(url, saveName)
+			val, err := gaugeValue(exporter.TrainRoundTrip, "Train1", url, saveName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
 			testTime.Add(30 * time.Second)
 
 			// Started recording round trip on first station arrival
 			updateTrain("First")
-			collector.Collect()
-			val, err = gaugeValue(exporter.TrainRoundTrip, "Train1")
+			collector.Collect(url, saveName)
+			val, err = gaugeValue(exporter.TrainRoundTrip, "Train1", url, saveName)
 			Expect(val).To(Equal(float64(0)))
 
 			testTime.Add(30 * time.Second)
 			updateTrain("Second")
-			collector.Collect()
+			collector.Collect(url, saveName)
 			testTime.Add(30 * time.Second)
 			updateTrain("Third")
-			collector.Collect()
+			collector.Collect(url, saveName)
 			testTime.Add(30 * time.Second)
 			updateTrain("First")
-			collector.Collect()
+			collector.Collect(url, saveName)
 
-			val, err = gaugeValue(exporter.TrainRoundTrip, "Train1")
+			val, err = gaugeValue(exporter.TrainRoundTrip, "Train1", url, saveName)
 			Expect(val).To(Equal(float64(90)))
 
 			//second round trip should also record properly
 			testTime.Add(10 * time.Second)
 			updateTrain("Second")
-			collector.Collect()
+			collector.Collect(url, saveName)
 			testTime.Add(10 * time.Second)
 			updateTrain("Third")
-			collector.Collect()
+			collector.Collect(url, saveName)
 			testTime.Add(10 * time.Second)
 			updateTrain("First")
-			collector.Collect()
+			collector.Collect(url, saveName)
 
-			val, err = gaugeValue(exporter.TrainRoundTrip, "Train1")
+			val, err = gaugeValue(exporter.TrainRoundTrip, "Train1", url, saveName)
 			Expect(val).To(Equal(float64(30)))
 
 		})

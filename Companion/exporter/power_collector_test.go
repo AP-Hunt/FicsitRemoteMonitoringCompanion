@@ -8,10 +8,12 @@ import (
 
 var _ = Describe("PowerCollector", func() {
 	var collector *exporter.PowerCollector
+	var url = "http://localhost:9080"
+	var saveName = "default"
 
 	BeforeEach(func() {
 		FRMServer.Reset()
-		collector = exporter.NewPowerCollector("http://localhost:9080/getPower")
+		collector = exporter.NewPowerCollector("/getPower")
 
 		FRMServer.ReturnsPowerData([]exporter.PowerDetails{
 			{
@@ -47,41 +49,41 @@ var _ = Describe("PowerCollector", func() {
 
 	Describe("Power metrics collection", func() {
 		It("sets the 'power_consumed' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.PowerConsumed, "1")
+			val, err := gaugeValue(exporter.PowerConsumed, "1", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(30)))
 		})
 		It("sets the 'battery_seconds_full' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.BatterySecondsFull, "1")
+			val, err := gaugeValue(exporter.BatterySecondsFull, "1", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(120131)))
 		})
 		It("sets the 'fuse_triggered' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.FuseTriggered, "1")
+			val, err := gaugeValue(exporter.FuseTriggered, "1", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
 
-			val2, err := gaugeValue(exporter.FuseTriggered, "2")
+			val2, err := gaugeValue(exporter.FuseTriggered, "2", url, saveName)
 			Expect(val2).To(Equal(float64(1)))
 		})
 		It("sets the 'battery_differential' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, saveName)
 
-			val, err := gaugeValue(exporter.BatteryDifferential, "1")
+			val, err := gaugeValue(exporter.BatteryDifferential, "1", url, saveName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(12)))
 
-			val2, err := gaugeValue(exporter.BatteryDifferential, "2")
+			val2, err := gaugeValue(exporter.BatteryDifferential, "2", url, saveName)
 			Expect(val2).To(Equal(float64(-12)))
 		})
 	})

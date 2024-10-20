@@ -5,7 +5,7 @@ import (
 )
 
 type ProductionCollector struct {
-	FRMAddress string
+	endpoint string
 }
 
 type ProductionDetails struct {
@@ -18,27 +18,27 @@ type ProductionDetails struct {
 	MaxConsumed        float64  `json:"MaxConsumed"`
 }
 
-func NewProductionCollector(frmAddress string) *ProductionCollector {
+func NewProductionCollector(endpoint string) *ProductionCollector {
 	return &ProductionCollector{
-		FRMAddress: frmAddress,
+		endpoint: endpoint,
 	}
 }
 
-func (c *ProductionCollector) Collect() {
+func (c *ProductionCollector) Collect(frmAddress string, saveName string) {
 	details := []ProductionDetails{}
-	err := retrieveData(c.FRMAddress, &details)
+	err := retrieveData(frmAddress + c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading production statistics from FRM: %s\n", err)
 		return
 	}
 
 	for _, d := range details {
-		ItemsProducedPerMin.WithLabelValues(d.ItemName).Set(d.CurrentProduction)
-		ItemsConsumedPerMin.WithLabelValues(d.ItemName).Set(d.CurrentConsumption)
+		ItemsProducedPerMin.WithLabelValues(d.ItemName, frmAddress, saveName).Set(d.CurrentProduction)
+		ItemsConsumedPerMin.WithLabelValues(d.ItemName, frmAddress, saveName).Set(d.CurrentConsumption)
 
-		ItemProductionCapacityPercent.WithLabelValues(d.ItemName).Set(d.ProdPercent)
-		ItemConsumptionCapacityPercent.WithLabelValues(d.ItemName).Set(d.ConsPercent)
-		ItemProductionCapacityPerMinute.WithLabelValues(d.ItemName).Set(d.MaxProd)
-		ItemConsumptionCapacityPerMinute.WithLabelValues(d.ItemName).Set(d.MaxConsumed)
+		ItemProductionCapacityPercent.WithLabelValues(d.ItemName, frmAddress, saveName).Set(d.ProdPercent)
+		ItemConsumptionCapacityPercent.WithLabelValues(d.ItemName, frmAddress, saveName).Set(d.ConsPercent)
+		ItemProductionCapacityPerMinute.WithLabelValues(d.ItemName, frmAddress, saveName).Set(d.MaxProd)
+		ItemConsumptionCapacityPerMinute.WithLabelValues(d.ItemName, frmAddress, saveName).Set(d.MaxConsumed)
 	}
 }

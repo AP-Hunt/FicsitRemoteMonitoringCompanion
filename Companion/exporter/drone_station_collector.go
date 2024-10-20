@@ -6,7 +6,7 @@ import (
 )
 
 type DroneStationCollector struct {
-	FRMAddress string
+	endpoint string
 }
 
 type DroneStationDetails struct {
@@ -31,7 +31,7 @@ type DroneStationDetails struct {
 	EstLatestTotalOutStack float64   `json:"EstLatestTotalOutStack"`
 	LatestIncStack         float64   `json:"LatestIncStack"`
 	LatestOutStack         float64   `json:"LatestOutStack"`
-	LatestRndTrip          string    `json:"LatestRndTrip"`
+	LatestRndTrip          float64   `json:"LatestRndTrip"`
 	LatestTripIncAmt       float64   `json:"LatestTripIncAmt"`
 	LatestTripOutAmt       float64   `json:"LatestTripOutAmt"`
 	MedianRndTrip          string    `json:"MedianRndTrip"`
@@ -41,15 +41,15 @@ type DroneStationDetails struct {
 	PowerInfo              PowerInfo `json:"PowerInfo"`
 }
 
-func NewDroneStationCollector(frmAddress string) *DroneStationCollector {
+func NewDroneStationCollector(endpoint string) *DroneStationCollector {
 	return &DroneStationCollector{
-		FRMAddress: frmAddress,
+		endpoint: endpoint,
 	}
 }
 
-func (c *DroneStationCollector) Collect() {
+func (c *DroneStationCollector) Collect(frmAddress string, saveName string) {
 	details := []DroneStationDetails{}
-	err := retrieveData(c.FRMAddress, &details)
+	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading drone station statistics from FRM: %s\n", err)
 		return
@@ -61,12 +61,9 @@ func (c *DroneStationCollector) Collect() {
 		home := d.HomeStation
 		paired := d.PairedStation
 
-		DronePortBatteryRate.WithLabelValues(id, home, paired).Set(d.EstBatteryRate)
+		DronePortBatteryRate.WithLabelValues(id, home, paired, frmAddress, saveName).Set(d.EstBatteryRate)
 
-		roundTrip := parseTimeSeconds(d.LatestRndTrip)
-		if roundTrip != nil {
-			DronePortRndTrip.WithLabelValues(id, home, paired).Set(*roundTrip)
-		}
+		DronePortRndTrip.WithLabelValues(id, home, paired, frmAddress, saveName).Set(d.LatestRndTrip)
 
 		val, ok := powerInfo[d.PowerInfo.CircuitId]
 		if ok {
@@ -78,6 +75,6 @@ func (c *DroneStationCollector) Collect() {
 
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		DronePortPower.WithLabelValues(cid).Set(powerConsumed)
+		DronePortPower.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
 	}
 }
