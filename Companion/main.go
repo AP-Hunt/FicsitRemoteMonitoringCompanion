@@ -9,7 +9,6 @@ import (
 	"os/signal"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"syscall"
 
@@ -20,12 +19,20 @@ import (
 
 var Version = "0.0.0-dev"
 
+func lookupEnvWithDefault(variable string, defaultVal string) string {
+	val, exist := os.LookupEnv(variable)
+	if exist {
+		return val
+	}
+	return defaultVal
+}
+
 func main() {
 
 	var frmHostname string
 	flag.StringVar(&frmHostname, "hostname", "localhost", "hostname of Ficsit Remote Monitoring webserver")
-	var frmPort int
-	flag.IntVar(&frmPort, "port", 8080, "port of Ficsit Remote Monitoring webserver")
+	var frmPort string
+	flag.StringVar(&frmPort, "port", "8080", "port of Ficsit Remote Monitoring webserver")
 
 	var frmHostnames string
 	flag.StringVar(&frmHostnames, "hostnames", "", "comma separated values of multiple Ficsit Remote Monitoring webservers, of the form http://myserver1:8080,http://myserver2:8080. If defined, this will be used instead of hostname+port")
@@ -35,6 +42,10 @@ func main() {
 	var noProm bool
 	flag.BoolVar(&noProm, "noprom", false, "Do not run prometheus with the app.")
 	flag.Parse()
+
+	frmHostname = lookupEnvWithDefault("FRM_HOST", frmHostname)
+	frmPort = lookupEnvWithDefault("FRM_HOST", frmPort)
+	frmHostnames = lookupEnvWithDefault("FRM_HOSTS", frmHostnames)
 
 	if showMetrics {
 		exportMetrics()
@@ -51,7 +62,7 @@ func main() {
 	// Create exporter
 	frmUrls := []string{}
 	if frmHostnames == "" {
-		frmUrls = append(frmUrls, "http://" + frmHostname + ":" + strconv.Itoa(frmPort))
+		frmUrls = append(frmUrls, "http://"+frmHostname+":"+frmPort)
 	} else {
 		for _, frmServer := range strings.Split(frmHostnames, ",") {
 			if !strings.HasPrefix(frmServer, "http://") && !strings.HasPrefix(frmServer, "https://") {
