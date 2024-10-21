@@ -44,7 +44,7 @@ func main() {
 	flag.Parse()
 
 	frmHostname = lookupEnvWithDefault("FRM_HOST", frmHostname)
-	frmPort = lookupEnvWithDefault("FRM_HOST", frmPort)
+	frmPort = lookupEnvWithDefault("FRM_PORT", frmPort)
 	frmHostnames = lookupEnvWithDefault("FRM_HOSTS", frmHostnames)
 
 	if showMetrics {
