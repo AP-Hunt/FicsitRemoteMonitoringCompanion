@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"html/template"
+	"text/template"
 	"log"
 	"os"
 	"os/signal"
@@ -37,8 +37,8 @@ func main() {
 	var frmHostnames string
 	flag.StringVar(&frmHostnames, "hostnames", "", "comma separated values of multiple Ficsit Remote Monitoring webservers, of the form http://myserver1:8080,http://myserver2:8080. If defined, this will be used instead of hostname+port")
 
-	var showMetrics bool
-	flag.BoolVar(&showMetrics, "ShowMetrics", false, "Show metrics and exit")
+	var genReadme bool
+	flag.BoolVar(&genReadme, "GenerateReadme", false, "Generate readme and exit")
 	var noProm bool
 	flag.BoolVar(&noProm, "noprom", false, "Do not run prometheus with the app.")
 	flag.Parse()
@@ -47,8 +47,8 @@ func main() {
 	frmPort = lookupEnvWithDefault("FRM_PORT", frmPort)
 	frmHostnames = lookupEnvWithDefault("FRM_HOSTS", frmHostnames)
 
-	if showMetrics {
-		exportMetrics()
+	if genReadme {
+		generateReadme()
 		os.Exit(0)
 	}
 
@@ -164,38 +164,16 @@ func createLogFile() (*os.File, error) {
 	return os.Create(path.Join(curExeDir, "frmc.log"))
 }
 
-func exportMetrics() {
-	tpl := template.New("metrics_table")
+func generateReadme() {
+
+	tpl := template.New("readme.tpl.md")
 	tpl.Funcs(template.FuncMap{
 		"List": strings.Join,
 	})
 
-	tpl, err := tpl.Parse(`
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Labels</th>
-        </tr>
-    </thead>
-    <tbody>
-		{{range .Metrics}}
-        <tr>
-            <td>{{.Name}}</td>
-            <td>{{.Help}}</td>
-            <td>{{List .Labels ", "}}</td>
-        </tr>
-		{{ end -}}
-	</tbody>
-</table>
-`)
-	if err != nil {
-		fmt.Printf("Error generating metrics table: %s", err)
-		os.Exit(1)
-	}
+	tpl = template.Must(tpl.ParseFiles("../readme/readme.tpl.md"))
 
-	tpl.Execute(
+	err := tpl.Execute(
 		os.Stdout,
 		struct {
 			Metrics []exporter.MetricVectorDetails
@@ -203,4 +181,7 @@ func exportMetrics() {
 			Metrics: exporter.RegisteredMetricVectors,
 		},
 	)
+	if err != nil {
+		fmt.Printf("Error writing readme", err)
+	}
 }
