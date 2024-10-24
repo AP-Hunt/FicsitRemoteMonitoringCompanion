@@ -47,13 +47,13 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, saveName string) {
 			).Set(prod.ProdPercent)
 		}
 
-		val, ok := powerInfo[building.PowerInfo.CircuitId]
+		val, ok := powerInfo[building.PowerInfo.CircuitGroupId]
 		if ok {
-			powerInfo[building.PowerInfo.CircuitId] = val + building.PowerInfo.PowerConsumed
+			powerInfo[building.PowerInfo.CircuitGroupId] = val + building.PowerInfo.PowerConsumed
 		} else {
-			powerInfo[building.PowerInfo.CircuitId] = building.PowerInfo.PowerConsumed
+			powerInfo[building.PowerInfo.CircuitGroupId] = building.PowerInfo.PowerConsumed
 		}
-		val, ok = maxPowerInfo[building.PowerInfo.CircuitId]
+		val, ok = maxPowerInfo[building.PowerInfo.CircuitGroupId]
 		maxBuildingPower := 0.0
 		switch building.Building {
 		case "Smelter":
@@ -82,9 +82,9 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, saveName string) {
 		// see https://satisfactory.wiki.gg/wiki/Clock_speed#Clock_speed_for_production_buildings for power info
 		maxBuildingPower = maxBuildingPower * (math.Pow(building.ManuSpeed/100, 1.321928))
 		if ok {
-			maxPowerInfo[building.PowerInfo.CircuitId] = val + maxBuildingPower
+			maxPowerInfo[building.PowerInfo.CircuitGroupId] = val + maxBuildingPower
 		} else {
-			maxPowerInfo[building.PowerInfo.CircuitId] = maxBuildingPower
+			maxPowerInfo[building.PowerInfo.CircuitGroupId] = maxBuildingPower
 		}
 	}
 	for circuitId, powerConsumed := range powerInfo {

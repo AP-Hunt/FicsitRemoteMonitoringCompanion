@@ -34,7 +34,7 @@ var _ = Describe("TrainStationCollector", func() {
 					},
 				},
 				PowerInfo: exporter.PowerInfo{
-					CircuitId: 1,
+					CircuitGroupId: 1,
 					PowerConsumed: 50,
 				},
 			},
@@ -55,7 +55,7 @@ var _ = Describe("TrainStationCollector", func() {
 					},
 				},
 				PowerInfo: exporter.PowerInfo{
-					CircuitId: 1,
+					CircuitGroupId: 1,
 					PowerConsumed: 50,
 				},
 			},

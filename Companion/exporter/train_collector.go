@@ -152,28 +152,28 @@ func (c *TrainCollector) Collect(frmAddress string, saveName string) {
 		if len(d.TimeTable) > 0 {
 			station, ok := (*c.TrackedStations)[d.TimeTable[0].StationName]
 			if ok {
-				circuitId := station.PowerInfo.CircuitId
-				val, ok := powerInfo[circuitId]
+				circuitGroupId := station.PowerInfo.CircuitGroupId
+				val, ok := powerInfo[circuitGroupId]
 				if ok {
-					powerInfo[circuitId] = val + trainPowerConsumed
+					powerInfo[circuitGroupId] = val + trainPowerConsumed
 				} else {
-					powerInfo[circuitId] = trainPowerConsumed
+					powerInfo[circuitGroupId] = trainPowerConsumed
 				}
-				val, ok = maxPowerInfo[circuitId]
+				val, ok = maxPowerInfo[circuitGroupId]
 				if ok {
-					maxPowerInfo[circuitId] = val + maxTrainPowerConsumed
+					maxPowerInfo[circuitGroupId] = val + maxTrainPowerConsumed
 				} else {
-					maxPowerInfo[circuitId] = maxTrainPowerConsumed
+					maxPowerInfo[circuitGroupId] = maxTrainPowerConsumed
 				}
 			}
 		}
 	}
-	for circuitId, powerConsumed := range powerInfo {
-		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
+	for circuitGroupId, powerConsumed := range powerInfo {
+		cid := strconv.FormatFloat(circuitGroupId, 'f', -1, 64)
 		TrainCircuitPower.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
 	}
-	for circuitId, powerConsumed := range maxPowerInfo {
-		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
+	for circuitGroupId, powerConsumed := range maxPowerInfo {
+		cid := strconv.FormatFloat(circuitGroupId, 'f', -1, 64)
 		TrainCircuitPowerMax.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
 	}
 }

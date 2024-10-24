@@ -65,11 +65,11 @@ func (c *DroneStationCollector) Collect(frmAddress string, saveName string) {
 
 		DronePortRndTrip.WithLabelValues(id, home, paired, frmAddress, saveName).Set(d.LatestRndTrip)
 
-		val, ok := powerInfo[d.PowerInfo.CircuitId]
+		val, ok := powerInfo[d.PowerInfo.CircuitGroupId]
 		if ok {
-			powerInfo[d.PowerInfo.CircuitId] = val + d.PowerInfo.PowerConsumed
+			powerInfo[d.PowerInfo.CircuitGroupId] = val + d.PowerInfo.PowerConsumed
 		} else {
-			powerInfo[d.PowerInfo.CircuitId] = d.PowerInfo.PowerConsumed
+			powerInfo[d.PowerInfo.CircuitGroupId] = d.PowerInfo.PowerConsumed
 		}
 	}
 

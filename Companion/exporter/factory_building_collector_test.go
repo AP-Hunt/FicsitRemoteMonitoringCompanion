@@ -52,9 +52,9 @@ var _ = Describe("FactoryBuildingCollector", func() {
 				IsConfigured: false,
 				IsProducing:  false,
 				IsPaused:     false,
-				CircuitID:    0,
+				CircuitGroupId:    0,
 				PowerInfo: exporter.PowerInfo{
-					CircuitId:     1,
+					CircuitGroupId:     1,
 					PowerConsumed: 23,
 				},
 			},

@@ -1,27 +1,27 @@
 package exporter
 
 var (
-	SmelterPower     = 4.0
-	ConstructorPower = 4.0
-	AssemblerPower = 15.0
-	ManufacturerPower = 55.0
-	BlenderPower = 75.0
-	RefineryPower = 30.0
+	SmelterPower             = 4.0
+	ConstructorPower         = 4.0
+	AssemblerPower           = 15.0
+	ManufacturerPower        = 55.0
+	BlenderPower             = 75.0
+	RefineryPower            = 30.0
 	ParticleAcceleratorPower = 1500.0
 )
 
 type BuildingDetail struct {
-	Building     string       `json:"Name"`
-	Location     Location     `json:"location"`
-	Recipe       string       `json:"Recipe"`
-	Production   []Production `json:"production"`
-	Ingredients  []Ingredient `json:"ingredients"`
-	ManuSpeed    float64      `json:"ManuSpeed"`
-	IsConfigured bool         `json:"IsConfigured"`
-	IsProducing  bool         `json:"IsProducing"`
-	IsPaused     bool         `json:"IsPaused"`
-	CircuitID    int          `json:"CircuitID"`
-	PowerInfo    PowerInfo    `json:"PowerInfo"`
+	Building       string       `json:"Name"`
+	Location       Location     `json:"location"`
+	Recipe         string       `json:"Recipe"`
+	Production     []Production `json:"production"`
+	Ingredients    []Ingredient `json:"ingredients"`
+	ManuSpeed      float64      `json:"ManuSpeed"`
+	IsConfigured   bool         `json:"IsConfigured"`
+	IsProducing    bool         `json:"IsProducing"`
+	IsPaused       bool         `json:"IsPaused"`
+	CircuitGroupId int          `json:"CircuitGroupID"`
+	PowerInfo      PowerInfo    `json:"PowerInfo"`
 }
 
 type Production struct {

@@ -6,8 +6,8 @@ import (
 )
 
 type PowerInfo struct {
-	CircuitId     float64 `json:"CircuitID"`
-	PowerConsumed float64 `json:"PowerConsumed"`
+	CircuitGroupId float64 `json:"CircuitGroupID"`
+	PowerConsumed  float64 `json:"PowerConsumed"`
 }
 
 type PowerCollector struct {
@@ -15,7 +15,7 @@ type PowerCollector struct {
 }
 
 type PowerDetails struct {
-	CircuitId           float64 `json:"CircuitID"`
+	CircuitGroupId      float64 `json:"CircuitGroupID"`
 	PowerConsumed       float64 `json:"PowerConsumed"`
 	PowerCapacity       float64 `json:"PowerCapacity"`
 	PowerMaxConsumed    float64 `json:"PowerMaxConsumed"`
@@ -42,7 +42,7 @@ func (c *PowerCollector) Collect(frmAddress string, saveName string) {
 	}
 
 	for _, d := range details {
-		circuitId := strconv.FormatFloat(d.CircuitId, 'f', -1, 64)
+		circuitId := strconv.FormatFloat(d.CircuitGroupId, 'f', -1, 64)
 		PowerConsumed.WithLabelValues(circuitId, frmAddress, saveName).Set(d.PowerConsumed)
 		PowerCapacity.WithLabelValues(circuitId, frmAddress, saveName).Set(d.PowerCapacity)
 		PowerMaxConsumed.WithLabelValues(circuitId, frmAddress, saveName).Set(d.PowerMaxConsumed)

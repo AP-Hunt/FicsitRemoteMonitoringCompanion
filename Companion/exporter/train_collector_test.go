@@ -55,19 +55,19 @@ var _ = Describe("TrainCollector", func() {
 			"First": {
 				Name: "First",
 				PowerInfo: exporter.PowerInfo{
-					CircuitId: 1,
+					CircuitGroupId: 1,
 				},
 			},
 			"Second": {
 				Name: "Second",
 				PowerInfo: exporter.PowerInfo{
-					CircuitId: 1,
+					CircuitGroupId: 1,
 				},
 			},
 			"Third": {
 				Name: "Third",
 				PowerInfo: exporter.PowerInfo{
-					CircuitId: 1,
+					CircuitGroupId: 1,
 				},
 			},
 		})

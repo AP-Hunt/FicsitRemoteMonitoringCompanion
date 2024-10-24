@@ -48,8 +48,8 @@ func (c *TrainStationCollector) Collect(frmAddress string, saveName string) {
 	powerInfo := map[float64]float64{}
 	maxPowerInfo := map[float64]float64{}
 	for _, d := range details {
-		val, ok := powerInfo[d.PowerInfo.CircuitId]
-		maxval, maxok := maxPowerInfo[d.PowerInfo.CircuitId]
+		val, ok := powerInfo[d.PowerInfo.CircuitGroupId]
+		maxval, maxok := maxPowerInfo[d.PowerInfo.CircuitGroupId]
 
 		// some additional calculations: for now, power listed here is only for the station.
 		// add each of the cargo platforms' power info: 0.1MW if Idle, 50MW otherwise
@@ -65,15 +65,15 @@ func (c *TrainStationCollector) Collect(frmAddress string, saveName string) {
 		}
 
 		if ok {
-			powerInfo[d.PowerInfo.CircuitId] = val + totalPowerConsumed
+			powerInfo[d.PowerInfo.CircuitGroupId] = val + totalPowerConsumed
 		} else {
-			powerInfo[d.PowerInfo.CircuitId] = totalPowerConsumed
+			powerInfo[d.PowerInfo.CircuitGroupId] = totalPowerConsumed
 		}
 
 		if maxok {
-			maxPowerInfo[d.PowerInfo.CircuitId] = maxval + maxTotalPowerConsumed
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = maxval + maxTotalPowerConsumed
 		} else {
-			maxPowerInfo[d.PowerInfo.CircuitId] = maxTotalPowerConsumed
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = maxTotalPowerConsumed
 		}
 
 		//also cache stations so other metrics can figure out a circuit id from a station name

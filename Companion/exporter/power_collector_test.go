@@ -17,7 +17,7 @@ var _ = Describe("PowerCollector", func() {
 
 		FRMServer.ReturnsPowerData([]exporter.PowerDetails{
 			{
-				CircuitId:           1,
+				CircuitGroupId:      1,
 				PowerConsumed:       30,
 				PowerCapacity:       44,
 				PowerMaxConsumed:    50,
@@ -29,7 +29,7 @@ var _ = Describe("PowerCollector", func() {
 				FuseTriggered:       false,
 			},
 			{
-				CircuitId:           2,
+				CircuitGroupId:      2,
 				PowerConsumed:       55,
 				PowerCapacity:       44,
 				PowerMaxConsumed:    60,

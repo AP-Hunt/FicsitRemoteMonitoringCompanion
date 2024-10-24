@@ -34,17 +34,17 @@ func (c *VehicleStationCollector) Collect(frmAddress string, saveName string) {
 	powerInfo := map[float64]float64{}
 	maxPowerInfo := map[float64]float64{}
 	for _, d := range details {
-		val, ok := powerInfo[d.PowerInfo.CircuitId]
+		val, ok := powerInfo[d.PowerInfo.CircuitGroupId]
 		if ok {
-			powerInfo[d.PowerInfo.CircuitId] = val + d.PowerInfo.PowerConsumed
+			powerInfo[d.PowerInfo.CircuitGroupId] = val + d.PowerInfo.PowerConsumed
 		} else {
-			powerInfo[d.PowerInfo.CircuitId] = d.PowerInfo.PowerConsumed
+			powerInfo[d.PowerInfo.CircuitGroupId] = d.PowerInfo.PowerConsumed
 		}
-		val, ok = maxPowerInfo[d.PowerInfo.CircuitId]
+		val, ok = maxPowerInfo[d.PowerInfo.CircuitGroupId]
 		if ok {
-			maxPowerInfo[d.PowerInfo.CircuitId] = val + VehicleStationPowerConsumption
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = val + VehicleStationPowerConsumption
 		} else {
-			maxPowerInfo[d.PowerInfo.CircuitId] = VehicleStationPowerConsumption
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = VehicleStationPowerConsumption
 		}
 	}
 	for circuitId, powerConsumed := range powerInfo {
