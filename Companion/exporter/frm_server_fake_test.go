@@ -17,6 +17,7 @@ type FRMServerFake struct {
 	droneData          []exporter.DroneStationDetails
 	vehicleStationData []exporter.VehicleStationDetails
 	trainStationData   []exporter.TrainStationDetails
+	resourceSinkData   []exporter.ResourceSinkDetails
 }
 
 func NewFRMServerFake() *FRMServerFake {
@@ -38,6 +39,7 @@ func NewFRMServerFake() *FRMServerFake {
 	mux.Handle("/getVehicles", http.HandlerFunc(getStatsHandler(&fake.vehicleData)))
 	mux.Handle("/getTruckStation", http.HandlerFunc(getStatsHandler(&fake.vehicleStationData)))
 	mux.Handle("/getTrainStation", http.HandlerFunc(getStatsHandler(&fake.trainStationData)))
+	mux.Handle("/getResourceSinkBuilding", http.HandlerFunc(getStatsHandler(&fake.resourceSinkData)))
 
 	return fake
 }
@@ -94,6 +96,10 @@ func (e *FRMServerFake) ReturnsVehicleStationData(data []exporter.VehicleStation
 
 func (e *FRMServerFake) ReturnsTrainStationData(data []exporter.TrainStationDetails) {
 	e.trainStationData = data
+}
+
+func (e *FRMServerFake) ReturnsResourceSinkData(data []exporter.ResourceSinkDetails) {
+	e.resourceSinkData = data
 }
 
 func getStatsHandler(data any) func(w http.ResponseWriter, r *http.Request) {
