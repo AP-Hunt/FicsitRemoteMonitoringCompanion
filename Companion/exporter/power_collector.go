@@ -3,6 +3,8 @@ package exporter
 import (
 	"log"
 	"strconv"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type PowerInfo struct {
@@ -11,7 +13,8 @@ type PowerInfo struct {
 }
 
 type PowerCollector struct {
-	endpoint string
+	endpoint       string
+	metricsDropper *MetricsDropper
 }
 
 type PowerDetails struct {
@@ -30,6 +33,25 @@ type PowerDetails struct {
 func NewPowerCollector(endpoint string) *PowerCollector {
 	return &PowerCollector{
 		endpoint: endpoint,
+		metricsDropper: NewMetricsDropper(
+			PowerConsumed,
+			PowerCapacity,
+			PowerMaxConsumed,
+			BatteryDifferential,
+			BatteryPercent,
+			BatteryCapacity,
+			BatterySecondsEmpty,
+			BatterySecondsFull,
+			FuseTriggered,
+			TrainCircuitPower,
+			TrainCircuitPowerMax,
+			TrainStationPower,
+			TrainStationPowerMax,
+			VehicleStationPower,
+			VehicleStationPowerMax,
+			FactoryPower,
+			FactoryPowerMax,
+		),
 	}
 }
 
@@ -37,12 +59,14 @@ func (c *PowerCollector) Collect(frmAddress string, sessionName string) {
 	details := []PowerDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
+		c.metricsDropper.DropStaleMetricLabels()
 		log.Printf("error reading power statistics from FRM: %s\n", err)
 		return
 	}
 
 	for _, d := range details {
 		circuitId := strconv.FormatFloat(d.CircuitGroupId, 'f', -1, 64)
+		c.metricsDropper.CacheFreshMetricLabel(prometheus.Labels{"url": frmAddress, "session_name": sessionName, "circuit_id": circuitId})
 		PowerConsumed.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.PowerConsumed)
 		PowerCapacity.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.PowerCapacity)
 		PowerMaxConsumed.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.PowerMaxConsumed)
@@ -60,4 +84,5 @@ func (c *PowerCollector) Collect(frmAddress string, sessionName string) {
 		fuseTriggered := parseBool(d.FuseTriggered)
 		FuseTriggered.WithLabelValues(circuitId, frmAddress, sessionName).Set(fuseTriggered)
 	}
+	c.metricsDropper.DropStaleMetricLabels()
 }

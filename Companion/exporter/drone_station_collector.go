@@ -3,10 +3,13 @@ package exporter
 import (
 	"log"
 	"strconv"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type DroneStationCollector struct {
-	endpoint string
+	endpoint       string
+	metricsDropper *MetricsDropper
 }
 
 type DroneStationDetails struct {
@@ -44,6 +47,11 @@ type DroneStationDetails struct {
 func NewDroneStationCollector(endpoint string) *DroneStationCollector {
 	return &DroneStationCollector{
 		endpoint: endpoint,
+		metricsDropper: NewMetricsDropper(
+			DronePortBatteryRate,
+			DronePortRndTrip,
+			DronePortPower,
+		),
 	}
 }
 
@@ -51,12 +59,14 @@ func (c *DroneStationCollector) Collect(frmAddress string, sessionName string) {
 	details := []DroneStationDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
+		c.metricsDropper.DropStaleMetricLabels()
 		log.Printf("error reading drone station statistics from FRM: %s\n", err)
 		return
 	}
 
 	powerInfo := map[float64]float64{}
 	for _, d := range details {
+		c.metricsDropper.CacheFreshMetricLabel(prometheus.Labels{"url": frmAddress, "session_name": sessionName, "id": d.Id})
 		id := d.Id
 		home := d.HomeStation
 		paired := d.PairedStation
@@ -77,4 +87,6 @@ func (c *DroneStationCollector) Collect(frmAddress string, sessionName string) {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
 		DronePortPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
+
+	c.metricsDropper.DropStaleMetricLabels()
 }

@@ -4,6 +4,8 @@ import (
 	"log"
 	"strconv"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 var MaxTrainPowerConsumption = 110.0
@@ -12,6 +14,7 @@ type TrainCollector struct {
 	endpoint        string
 	TrackedTrains   map[string]*TrainDetails
 	TrackedStations *map[string]TrainStationDetails
+	metricsDropper  *MetricsDropper
 }
 
 type TimeTable struct {
@@ -43,6 +46,15 @@ func NewTrainCollector(endpoint string, trackedStations *map[string]TrainStation
 		endpoint:        endpoint,
 		TrackedTrains:   make(map[string]*TrainDetails),
 		TrackedStations: trackedStations,
+		metricsDropper: NewMetricsDropper(
+			TrainRoundTrip,
+			TrainSegmentTrip,
+			TrainPower,
+			TrainTotalMass,
+			TrainPayloadMass,
+			TrainMaxPayloadMass,
+			TrainDerailed,
+		),
 	}
 }
 
@@ -114,6 +126,7 @@ func (c *TrainCollector) Collect(frmAddress string, sessionName string) {
 	details := []TrainDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
+		c.metricsDropper.DropStaleMetricLabels()
 		log.Printf("error reading train statistics from FRM: %s\n", err)
 		return
 	}
@@ -121,6 +134,7 @@ func (c *TrainCollector) Collect(frmAddress string, sessionName string) {
 	powerInfo := map[float64]float64{}
 	maxPowerInfo := map[float64]float64{}
 	for _, d := range details {
+		c.metricsDropper.CacheFreshMetricLabel(prometheus.Labels{"url": frmAddress, "session_name": sessionName, "name": d.TrainName})
 		totalMass := 0.0
 		payloadMass := 0.0
 		maxPayloadMass := 0.0
@@ -176,4 +190,5 @@ func (c *TrainCollector) Collect(frmAddress string, sessionName string) {
 		cid := strconv.FormatFloat(circuitGroupId, 'f', -1, 64)
 		TrainCircuitPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
+	c.metricsDropper.DropStaleMetricLabels()
 }

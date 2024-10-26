@@ -4,15 +4,22 @@ import (
 	"log"
 	"math"
 	"strconv"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type FactoryBuildingCollector struct {
-	endpoint string
+	endpoint       string
+	metricsDropper *MetricsDropper
 }
 
 func NewFactoryBuildingCollector(endpoint string) *FactoryBuildingCollector {
 	return &FactoryBuildingCollector{
 		endpoint: endpoint,
+		metricsDropper: NewMetricsDropper(
+			MachineItemsProducedPerMin,
+			MachineItemsProducedEffiency,
+		),
 	}
 }
 
@@ -20,6 +27,7 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 	details := []BuildingDetail{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
+		c.metricsDropper.DropStaleMetricLabels()
 		log.Printf("error reading factory buildings from FRM: %s\n", err)
 		return
 	}
@@ -27,6 +35,11 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 	powerInfo := map[float64]float64{}
 	maxPowerInfo := map[float64]float64{}
 	for _, building := range details {
+		c.metricsDropper.CacheFreshMetricLabel(prometheus.Labels{"url": frmAddress, "session_name": sessionName, "machine_name": building.Building,
+			"x": strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+			"y": strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+			"z": strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+		})
 		for _, prod := range building.Production {
 			MachineItemsProducedPerMin.WithLabelValues(
 				prod.Name,
@@ -87,6 +100,7 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 			maxPowerInfo[building.PowerInfo.CircuitGroupId] = maxBuildingPower
 		}
 	}
+	c.metricsDropper.DropStaleMetricLabels()
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
 		FactoryPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)

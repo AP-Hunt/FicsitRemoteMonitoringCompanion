@@ -3,11 +3,14 @@ package exporter
 import (
 	"log"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type VehicleCollector struct {
 	endpoint        string
 	TrackedVehicles map[string]*VehicleDetails
+	metricsDropper *MetricsDropper
 }
 
 type VehicleDetails struct {
@@ -83,6 +86,10 @@ func NewVehicleCollector(endpoint string) *VehicleCollector {
 	return &VehicleCollector{
 		endpoint:        endpoint,
 		TrackedVehicles: make(map[string]*VehicleDetails),
+		metricsDropper: NewMetricsDropper(
+			VehicleRoundTrip,
+			VehicleFuel,
+		),
 	}
 }
 
@@ -90,15 +97,19 @@ func (c *VehicleCollector) Collect(frmAddress string, sessionName string) {
 	details := []VehicleDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
+		c.metricsDropper.DropStaleMetricLabels()
 		log.Printf("error reading vehicle statistics from FRM: %s\n", err)
 		return
 	}
 
 	for _, d := range details {
+		c.metricsDropper.CacheFreshMetricLabel(prometheus.Labels{"url": frmAddress, "session_name": sessionName, "id": d.Id})
 		if len(d.Fuel) > 0 {
 			VehicleFuel.WithLabelValues(d.Id, d.VehicleType, d.Fuel[0].Name, frmAddress, sessionName).Set(d.Fuel[0].Amount)
 		}
 
 		d.handleTimingUpdates(c.TrackedVehicles, frmAddress, sessionName)
 	}
+
+	c.metricsDropper.DropStaleMetricLabels()
 }
