@@ -21,42 +21,42 @@ var _ = Describe("TrainStationCollector", func() {
 				Name: "test1",
 				CargoPlatforms: []exporter.CargoPlatform{
 					{
-						LoadingDock: "Freight Platform",
-						TransferRate: 66,
+						LoadingDock:   "Freight Platform",
+						TransferRate:  66,
 						LoadingStatus: "Idle",
-						LoadingMode: "Loading",
+						LoadingMode:   "Loading",
 					},
 					{
-						LoadingDock: "Freight Platform",
-						TransferRate: 66,
+						LoadingDock:   "Freight Platform",
+						TransferRate:  66,
 						LoadingStatus: "Idle",
-						LoadingMode: "Loading",
+						LoadingMode:   "Loading",
 					},
 				},
 				PowerInfo: exporter.PowerInfo{
 					CircuitGroupId: 1,
-					PowerConsumed: 50,
+					PowerConsumed:  50,
 				},
 			},
 			{
 				Name: "test2",
 				CargoPlatforms: []exporter.CargoPlatform{
 					{
-						LoadingDock: "Freight Platform",
-						TransferRate: 66,
+						LoadingDock:   "Freight Platform",
+						TransferRate:  66,
 						LoadingStatus: "Unloading",
-						LoadingMode: "Unloading",
+						LoadingMode:   "Unloading",
 					},
 					{
-						LoadingDock: "Freight Platform",
-						TransferRate: 66,
+						LoadingDock:   "Freight Platform",
+						TransferRate:  66,
 						LoadingStatus: "Idle",
-						LoadingMode: "Unloading",
+						LoadingMode:   "Unloading",
 					},
 				},
 				PowerInfo: exporter.PowerInfo{
 					CircuitGroupId: 1,
-					PowerConsumed: 50,
+					PowerConsumed:  50,
 				},
 			},
 		})

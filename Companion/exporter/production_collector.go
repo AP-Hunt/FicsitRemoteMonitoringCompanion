@@ -9,13 +9,13 @@ type ProductionCollector struct {
 }
 
 type ProductionDetails struct {
-	ItemName           string   `json:"Name"`
+	ItemName           string  `json:"Name"`
 	ProdPercent        float64 `json:"ProdPercent"`
 	ConsPercent        float64 `json:"ConsPercent"`
-	CurrentProduction  float64  `json:"CurrentProd"`
-	CurrentConsumption float64  `json:"CurrentConsumed"`
-	MaxProd            float64  `json:"MaxProd"`
-	MaxConsumed        float64  `json:"MaxConsumed"`
+	CurrentProduction  float64 `json:"CurrentProd"`
+	CurrentConsumption float64 `json:"CurrentConsumed"`
+	MaxProd            float64 `json:"MaxProd"`
+	MaxConsumed        float64 `json:"MaxConsumed"`
 }
 
 func NewProductionCollector(endpoint string) *ProductionCollector {
@@ -26,7 +26,7 @@ func NewProductionCollector(endpoint string) *ProductionCollector {
 
 func (c *ProductionCollector) Collect(frmAddress string, sessionName string) {
 	details := []ProductionDetails{}
-	err := retrieveData(frmAddress + c.endpoint, &details)
+	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading production statistics from FRM: %s\n", err)
 		return

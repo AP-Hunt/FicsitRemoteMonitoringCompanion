@@ -19,22 +19,22 @@ var _ = Describe("VehicleStationCollector", func() {
 			{
 				Name: "Truck Station",
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId:     1,
-					PowerConsumed: 20,
+					CircuitGroupId: 1,
+					PowerConsumed:  20,
 				},
 			},
 			{
 				Name: "Truck Station",
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId:     1,
-					PowerConsumed: 20,
+					CircuitGroupId: 1,
+					PowerConsumed:  20,
 				},
 			},
 			{
 				Name: "Truck Station",
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId:     1,
-					PowerConsumed: 0.1,
+					CircuitGroupId: 1,
+					PowerConsumed:  0.1,
 				},
 			},
 		})

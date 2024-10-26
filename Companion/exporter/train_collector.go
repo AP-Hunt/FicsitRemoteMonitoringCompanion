@@ -90,7 +90,7 @@ func (t *TrainDetails) startTracking(trackedTrains map[string]*TrainDetails) {
 	trackedTrains[t.TrainName] = &trackedTrain
 }
 
-func (d *TrainDetails) handleTimingUpdates(trackedTrains map[string]*TrainDetails,frmAddress string, sessionName string ) {
+func (d *TrainDetails) handleTimingUpdates(trackedTrains map[string]*TrainDetails, frmAddress string, sessionName string) {
 	// track self driving train timing
 	if d.Status == "Self-Driving" {
 		train, exists := trackedTrains[d.TrainName]

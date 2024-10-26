@@ -30,8 +30,8 @@ var _ = Describe("DroneStationCollector", func() {
 				LatestTripOutAmt: 50,
 				EstBatteryRate:   30,
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId:     1.0,
-					PowerConsumed: 100,
+					CircuitGroupId: 1.0,
+					PowerConsumed:  100,
 				},
 			},
 			{
@@ -48,8 +48,8 @@ var _ = Describe("DroneStationCollector", func() {
 				LatestTripOutAmt: 50,
 				EstBatteryRate:   30,
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId:     1.0,
-					PowerConsumed: 100,
+					CircuitGroupId: 1.0,
+					PowerConsumed:  100,
 				},
 			},
 		})

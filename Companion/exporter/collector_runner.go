@@ -6,11 +6,11 @@ import (
 )
 
 type CollectorRunner struct {
-	collectors []Collector
-	ctx        context.Context
-	cancel     context.CancelFunc
-	frmBaseUrl string
-	sessionName   string
+	collectors  []Collector
+	ctx         context.Context
+	cancel      context.CancelFunc
+	frmBaseUrl  string
+	sessionName string
 }
 
 type Collector interface {
@@ -20,10 +20,10 @@ type Collector interface {
 func NewCollectorRunner(ctx context.Context, frmBaseUrl string, collectors ...Collector) *CollectorRunner {
 	ctx, cancel := context.WithCancel(ctx)
 	return &CollectorRunner{
-		ctx:        ctx,
-		cancel:     cancel,
-		collectors: collectors,
-		frmBaseUrl: frmBaseUrl,
+		ctx:         ctx,
+		cancel:      cancel,
+		collectors:  collectors,
+		frmBaseUrl:  frmBaseUrl,
 		sessionName: "default",
 	}
 }
