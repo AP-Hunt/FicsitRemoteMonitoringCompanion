@@ -12,7 +12,6 @@ type ResourceSinkCollector struct {
 }
 
 type ResourceSinkDetails struct {
-	Name      string    `json:"Name"`
 	Location  Location  `json:"location"`
 	PowerInfo PowerInfo `json:"PowerInfo"`
 }
