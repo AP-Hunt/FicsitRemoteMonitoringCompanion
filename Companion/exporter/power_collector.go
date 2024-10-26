@@ -51,6 +51,8 @@ func NewPowerCollector(endpoint string) *PowerCollector {
 			VehicleStationPowerMax,
 			FactoryPower,
 			FactoryPowerMax,
+			ResourceSinkPower,
+			ResourceSinkPowerMax,
 		),
 	}
 }
