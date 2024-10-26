@@ -13,7 +13,6 @@ var MaxTrainPowerConsumption = 110.0
 type TrainCollector struct {
 	endpoint        string
 	TrackedTrains   map[string]*TrainDetails
-	TrackedStations *map[string]TrainStationDetails
 	metricsDropper  *MetricsDropper
 }
 
@@ -30,22 +29,21 @@ type TrainCar struct {
 
 type TrainDetails struct {
 	TrainName        string      `json:"Name"`
-	PowerConsumed    float64     `json:"PowerConsumed"`
 	TrainStation     string      `json:"TrainStation"`
 	Derailed         bool        `json:"Derailed"`
 	Status           string      `json:"Status"` //"Self-Driving",
 	TimeTable        []TimeTable `json:"TimeTable"`
-	TrainConsist     []TrainCar  `json:"TrainConsist"`
+	TrainCars        []TrainCar  `json:"Vehicles"`
+	PowerInfo        PowerInfo   `json:"PowerInfo"`
 	ArrivalTime      time.Time
 	StationCounter   int
 	FirstArrivalTime time.Time
 }
 
-func NewTrainCollector(endpoint string, trackedStations *map[string]TrainStationDetails) *TrainCollector {
+func NewTrainCollector(endpoint string) *TrainCollector {
 	return &TrainCollector{
 		endpoint:        endpoint,
 		TrackedTrains:   make(map[string]*TrainDetails),
-		TrackedStations: trackedStations,
 		metricsDropper: NewMetricsDropper(
 			TrainRoundTrip,
 			TrainSegmentTrip,
@@ -140,7 +138,7 @@ func (c *TrainCollector) Collect(frmAddress string, sessionName string) {
 		maxPayloadMass := 0.0
 		locomotives := 0.0
 
-		for _, car := range d.TrainConsist {
+		for _, car := range d.TrainCars {
 			if car.Name == "Electric Locomotive" {
 				locomotives = locomotives + 1
 			}
@@ -150,7 +148,7 @@ func (c *TrainCollector) Collect(frmAddress string, sessionName string) {
 		}
 
 		// for now, the total power consumed is a multiple of the reported power consumed by the number of locomotives
-		trainPowerConsumed := d.PowerConsumed * locomotives
+		trainPowerConsumed := d.PowerInfo.PowerConsumed * locomotives
 		maxTrainPowerConsumed := MaxTrainPowerConsumption * locomotives
 
 		TrainPower.WithLabelValues(d.TrainName, frmAddress, sessionName).Set(trainPowerConsumed)
@@ -163,10 +161,7 @@ func (c *TrainCollector) Collect(frmAddress string, sessionName string) {
 
 		d.handleTimingUpdates(c.TrackedTrains, frmAddress, sessionName)
 
-		if len(d.TimeTable) > 0 {
-			station, ok := (*c.TrackedStations)[d.TimeTable[0].StationName]
-			if ok {
-				circuitGroupId := station.PowerInfo.CircuitGroupId
+		circuitGroupId := d.PowerInfo.CircuitGroupId
 				val, ok := powerInfo[circuitGroupId]
 				if ok {
 					powerInfo[circuitGroupId] = val + trainPowerConsumed
@@ -179,8 +174,6 @@ func (c *TrainCollector) Collect(frmAddress string, sessionName string) {
 				} else {
 					maxPowerInfo[circuitGroupId] = maxTrainPowerConsumed
 				}
-			}
-		}
 	}
 	for circuitGroupId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitGroupId, 'f', -1, 64)

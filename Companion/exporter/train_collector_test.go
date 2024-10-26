@@ -13,7 +13,6 @@ func updateTrain(station string) {
 	FRMServer.ReturnsTrainData([]exporter.TrainDetails{
 		{
 			TrainName:     "Train1",
-			PowerConsumed: 0,
 			TrainStation:  station,
 			Derailed:      false,
 			Status:        "Self-Driving",
@@ -22,23 +21,30 @@ func updateTrain(station string) {
 				{StationName: "Second"},
 				{StationName: "Third"},
 			},
-			TrainConsist: []exporter.TrainCar{
+			TrainCars: []exporter.TrainCar{
 				{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
 				{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
+			},
+			PowerInfo: exporter.PowerInfo{
+				CircuitGroupId: 1,
+				PowerConsumed: 0,
 			},
 		},
 		{
 			TrainName:     "Not In Use",
-			PowerConsumed: 0,
 			TrainStation:  "Offsite",
 			Derailed:      false,
 			Status:        "Parked",
 			TimeTable: []exporter.TimeTable{
 				{StationName: "Offsite"},
 			},
-			TrainConsist: []exporter.TrainCar{
+			TrainCars: []exporter.TrainCar{
 				{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
 				{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
+			},
+			PowerInfo: exporter.PowerInfo{
+				CircuitGroupId: 1,
+				PowerConsumed: 0,
 			},
 		},
 	})
@@ -51,32 +57,11 @@ var _ = Describe("TrainCollector", func() {
 
 	BeforeEach(func() {
 		FRMServer.Reset()
-		trackedStations := &(map[string]exporter.TrainStationDetails{
-			"First": {
-				Name: "First",
-				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1,
-				},
-			},
-			"Second": {
-				Name: "Second",
-				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1,
-				},
-			},
-			"Third": {
-				Name: "Third",
-				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1,
-				},
-			},
-		})
-		collector = exporter.NewTrainCollector("/getTrains", trackedStations)
+		collector = exporter.NewTrainCollector("/getTrains")
 
 		FRMServer.ReturnsTrainData([]exporter.TrainDetails{
 			{
 				TrainName:     "Train1",
-				PowerConsumed: 67,
 				TrainStation:  "NextStation",
 				Derailed:      false,
 				Status:        "Self-Driving",
@@ -84,16 +69,19 @@ var _ = Describe("TrainCollector", func() {
 					{StationName: "First"},
 					{StationName: "Second"},
 				},
-				TrainConsist: []exporter.TrainCar{
+				TrainCars: []exporter.TrainCar{
 					{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
 					{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
 					{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
 					{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
 				},
+				PowerInfo: exporter.PowerInfo{
+					CircuitGroupId: 1,
+					PowerConsumed: 67,
+				},
 			},
 			{
 				TrainName:     "Train2",
-				PowerConsumed: 22,
 				TrainStation:  "NextStation",
 				Derailed:      false,
 				Status:        "Self-Driving",
@@ -101,19 +89,26 @@ var _ = Describe("TrainCollector", func() {
 					{StationName: "Second"},
 					{StationName: "Third"},
 				},
-				TrainConsist: []exporter.TrainCar{
+				TrainCars: []exporter.TrainCar{
 					{Name: "Electric Locomotive", TotalMass: 3000, PayloadMass: 0, MaxPayloadMass: 0},
 					{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
 					{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
 				},
+				PowerInfo: exporter.PowerInfo{
+					CircuitGroupId: 1,
+					PowerConsumed: 22,
+				},
 			},
 			{
 				TrainName:     "DerailedTrain",
-				PowerConsumed: 0,
 				TrainStation:  "NextStation",
 				Derailed:      true,
 				Status:        "Derailed",
-				TrainConsist:  []exporter.TrainCar{},
+				TrainCars:  []exporter.TrainCar{},
+				PowerInfo: exporter.PowerInfo{
+					CircuitGroupId: 0,
+					PowerConsumed: 0,
+				},
 			},
 		})
 	})

@@ -10,10 +10,8 @@ var (
 	CargoPlatformPower = 50.0
 )
 
-// TODO: drop tracked stations when session name is updated?
 type TrainStationCollector struct {
 	endpoint        string
-	TrackedStations *map[string]TrainStationDetails
 }
 
 type CargoPlatform struct {
@@ -30,10 +28,9 @@ type TrainStationDetails struct {
 	PowerInfo      PowerInfo       `json:"PowerInfo"`
 }
 
-func NewTrainStationCollector(endpoint string, trackedStations *map[string]TrainStationDetails) *TrainStationCollector {
+func NewTrainStationCollector(endpoint string) *TrainStationCollector {
 	return &TrainStationCollector{
 		endpoint:        endpoint,
-		TrackedStations: trackedStations,
 	}
 }
 
@@ -75,9 +72,6 @@ func (c *TrainStationCollector) Collect(frmAddress string, sessionName string) {
 		} else {
 			maxPowerInfo[d.PowerInfo.CircuitGroupId] = maxTotalPowerConsumed
 		}
-
-		//also cache stations so other metrics can figure out a circuit id from a station name
-		(*c.TrackedStations)[d.Name] = d
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)

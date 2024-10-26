@@ -35,10 +35,8 @@ func NewPrometheusExporter(frmApiHosts []string) *PrometheusExporter {
 		vehicleCollector := NewVehicleCollector("/getVehicles")
 		droneCollector := NewDroneStationCollector("/getDroneStation")
 		vehicleStationCollector := NewVehicleStationCollector("/getTruckStation")
-
-		trackedStations := &(map[string]TrainStationDetails{})
-		trainCollector := NewTrainCollector("/getTrains", trackedStations)
-		trainStationCollector := NewTrainStationCollector("/getTrainStation", trackedStations)
+		trainCollector := NewTrainCollector("/getTrains")
+		trainStationCollector := NewTrainStationCollector("/getTrainStation")
 		collectorRunners = append(collectorRunners, NewCollectorRunner(ctx, frmApiHost, productionCollector, powerCollector, buildingCollector, vehicleCollector, trainCollector, droneCollector, vehicleStationCollector, trainStationCollector))
 	}
 

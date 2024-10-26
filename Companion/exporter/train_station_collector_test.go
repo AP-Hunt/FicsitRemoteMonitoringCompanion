@@ -13,8 +13,7 @@ var _ = Describe("TrainStationCollector", func() {
 
 	BeforeEach(func() {
 		FRMServer.Reset()
-		trackedStations := &(map[string]exporter.TrainStationDetails{})
-		collector = exporter.NewTrainStationCollector("/getTrainStation", trackedStations)
+		collector = exporter.NewTrainStationCollector("/getTrainStation")
 
 		FRMServer.ReturnsTrainStationData([]exporter.TrainStationDetails{
 			{
