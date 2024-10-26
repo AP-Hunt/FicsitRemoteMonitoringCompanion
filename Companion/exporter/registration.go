@@ -15,8 +15,8 @@ var RegisteredMetricVectors = []MetricVectorDetails{}
 var RegisteredMetrics = []*prometheus.GaugeVec{}
 
 func RegisterNewGaugeVec(opts prometheus.GaugeOpts, labelNames []string) *prometheus.GaugeVec {
-	// All metrics include url and save_name labels
-	labelNames = append(labelNames, "url", "save_name")
+	// All metrics include url and session_name labels
+	labelNames = append(labelNames, "url", "session_name")
 	RegisteredMetricVectors = append(RegisteredMetricVectors, MetricVectorDetails{
 		Name:   opts.Name,
 		Help:   opts.Help,

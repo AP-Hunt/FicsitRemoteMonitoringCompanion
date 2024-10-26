@@ -9,7 +9,7 @@ import (
 
 var _ = Describe("FactoryBuildingCollector", func() {
 	var url = "http://localhost:9080"
-	var saveName = "default"
+	var sessionName = "default"
 	var collector *exporter.FactoryBuildingCollector
 
 	BeforeEach(func() {
@@ -68,40 +68,40 @@ var _ = Describe("FactoryBuildingCollector", func() {
 	Describe("Factory Power", func() {
 
 		It("Records power per circuit", func() {
-			collector.Collect(url, saveName)
-			val, err := gaugeValue(exporter.FactoryPower, "1", url, saveName)
+			collector.Collect(url, sessionName)
+			val, err := gaugeValue(exporter.FactoryPower, "1", url, sessionName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(23.0))
-			val2, _ := gaugeValue(exporter.FactoryPowerMax, "1", url, saveName)
+			val2, _ := gaugeValue(exporter.FactoryPowerMax, "1", url, sessionName)
 			Expect(val2).To(Equal(exporter.SmelterPower))
 		})
 	})
 
 	Describe("Machine item production metrics", func() {
 		It("records a metric with labels for the produced item name, machine type, and x, y, z coordinates", func() {
-			collector.Collect(url, saveName)
-			metric, err := getMetric(exporter.MachineItemsProducedPerMin, "Iron Ingot", "Smelter", "100", "200", "-300", url, saveName)
+			collector.Collect(url, sessionName)
+			metric, err := getMetric(exporter.MachineItemsProducedPerMin, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(metric).ToNot(BeNil())
 		})
 
 		It("records the current production figure as the metric value", func() {
-			collector.Collect(url, saveName)
+			collector.Collect(url, sessionName)
 
-			val, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Ingot", "Smelter", "100", "200", "-300", url, saveName)
+			val, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(10.0)))
 		})
 
 		Describe("when a machine has multiple outputs", func() {
 			It("records a metric per item", func() {
-				collector.Collect(url, saveName)
+				collector.Collect(url, sessionName)
 
-				ironIngots, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Ingot", "Smelter", "100", "200", "-300", url, saveName)
+				ironIngots, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(ironIngots).To(Equal(float64(10.0)))
 
-				ironNothing, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Nothing", "Smelter", "100", "200", "-300", url, saveName)
+				ironNothing, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Nothing", "Smelter", "100", "200", "-300", url, sessionName)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(ironNothing).To(Equal(float64(1000.0)))
 			})
@@ -110,29 +110,29 @@ var _ = Describe("FactoryBuildingCollector", func() {
 
 	Describe("Machine item production efficiency metrics", func() {
 		It("records a metric with labels for the produced item name, machine type, and x, y, z coordinates", func() {
-			collector.Collect(url, saveName)
-			metric, err := getMetric(exporter.MachineItemsProducedEffiency, "Iron Ingot", "Smelter", "100", "200", "-300", url, saveName)
+			collector.Collect(url, sessionName)
+			metric, err := getMetric(exporter.MachineItemsProducedEffiency, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(metric).ToNot(BeNil())
 		})
 
 		It("records the current production efficiency as the metric value", func() {
-			collector.Collect(url, saveName)
+			collector.Collect(url, sessionName)
 
-			val, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Ingot", "Smelter", "100", "200", "-300", url, saveName)
+			val, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0.5)))
 		})
 
 		Describe("when a machine has multiple outputs", func() {
 			It("records a metric per item", func() {
-				collector.Collect(url, saveName)
+				collector.Collect(url, sessionName)
 
-				ironIngots, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Ingot", "Smelter", "100", "200", "-300", url, saveName)
+				ironIngots, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(ironIngots).To(Equal(float64(0.5)))
 
-				ironNothing, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Nothing", "Smelter", "100", "200", "-300", url, saveName)
+				ironNothing, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Nothing", "Smelter", "100", "200", "-300", url, sessionName)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(ironNothing).To(Equal(float64(0.25)))
 			})

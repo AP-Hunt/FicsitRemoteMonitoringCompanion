@@ -23,7 +23,7 @@ func NewVehicleStationCollector(endpoint string) *VehicleStationCollector {
 	}
 }
 
-func (c *VehicleStationCollector) Collect(frmAddress string, saveName string) {
+func (c *VehicleStationCollector) Collect(frmAddress string, sessionName string) {
 	details := []VehicleStationDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
@@ -49,10 +49,10 @@ func (c *VehicleStationCollector) Collect(frmAddress string, saveName string) {
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		VehicleStationPower.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
+		VehicleStationPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 	for circuitId, powerConsumed := range maxPowerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		VehicleStationPowerMax.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
+		VehicleStationPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }

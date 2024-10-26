@@ -16,7 +16,7 @@ func NewFactoryBuildingCollector(endpoint string) *FactoryBuildingCollector {
 	}
 }
 
-func (c *FactoryBuildingCollector) Collect(frmAddress string, saveName string) {
+func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string) {
 	details := []BuildingDetail{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
@@ -34,7 +34,7 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, saveName string) {
 				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
-				frmAddress, saveName,
+				frmAddress, sessionName,
 			).Set(prod.CurrentProd)
 
 			MachineItemsProducedEffiency.WithLabelValues(
@@ -43,7 +43,7 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, saveName string) {
 				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
-				frmAddress, saveName,
+				frmAddress, sessionName,
 			).Set(prod.ProdPercent)
 		}
 
@@ -89,10 +89,10 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, saveName string) {
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		FactoryPower.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
+		FactoryPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 	for circuitId, powerConsumed := range maxPowerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		FactoryPowerMax.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
+		FactoryPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }

@@ -33,7 +33,7 @@ func NewPowerCollector(endpoint string) *PowerCollector {
 	}
 }
 
-func (c *PowerCollector) Collect(frmAddress string, saveName string) {
+func (c *PowerCollector) Collect(frmAddress string, sessionName string) {
 	details := []PowerDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
@@ -43,21 +43,21 @@ func (c *PowerCollector) Collect(frmAddress string, saveName string) {
 
 	for _, d := range details {
 		circuitId := strconv.FormatFloat(d.CircuitGroupId, 'f', -1, 64)
-		PowerConsumed.WithLabelValues(circuitId, frmAddress, saveName).Set(d.PowerConsumed)
-		PowerCapacity.WithLabelValues(circuitId, frmAddress, saveName).Set(d.PowerCapacity)
-		PowerMaxConsumed.WithLabelValues(circuitId, frmAddress, saveName).Set(d.PowerMaxConsumed)
-		BatteryDifferential.WithLabelValues(circuitId, frmAddress, saveName).Set(d.BatteryDifferential)
-		BatteryPercent.WithLabelValues(circuitId, frmAddress, saveName).Set(d.BatteryPercent)
-		BatteryCapacity.WithLabelValues(circuitId, frmAddress, saveName).Set(d.BatteryCapacity)
+		PowerConsumed.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.PowerConsumed)
+		PowerCapacity.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.PowerCapacity)
+		PowerMaxConsumed.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.PowerMaxConsumed)
+		BatteryDifferential.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.BatteryDifferential)
+		BatteryPercent.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.BatteryPercent)
+		BatteryCapacity.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.BatteryCapacity)
 		batterySecondsRemaining := parseTimeSeconds(d.BatteryTimeEmpty)
 		if batterySecondsRemaining != nil {
-			BatterySecondsEmpty.WithLabelValues(circuitId, frmAddress, saveName).Set(*batterySecondsRemaining)
+			BatterySecondsEmpty.WithLabelValues(circuitId, frmAddress, sessionName).Set(*batterySecondsRemaining)
 		}
 		batterySecondsFull := parseTimeSeconds(d.BatteryTimeFull)
 		if batterySecondsFull != nil {
-			BatterySecondsFull.WithLabelValues(circuitId, frmAddress, saveName).Set(*batterySecondsFull)
+			BatterySecondsFull.WithLabelValues(circuitId, frmAddress, sessionName).Set(*batterySecondsFull)
 		}
 		fuseTriggered := parseBool(d.FuseTriggered)
-		FuseTriggered.WithLabelValues(circuitId, frmAddress, saveName).Set(fuseTriggered)
+		FuseTriggered.WithLabelValues(circuitId, frmAddress, sessionName).Set(fuseTriggered)
 	}
 }

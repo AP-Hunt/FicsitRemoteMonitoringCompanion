@@ -27,10 +27,10 @@ type Fuel struct {
 	Amount float64 `json:Amount`
 }
 
-func (v *VehicleDetails) recordElapsedTime(frmAddress string, saveName string) {
+func (v *VehicleDetails) recordElapsedTime(frmAddress string, sessionName string) {
 	now := Clock.Now()
 	tripSeconds := now.Sub(v.DepartTime).Seconds()
-	VehicleRoundTrip.WithLabelValues(v.Id, v.VehicleType, v.PathName, frmAddress, saveName).Set(tripSeconds)
+	VehicleRoundTrip.WithLabelValues(v.Id, v.VehicleType, v.PathName, frmAddress, sessionName).Set(tripSeconds)
 	v.Departed = false
 }
 
@@ -59,11 +59,11 @@ func (v *VehicleDetails) startTracking(trackedVehicles map[string]*VehicleDetail
 	}
 }
 
-func (d *VehicleDetails) handleTimingUpdates(trackedVehicles map[string]*VehicleDetails, frmAddress string, saveName string) {
+func (d *VehicleDetails) handleTimingUpdates(trackedVehicles map[string]*VehicleDetails, frmAddress string, sessionName string) {
 	if d.AutoPilot {
 		vehicle, exists := trackedVehicles[d.Id]
 		if exists && vehicle.isCompletingTrip(d.Location) {
-			vehicle.recordElapsedTime(frmAddress, saveName)
+			vehicle.recordElapsedTime(frmAddress, sessionName)
 		} else if exists && vehicle.isStartingTrip(d.Location) {
 			vehicle.Departed = true
 			vehicle.DepartTime = Clock.Now()
@@ -86,7 +86,7 @@ func NewVehicleCollector(endpoint string) *VehicleCollector {
 	}
 }
 
-func (c *VehicleCollector) Collect(frmAddress string, saveName string) {
+func (c *VehicleCollector) Collect(frmAddress string, sessionName string) {
 	details := []VehicleDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
@@ -96,9 +96,9 @@ func (c *VehicleCollector) Collect(frmAddress string, saveName string) {
 
 	for _, d := range details {
 		if len(d.Fuel) > 0 {
-			VehicleFuel.WithLabelValues(d.Id, d.VehicleType, d.Fuel[0].Name, frmAddress, saveName).Set(d.Fuel[0].Amount)
+			VehicleFuel.WithLabelValues(d.Id, d.VehicleType, d.Fuel[0].Name, frmAddress, sessionName).Set(d.Fuel[0].Amount)
 		}
 
-		d.handleTimingUpdates(c.TrackedVehicles, frmAddress, saveName)
+		d.handleTimingUpdates(c.TrackedVehicles, frmAddress, sessionName)
 	}
 }

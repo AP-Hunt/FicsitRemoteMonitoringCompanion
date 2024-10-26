@@ -46,26 +46,26 @@ func NewTrainCollector(endpoint string, trackedStations *map[string]TrainStation
 	}
 }
 
-func (t *TrainDetails) recordRoundTripTime(now time.Time, frmAddress string, saveName string) {
+func (t *TrainDetails) recordRoundTripTime(now time.Time, frmAddress string, sessionName string) {
 	if len(t.TimeTable) <= t.StationCounter {
 		roundTripSeconds := now.Sub(t.FirstArrivalTime).Seconds()
-		TrainRoundTrip.WithLabelValues(t.TrainName, frmAddress, saveName).Set(roundTripSeconds)
+		TrainRoundTrip.WithLabelValues(t.TrainName, frmAddress, sessionName).Set(roundTripSeconds)
 		t.StationCounter = 0
 		t.FirstArrivalTime = now
 	}
 }
 
-func (t *TrainDetails) recordSegmentTripTime(destination string, now time.Time, frmAddress string, saveName string) {
+func (t *TrainDetails) recordSegmentTripTime(destination string, now time.Time, frmAddress string, sessionName string) {
 	tripSeconds := now.Sub(t.ArrivalTime).Seconds()
-	TrainSegmentTrip.WithLabelValues(t.TrainName, t.TrainStation, destination, frmAddress, saveName).Set(tripSeconds)
+	TrainSegmentTrip.WithLabelValues(t.TrainName, t.TrainStation, destination, frmAddress, sessionName).Set(tripSeconds)
 }
 
-func (t *TrainDetails) recordNextStation(d *TrainDetails, frmAddress string, saveName string) {
+func (t *TrainDetails) recordNextStation(d *TrainDetails, frmAddress string, sessionName string) {
 	if t.TrainStation != d.TrainStation {
 		t.StationCounter = t.StationCounter + 1
 		now := Clock.Now()
-		t.recordSegmentTripTime(d.TrainStation, now, frmAddress, saveName)
-		t.recordRoundTripTime(now, frmAddress, saveName)
+		t.recordSegmentTripTime(d.TrainStation, now, frmAddress, sessionName)
+		t.recordRoundTripTime(now, frmAddress, sessionName)
 		t.ArrivalTime = now
 		t.TrainStation = d.TrainStation
 	}
@@ -90,12 +90,12 @@ func (t *TrainDetails) startTracking(trackedTrains map[string]*TrainDetails) {
 	trackedTrains[t.TrainName] = &trackedTrain
 }
 
-func (d *TrainDetails) handleTimingUpdates(trackedTrains map[string]*TrainDetails,frmAddress string, saveName string ) {
+func (d *TrainDetails) handleTimingUpdates(trackedTrains map[string]*TrainDetails,frmAddress string, sessionName string ) {
 	// track self driving train timing
 	if d.Status == "Self-Driving" {
 		train, exists := trackedTrains[d.TrainName]
 		if exists && !train.FirstArrivalTime.IsZero() {
-			train.recordNextStation(d, frmAddress, saveName)
+			train.recordNextStation(d, frmAddress, sessionName)
 		} else if exists {
 			train.markFirstStation(d)
 		} else {
@@ -110,7 +110,7 @@ func (d *TrainDetails) handleTimingUpdates(trackedTrains map[string]*TrainDetail
 	}
 }
 
-func (c *TrainCollector) Collect(frmAddress string, saveName string) {
+func (c *TrainCollector) Collect(frmAddress string, sessionName string) {
 	details := []TrainDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
@@ -139,15 +139,15 @@ func (c *TrainCollector) Collect(frmAddress string, saveName string) {
 		trainPowerConsumed := d.PowerConsumed * locomotives
 		maxTrainPowerConsumed := MaxTrainPowerConsumption * locomotives
 
-		TrainPower.WithLabelValues(d.TrainName, frmAddress, saveName).Set(trainPowerConsumed)
-		TrainTotalMass.WithLabelValues(d.TrainName, frmAddress, saveName).Set(totalMass)
-		TrainPayloadMass.WithLabelValues(d.TrainName, frmAddress, saveName).Set(payloadMass)
-		TrainMaxPayloadMass.WithLabelValues(d.TrainName, frmAddress, saveName).Set(maxPayloadMass)
+		TrainPower.WithLabelValues(d.TrainName, frmAddress, sessionName).Set(trainPowerConsumed)
+		TrainTotalMass.WithLabelValues(d.TrainName, frmAddress, sessionName).Set(totalMass)
+		TrainPayloadMass.WithLabelValues(d.TrainName, frmAddress, sessionName).Set(payloadMass)
+		TrainMaxPayloadMass.WithLabelValues(d.TrainName, frmAddress, sessionName).Set(maxPayloadMass)
 
 		isDerailed := parseBool(d.Derailed)
-		TrainDerailed.WithLabelValues(d.TrainName, frmAddress, saveName).Set(isDerailed)
+		TrainDerailed.WithLabelValues(d.TrainName, frmAddress, sessionName).Set(isDerailed)
 
-		d.handleTimingUpdates(c.TrackedTrains, frmAddress, saveName)
+		d.handleTimingUpdates(c.TrackedTrains, frmAddress, sessionName)
 
 		if len(d.TimeTable) > 0 {
 			station, ok := (*c.TrackedStations)[d.TimeTable[0].StationName]
@@ -170,10 +170,10 @@ func (c *TrainCollector) Collect(frmAddress string, saveName string) {
 	}
 	for circuitGroupId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitGroupId, 'f', -1, 64)
-		TrainCircuitPower.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
+		TrainCircuitPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 	for circuitGroupId, powerConsumed := range maxPowerInfo {
 		cid := strconv.FormatFloat(circuitGroupId, 'f', -1, 64)
-		TrainCircuitPowerMax.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
+		TrainCircuitPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }

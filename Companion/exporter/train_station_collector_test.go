@@ -8,7 +8,7 @@ import (
 
 var _ = Describe("TrainStationCollector", func() {
 	var url = "http://localhost:9080"
-	var saveName = "default"
+	var sessionName = "default"
 	var collector *exporter.TrainStationCollector
 
 	BeforeEach(func() {
@@ -68,18 +68,18 @@ var _ = Describe("TrainStationCollector", func() {
 
 	Describe("Train station metrics collection", func() {
 		It("sets the 'train_station_power' metric with the right labels", func() {
-			collector.Collect(url, saveName)
+			collector.Collect(url, sessionName)
 
-			val, err := gaugeValue(exporter.TrainStationPower, "1", url, saveName)
+			val, err := gaugeValue(exporter.TrainStationPower, "1", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(150.3)))
 		})
 
 		It("sets the 'train_station_power_max' metric with the right labels", func() {
-			collector.Collect(url, saveName)
+			collector.Collect(url, sessionName)
 
-			val, err := gaugeValue(exporter.TrainStationPowerMax, "1", url, saveName)
+			val, err := gaugeValue(exporter.TrainStationPowerMax, "1", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(200.2)))

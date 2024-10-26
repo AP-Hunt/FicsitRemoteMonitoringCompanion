@@ -10,7 +10,7 @@ var (
 	CargoPlatformPower = 50.0
 )
 
-// TODO: drop tracked stations when save game is updated?
+// TODO: drop tracked stations when session name is updated?
 type TrainStationCollector struct {
 	endpoint        string
 	TrackedStations *map[string]TrainStationDetails
@@ -37,7 +37,7 @@ func NewTrainStationCollector(endpoint string, trackedStations *map[string]Train
 	}
 }
 
-func (c *TrainStationCollector) Collect(frmAddress string, saveName string) {
+func (c *TrainStationCollector) Collect(frmAddress string, sessionName string) {
 	details := []TrainStationDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
@@ -81,10 +81,10 @@ func (c *TrainStationCollector) Collect(frmAddress string, saveName string) {
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		TrainStationPower.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
+		TrainStationPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 	for circuitId, powerConsumed := range maxPowerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		TrainStationPowerMax.WithLabelValues(cid, frmAddress, saveName).Set(powerConsumed)
+		TrainStationPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }

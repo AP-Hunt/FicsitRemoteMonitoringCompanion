@@ -19,7 +19,7 @@ func NewTestCollector() *TestCollector {
 		counter: 0,
 	}
 }
-func (t *TestCollector) Collect(url string, saveName string) {
+func (t *TestCollector) Collect(url string, sessionName string) {
 	t.counter = t.counter + 1
 }
 

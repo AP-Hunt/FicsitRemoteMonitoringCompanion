@@ -24,7 +24,7 @@ func NewProductionCollector(endpoint string) *ProductionCollector {
 	}
 }
 
-func (c *ProductionCollector) Collect(frmAddress string, saveName string) {
+func (c *ProductionCollector) Collect(frmAddress string, sessionName string) {
 	details := []ProductionDetails{}
 	err := retrieveData(frmAddress + c.endpoint, &details)
 	if err != nil {
@@ -33,12 +33,12 @@ func (c *ProductionCollector) Collect(frmAddress string, saveName string) {
 	}
 
 	for _, d := range details {
-		ItemsProducedPerMin.WithLabelValues(d.ItemName, frmAddress, saveName).Set(d.CurrentProduction)
-		ItemsConsumedPerMin.WithLabelValues(d.ItemName, frmAddress, saveName).Set(d.CurrentConsumption)
+		ItemsProducedPerMin.WithLabelValues(d.ItemName, frmAddress, sessionName).Set(d.CurrentProduction)
+		ItemsConsumedPerMin.WithLabelValues(d.ItemName, frmAddress, sessionName).Set(d.CurrentConsumption)
 
-		ItemProductionCapacityPercent.WithLabelValues(d.ItemName, frmAddress, saveName).Set(d.ProdPercent)
-		ItemConsumptionCapacityPercent.WithLabelValues(d.ItemName, frmAddress, saveName).Set(d.ConsPercent)
-		ItemProductionCapacityPerMinute.WithLabelValues(d.ItemName, frmAddress, saveName).Set(d.MaxProd)
-		ItemConsumptionCapacityPerMinute.WithLabelValues(d.ItemName, frmAddress, saveName).Set(d.MaxConsumed)
+		ItemProductionCapacityPercent.WithLabelValues(d.ItemName, frmAddress, sessionName).Set(d.ProdPercent)
+		ItemConsumptionCapacityPercent.WithLabelValues(d.ItemName, frmAddress, sessionName).Set(d.ConsPercent)
+		ItemProductionCapacityPerMinute.WithLabelValues(d.ItemName, frmAddress, sessionName).Set(d.MaxProd)
+		ItemConsumptionCapacityPerMinute.WithLabelValues(d.ItemName, frmAddress, sessionName).Set(d.MaxConsumed)
 	}
 }

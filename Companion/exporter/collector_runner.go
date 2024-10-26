@@ -10,7 +10,7 @@ type CollectorRunner struct {
 	ctx        context.Context
 	cancel     context.CancelFunc
 	frmBaseUrl string
-	saveName   string
+	sessionName   string
 }
 
 type Collector interface {
@@ -24,24 +24,24 @@ func NewCollectorRunner(ctx context.Context, frmBaseUrl string, collectors ...Co
 		cancel:     cancel,
 		collectors: collectors,
 		frmBaseUrl: frmBaseUrl,
-		saveName: "default",
+		sessionName: "default",
 	}
 }
 
-func (c *CollectorRunner) updateSaveName() {
-	//TODO: update save name
+func (c *CollectorRunner) updateSessionName() {
+	//TODO: update session name
 }
 
 func (c *CollectorRunner) Start() {
-	c.updateSaveName()
-	c.Collect(c.frmBaseUrl, c.saveName)
+	c.updateSessionName()
+	c.Collect(c.frmBaseUrl, c.sessionName)
 	for {
 		select {
 		case <-c.ctx.Done():
 			return
 		case <-Clock.After(5 * time.Second):
-			c.updateSaveName()
-			c.Collect(c.frmBaseUrl, c.saveName)
+			c.updateSessionName()
+			c.Collect(c.frmBaseUrl, c.sessionName)
 		}
 	}
 }
@@ -50,8 +50,8 @@ func (c *CollectorRunner) Stop() {
 	c.cancel()
 }
 
-func (c *CollectorRunner) Collect(server string, saveName string) {
+func (c *CollectorRunner) Collect(server string, sessionName string) {
 	for _, collector := range c.collectors {
-		collector.Collect(server, saveName)
+		collector.Collect(server, sessionName)
 	}
 }
