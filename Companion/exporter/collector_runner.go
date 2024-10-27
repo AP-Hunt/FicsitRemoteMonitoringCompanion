@@ -22,7 +22,7 @@ type Collector interface {
 }
 
 type SessionInfo struct {
-	sessionName string `json:"SessionName"`
+	SessionName string `json:"SessionName"`
 }
 
 func NewCollectorRunner(ctx context.Context, frmBaseUrl string, collectors ...Collector) *CollectorRunner {
@@ -43,7 +43,7 @@ func (c *CollectorRunner) updateSessionName() {
 		log.Printf("error reading session name from FRM: %s\n", err)
 		return
 	}
-	newSessionName := details.sessionName
+	newSessionName := details.SessionName
 	if newSessionName != "" && newSessionName != c.sessionName {
 		for _, metric := range RegisteredMetrics {
 			metric.DeletePartialMatch(prometheus.Labels{"url": c.frmBaseUrl, "session_name": c.sessionName})
