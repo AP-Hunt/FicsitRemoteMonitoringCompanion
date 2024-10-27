@@ -2,6 +2,7 @@ package exporter
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -20,6 +21,10 @@ type Collector interface {
 	DropCache()
 }
 
+type SessionInfo struct {
+	sessionName string `json:"SessionName"`
+}
+
 func NewCollectorRunner(ctx context.Context, frmBaseUrl string, collectors ...Collector) *CollectorRunner {
 	ctx, cancel := context.WithCancel(ctx)
 	return &CollectorRunner{
@@ -32,9 +37,14 @@ func NewCollectorRunner(ctx context.Context, frmBaseUrl string, collectors ...Co
 }
 
 func (c *CollectorRunner) updateSessionName() {
-	//TODO: update session name
-	newSessionName := "default"
-	if newSessionName != c.sessionName {
+	details := SessionInfo{}
+	err := retrieveData(c.frmBaseUrl+"/getSessionInfo", &details)
+	if err != nil {
+		log.Printf("error reading session name from FRM: %s\n", err)
+		return
+	}
+	newSessionName := details.sessionName
+	if newSessionName != "" && newSessionName != c.sessionName {
 		for _, metric := range RegisteredMetrics {
 			metric.DeletePartialMatch(prometheus.Labels{"url": c.frmBaseUrl, "session_name": c.sessionName})
 		}
