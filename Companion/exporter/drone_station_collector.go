@@ -82,11 +82,11 @@ func (c *DroneStationCollector) Collect(frmAddress string, sessionName string) {
 		home := d.HomeStation
 		paired := d.PairedStation
 
-		DronePortFuelAmount.WithLabelValues(id, home, d.Fuel[0].Name, frmAddress, sessionName).Set(d.Fuel[0].Amount)
-		if d.ActiveFuel.Name != "N/A" {
+		if len(d.Fuel) > 0 {
+			DronePortFuelAmount.WithLabelValues(id, home, d.Fuel[0].Name, frmAddress, sessionName).Set(d.Fuel[0].Amount)
 			DronePortFuelRate.WithLabelValues(id, home, d.Fuel[0].Name, frmAddress, sessionName).Set(d.ActiveFuel.Rate)
+			DronePortRndTrip.WithLabelValues(id, home, paired, frmAddress, sessionName).Set(d.LatestRndTrip)
 		}
-		DronePortRndTrip.WithLabelValues(id, home, paired, frmAddress, sessionName).Set(d.LatestRndTrip)
 
 		val, ok := powerInfo[d.PowerInfo.CircuitGroupId]
 		if ok {
