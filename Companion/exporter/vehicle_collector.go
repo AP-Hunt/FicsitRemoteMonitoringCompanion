@@ -19,7 +19,7 @@ type VehicleDetails struct {
 	Location     Location `json:"location"`
 	ForwardSpeed float64  `json:"ForwardSpeed"`
 	AutoPilot    bool     `json:"Autopilot"`
-	Fuel         []Fuel   `json:FuelInventory`
+	Fuel         []Fuel   `json:"FuelInventory"`
 	PathName     string   `json:"PathName"`
 	DepartTime   time.Time
 	Departed     bool
