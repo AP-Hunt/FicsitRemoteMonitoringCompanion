@@ -48,11 +48,12 @@ func updateLocation(x float64, y float64, rotation float64) {
 
 var _ = Describe("VehicleCollector", func() {
 	var collector *exporter.VehicleCollector
-	var url = "http://localhost:9080"
+	var url string
 	var sessionName = "default"
 
 	BeforeEach(func() {
 		FRMServer.Reset()
+		url = FRMServer.server.URL
 		collector = exporter.NewVehicleCollector("/getVehicles")
 
 		FRMServer.ReturnsVehicleData([]exporter.VehicleDetails{

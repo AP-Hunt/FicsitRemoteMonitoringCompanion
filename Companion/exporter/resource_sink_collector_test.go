@@ -7,12 +7,13 @@ import (
 )
 
 var _ = Describe("ResourceSinkCollector", func() {
-	var url = "http://localhost:9080"
+	var url string
 	var sessionName = "default"
 	var collector *exporter.ResourceSinkCollector
 
 	BeforeEach(func() {
 		FRMServer.Reset()
+		url = FRMServer.server.URL
 		collector = exporter.NewResourceSinkCollector("/getResourceSinkBuilding")
 
 		FRMServer.ReturnsResourceSinkData([]exporter.ResourceSinkDetails{

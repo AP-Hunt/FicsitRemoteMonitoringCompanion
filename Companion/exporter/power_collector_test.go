@@ -8,11 +8,12 @@ import (
 
 var _ = Describe("PowerCollector", func() {
 	var collector *exporter.PowerCollector
-	var url = "http://localhost:9080"
+	var url string
 	var sessionName = "default"
 
 	BeforeEach(func() {
 		FRMServer.Reset()
+		url = FRMServer.server.URL
 		collector = exporter.NewPowerCollector("/getPower")
 
 		FRMServer.ReturnsPowerData([]exporter.PowerDetails{

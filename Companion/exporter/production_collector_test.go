@@ -8,11 +8,12 @@ import (
 
 var _ = Describe("ProductionCollector", func() {
 	var collector *exporter.ProductionCollector
-	var url = "http://localhost:9080"
+	var url string
 	var sessionName = "default"
 
 	BeforeEach(func() {
 		FRMServer.Reset()
+		url = FRMServer.server.URL
 		collector = exporter.NewProductionCollector("/getProdStats")
 
 		FRMServer.ReturnsProductionData([]exporter.ProductionDetails{

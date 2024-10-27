@@ -52,11 +52,12 @@ func updateTrain(station string) {
 
 var _ = Describe("TrainCollector", func() {
 	var collector *exporter.TrainCollector
-	var url = "http://localhost:9080"
+	var url string
 	var sessionName = "default"
 
 	BeforeEach(func() {
 		FRMServer.Reset()
+		url = FRMServer.server.URL
 		collector = exporter.NewTrainCollector("/getTrains")
 
 		FRMServer.ReturnsTrainData([]exporter.TrainDetails{

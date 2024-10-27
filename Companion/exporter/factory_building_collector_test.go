@@ -8,12 +8,13 @@ import (
 )
 
 var _ = Describe("FactoryBuildingCollector", func() {
-	var url = "http://localhost:9080"
+	var url string
 	var sessionName = "default"
 	var collector *exporter.FactoryBuildingCollector
 
 	BeforeEach(func() {
 		FRMServer.Reset()
+		url = FRMServer.server.URL
 		collector = exporter.NewFactoryBuildingCollector("/getFactory")
 
 		FRMServer.ReturnsFactoryBuildings([]exporter.BuildingDetail{

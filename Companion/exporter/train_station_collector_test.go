@@ -7,12 +7,13 @@ import (
 )
 
 var _ = Describe("TrainStationCollector", func() {
-	var url = "http://localhost:9080"
+	var url string
 	var sessionName = "default"
 	var collector *exporter.TrainStationCollector
 
 	BeforeEach(func() {
 		FRMServer.Reset()
+		url = FRMServer.server.URL
 		collector = exporter.NewTrainStationCollector("/getTrainStation")
 
 		FRMServer.ReturnsTrainStationData([]exporter.TrainStationDetails{

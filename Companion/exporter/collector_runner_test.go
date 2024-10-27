@@ -25,7 +25,16 @@ func (t *TestCollector) Collect(url string, sessionName string) {
 func (t *TestCollector) DropCache() {}
 
 var _ = Describe("CollectorRunner", func() {
-	var url = "http://localhost:9080"
+	var url string
+
+	BeforeEach(func() {
+		FRMServer.Reset()
+		url = FRMServer.server.URL
+		FRMServer.ReturnsSessionInfoData(exporter.SessionInfo{
+			SessionName: "test",
+		})
+	})
+
 	Describe("Basic Functionality", func() {
 		It("runs on init and on each timeout", func() {
 			ctx, cancel := context.WithCancel(context.Background())
@@ -39,9 +48,10 @@ var _ = Describe("CollectorRunner", func() {
 			testTime.Add(5 * time.Second)
 			testTime.Add(5 * time.Second)
 			testTime.Add(5 * time.Second)
+			testTime.Add(4 * time.Second)
 			cancel()
-			Expect(c1.counter).To(Equal(3))
-			Expect(c2.counter).To(Equal(3))
+			Eventually(c1.counter).Should(Equal(3))
+			Eventually(c2.counter).Should(Equal(3))
 		})
 
 		It("does not run after being canceled", func() {
@@ -53,6 +63,7 @@ var _ = Describe("CollectorRunner", func() {
 			runner := exporter.NewCollectorRunner(ctx, url, c1)
 			go runner.Start()
 			testTime.Add(5 * time.Second)
+			Eventually(c1.counter).Should(Equal(1))
 			cancel()
 			testTime.Add(5 * time.Second)
 			testTime.Add(5 * time.Second)

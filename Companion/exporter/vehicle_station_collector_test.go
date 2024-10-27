@@ -7,12 +7,13 @@ import (
 )
 
 var _ = Describe("VehicleStationCollector", func() {
-	var url = "http://localhost:9080"
+	var url string
 	var sessionName = "default"
 	var collector *exporter.VehicleStationCollector
 
 	BeforeEach(func() {
 		FRMServer.Reset()
+		url = FRMServer.server.URL
 		collector = exporter.NewVehicleStationCollector("/getTruckStation")
 
 		FRMServer.ReturnsVehicleStationData([]exporter.VehicleStationDetails{

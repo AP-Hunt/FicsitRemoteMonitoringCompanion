@@ -3,12 +3,13 @@ package exporter_test
 import (
 	"encoding/json"
 	"net/http"
+	"net/http/httptest"
 
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/exporter"
 )
 
 type FRMServerFake struct {
-	server             *http.Server
+	server             *httptest.Server
 	productionData     []exporter.ProductionDetails
 	powerData          []exporter.PowerDetails
 	factoryBuildings   []exporter.BuildingDetail
@@ -18,14 +19,12 @@ type FRMServerFake struct {
 	vehicleStationData []exporter.VehicleStationDetails
 	trainStationData   []exporter.TrainStationDetails
 	resourceSinkData   []exporter.ResourceSinkDetails
+	sessionInfoData    exporter.SessionInfo
 }
 
 func NewFRMServerFake() *FRMServerFake {
 	mux := http.NewServeMux()
-	server := &http.Server{
-		Handler: mux,
-		Addr:    ":9080",
-	}
+	server := httptest.NewServer(mux)
 
 	fake := &FRMServerFake{
 		server: server,
@@ -40,21 +39,14 @@ func NewFRMServerFake() *FRMServerFake {
 	mux.Handle("/getTruckStation", http.HandlerFunc(getStatsHandler(&fake.vehicleStationData)))
 	mux.Handle("/getTrainStation", http.HandlerFunc(getStatsHandler(&fake.trainStationData)))
 	mux.Handle("/getResourceSinkBuilding", http.HandlerFunc(getStatsHandler(&fake.resourceSinkData)))
+	mux.Handle("/getSessionInfo", http.HandlerFunc(getStatsHandler(&fake.sessionInfoData)))
 
 	return fake
 }
 
-func (f *FRMServerFake) Start() {
-
-	go func() {
-		f.server.ListenAndServe()
-	}()
-}
-
-func (e *FRMServerFake) Stop() error {
-	err := e.server.Close()
+func (e *FRMServerFake) Stop() {
+	e.server.Close()
 	e.Reset()
-	return err
 }
 
 func (e *FRMServerFake) Reset() {
@@ -100,6 +92,10 @@ func (e *FRMServerFake) ReturnsTrainStationData(data []exporter.TrainStationDeta
 
 func (e *FRMServerFake) ReturnsResourceSinkData(data []exporter.ResourceSinkDetails) {
 	e.resourceSinkData = data
+}
+
+func (e *FRMServerFake) ReturnsSessionInfoData(data exporter.SessionInfo) {
+	e.sessionInfoData = data
 }
 
 func getStatsHandler(data any) func(w http.ResponseWriter, r *http.Request) {
