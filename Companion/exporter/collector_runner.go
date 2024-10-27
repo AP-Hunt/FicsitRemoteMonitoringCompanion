@@ -45,6 +45,7 @@ func (c *CollectorRunner) updateSessionName() {
 	}
 	newSessionName := details.SessionName
 	if newSessionName != "" && newSessionName != c.sessionName {
+		log.Printf("%s has a new session name: %s\n", c.frmBaseUrl, newSessionName)
 		for _, metric := range RegisteredMetrics {
 			metric.DeletePartialMatch(prometheus.Labels{"url": c.frmBaseUrl, "session_name": c.sessionName})
 		}
