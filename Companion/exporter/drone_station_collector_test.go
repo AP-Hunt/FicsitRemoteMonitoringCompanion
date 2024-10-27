@@ -29,10 +29,19 @@ var _ = Describe("DroneStationCollector", func() {
 				LatestRndTrip:    264,
 				LatestTripIncAmt: 82,
 				LatestTripOutAmt: 50,
-				EstBatteryRate:   30,
 				PowerInfo: exporter.PowerInfo{
 					CircuitGroupId: 1.0,
 					PowerConsumed:  100,
+				},
+				Fuel: []exporter.DroneFuelInventory{
+					exporter.DroneFuelInventory{
+						Name:   "Battery",
+						Amount: 200,
+					},
+				},
+				ActiveFuel: exporter.DroneActiveFuel{
+					Name: "Battery",
+					Rate: 20,
 				},
 			},
 			{
@@ -47,10 +56,19 @@ var _ = Describe("DroneStationCollector", func() {
 				LatestRndTrip:    264,
 				LatestTripIncAmt: 82,
 				LatestTripOutAmt: 50,
-				EstBatteryRate:   30,
 				PowerInfo: exporter.PowerInfo{
 					CircuitGroupId: 1.0,
 					PowerConsumed:  100,
+				},
+				Fuel: []exporter.DroneFuelInventory{
+					exporter.DroneFuelInventory{
+						Name:   "Battery",
+						Amount: 200,
+					},
+				},
+				ActiveFuel: exporter.DroneActiveFuel{
+					Name: "Battery",
+					Rate: 30,
 				},
 			},
 		})
@@ -64,10 +82,13 @@ var _ = Describe("DroneStationCollector", func() {
 		It("sets the 'drone_port_battery_rate' metric with the right labels", func() {
 			collector.Collect(url, sessionName)
 
-			val, err := gaugeValue(exporter.DronePortBatteryRate, "1", "home", "remote station", url, sessionName)
+			val, err := gaugeValue(exporter.DronePortFuelRate, "1", "home", "Battery", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(Equal(float64(30)))
+			Expect(val).To(Equal(float64(20)))
+			val, err = gaugeValue(exporter.DronePortFuelAmount, "1", "home", "Battery", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(float64(200)))
 		})
 		It("sets the 'drone_port_round_trip_seconds' metric with the right labels", func() {
 			collector.Collect(url, sessionName)
