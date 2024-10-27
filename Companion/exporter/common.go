@@ -2,6 +2,7 @@ package exporter
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/benbjohnson/clock"
 	"log"
 	"net/http"
@@ -36,6 +37,10 @@ func parseBool(b bool) float64 {
 
 func retrieveData(frmAddress string, details any) error {
 	resp, err := http.Get(frmAddress)
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("non-200 returned when retireving data: %d", resp.StatusCode)
+	}
 
 	if err != nil {
 		log.Printf("error fetching statistics from FRM: %s\n", err)
