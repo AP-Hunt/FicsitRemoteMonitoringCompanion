@@ -82,3 +82,5 @@ func (c *TrainStationCollector) Collect(frmAddress string, sessionName string) {
 		TrainStationPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }
+
+func (c *TrainStationCollector) DropCache() {}

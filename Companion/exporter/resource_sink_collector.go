@@ -55,3 +55,5 @@ func (c *ResourceSinkCollector) Collect(frmAddress string, sessionName string) {
 		ResourceSinkPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }
+
+func (c *ResourceSinkCollector) DropCache() {}

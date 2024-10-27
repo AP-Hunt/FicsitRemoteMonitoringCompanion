@@ -110,3 +110,5 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 		FactoryPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }
+
+func (c *FactoryBuildingCollector) DropCache() {}

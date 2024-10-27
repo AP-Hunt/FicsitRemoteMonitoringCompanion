@@ -17,6 +17,7 @@ type CollectorRunner struct {
 
 type Collector interface {
 	Collect(string, string)
+	DropCache()
 }
 
 func NewCollectorRunner(ctx context.Context, frmBaseUrl string, collectors ...Collector) *CollectorRunner {
@@ -32,11 +33,13 @@ func NewCollectorRunner(ctx context.Context, frmBaseUrl string, collectors ...Co
 
 func (c *CollectorRunner) updateSessionName() {
 	//TODO: update session name
-	// TODO: on update, we also should reset calculated route timings on trains and vehicles
 	newSessionName := "default"
 	if newSessionName != c.sessionName {
 		for _, metric := range RegisteredMetrics {
 			metric.DeletePartialMatch(prometheus.Labels{"url": c.frmBaseUrl, "session_name": c.sessionName})
+		}
+		for _, collector := range c.collectors {
+			collector.DropCache()
 		}
 		c.sessionName = newSessionName
 	}

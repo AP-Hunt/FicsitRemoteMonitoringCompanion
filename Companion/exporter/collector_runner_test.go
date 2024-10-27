@@ -22,6 +22,7 @@ func NewTestCollector() *TestCollector {
 func (t *TestCollector) Collect(url string, sessionName string) {
 	t.counter = t.counter + 1
 }
+func (t *TestCollector) DropCache() {}
 
 var _ = Describe("CollectorRunner", func() {
 	var url = "http://localhost:9080"

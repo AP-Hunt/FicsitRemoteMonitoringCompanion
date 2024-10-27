@@ -56,3 +56,5 @@ func (c *ProductionCollector) Collect(frmAddress string, sessionName string) {
 	}
 	c.metricsDropper.DropStaleMetricLabels()
 }
+
+func (c *ProductionCollector) DropCache() {}

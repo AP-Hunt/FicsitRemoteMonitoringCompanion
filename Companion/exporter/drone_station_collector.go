@@ -90,3 +90,5 @@ func (c *DroneStationCollector) Collect(frmAddress string, sessionName string) {
 
 	c.metricsDropper.DropStaleMetricLabels()
 }
+
+func (c *DroneStationCollector) DropCache() {}

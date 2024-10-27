@@ -113,3 +113,7 @@ func (c *VehicleCollector) Collect(frmAddress string, sessionName string) {
 
 	c.metricsDropper.DropStaleMetricLabels()
 }
+
+func (c *VehicleCollector) DropCache() {
+	c.TrackedVehicles = map[string]*VehicleDetails{}
+}

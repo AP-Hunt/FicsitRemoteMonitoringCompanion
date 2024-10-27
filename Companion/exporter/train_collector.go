@@ -11,9 +11,9 @@ import (
 var MaxTrainPowerConsumption = 110.0
 
 type TrainCollector struct {
-	endpoint        string
-	TrackedTrains   map[string]*TrainDetails
-	metricsDropper  *MetricsDropper
+	endpoint       string
+	TrackedTrains  map[string]*TrainDetails
+	metricsDropper *MetricsDropper
 }
 
 type TimeTable struct {
@@ -42,8 +42,8 @@ type TrainDetails struct {
 
 func NewTrainCollector(endpoint string) *TrainCollector {
 	return &TrainCollector{
-		endpoint:        endpoint,
-		TrackedTrains:   make(map[string]*TrainDetails),
+		endpoint:      endpoint,
+		TrackedTrains: make(map[string]*TrainDetails),
 		metricsDropper: NewMetricsDropper(
 			TrainRoundTrip,
 			TrainSegmentTrip,
@@ -162,18 +162,18 @@ func (c *TrainCollector) Collect(frmAddress string, sessionName string) {
 		d.handleTimingUpdates(c.TrackedTrains, frmAddress, sessionName)
 
 		circuitGroupId := d.PowerInfo.CircuitGroupId
-				val, ok := powerInfo[circuitGroupId]
-				if ok {
-					powerInfo[circuitGroupId] = val + trainPowerConsumed
-				} else {
-					powerInfo[circuitGroupId] = trainPowerConsumed
-				}
-				val, ok = maxPowerInfo[circuitGroupId]
-				if ok {
-					maxPowerInfo[circuitGroupId] = val + maxTrainPowerConsumed
-				} else {
-					maxPowerInfo[circuitGroupId] = maxTrainPowerConsumed
-				}
+		val, ok := powerInfo[circuitGroupId]
+		if ok {
+			powerInfo[circuitGroupId] = val + trainPowerConsumed
+		} else {
+			powerInfo[circuitGroupId] = trainPowerConsumed
+		}
+		val, ok = maxPowerInfo[circuitGroupId]
+		if ok {
+			maxPowerInfo[circuitGroupId] = val + maxTrainPowerConsumed
+		} else {
+			maxPowerInfo[circuitGroupId] = maxTrainPowerConsumed
+		}
 	}
 	for circuitGroupId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitGroupId, 'f', -1, 64)
@@ -184,4 +184,8 @@ func (c *TrainCollector) Collect(frmAddress string, sessionName string) {
 		TrainCircuitPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 	c.metricsDropper.DropStaleMetricLabels()
+}
+
+func (c *TrainCollector) DropCache() {
+	c.TrackedTrains = map[string]*TrainDetails{}
 }

@@ -56,3 +56,5 @@ func (c *VehicleStationCollector) Collect(frmAddress string, sessionName string)
 		VehicleStationPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }
+
+func (c *VehicleStationCollector) DropCache() {}

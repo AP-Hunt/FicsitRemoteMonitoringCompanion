@@ -88,3 +88,5 @@ func (c *PowerCollector) Collect(frmAddress string, sessionName string) {
 	}
 	c.metricsDropper.DropStaleMetricLabels()
 }
+
+func (c *PowerCollector) DropCache() {}
