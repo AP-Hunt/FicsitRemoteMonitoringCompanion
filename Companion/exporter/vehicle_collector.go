@@ -23,6 +23,7 @@ type VehicleDetails struct {
 	PathName     string   `json:"PathName"`
 	DepartTime   time.Time
 	Departed     bool
+	LastTracked time.Time
 }
 
 type Fuel struct {
@@ -57,6 +58,7 @@ func (v *VehicleDetails) startTracking(trackedVehicles map[string]*VehicleDetail
 			VehicleType: v.VehicleType,
 			PathName:    v.PathName,
 			Departed:    false,
+			LastTracked: Clock.Now(),
 		}
 		trackedVehicles[v.Id] = &trackedVehicle
 	}
@@ -65,13 +67,18 @@ func (v *VehicleDetails) startTracking(trackedVehicles map[string]*VehicleDetail
 func (d *VehicleDetails) handleTimingUpdates(trackedVehicles map[string]*VehicleDetails, frmAddress string, sessionName string) {
 	if d.AutoPilot {
 		vehicle, exists := trackedVehicles[d.Id]
-		if exists && vehicle.isCompletingTrip(d.Location) {
+		if !exists || vehicle.LastTracked.Before(Clock.Now().Add(-time.Minute)) {
+			d.startTracking(trackedVehicles)
+		} else if exists && vehicle.isCompletingTrip(d.Location) {
 			vehicle.recordElapsedTime(frmAddress, sessionName)
 		} else if exists && vehicle.isStartingTrip(d.Location) {
 			vehicle.Departed = true
 			vehicle.DepartTime = Clock.Now()
-		} else if !exists {
-			d.startTracking(trackedVehicles)
+		}
+
+		// mark that we saw this vehicle
+		if exists {
+			vehicle.LastTracked = Clock.Now()
 		}
 	} else {
 		//remove manual vehicles, nothing to mark

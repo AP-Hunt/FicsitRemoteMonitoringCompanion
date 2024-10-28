@@ -132,5 +132,33 @@ var _ = Describe("VehicleCollector", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(30)))
 		})
+
+		It("Does not track if there's been a long time since the last pull", func() {
+
+			testTime := clock.NewMock()
+			exporter.Clock = testTime
+			updateLocation(0, 0, 0)
+			// first time collecting stats, nothing yet but it does set start location to 0,0,0
+			collector.Collect(url, sessionName)
+			val, err := gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(float64(0)))
+
+			testTime.Add(30 * time.Second)
+			updateLocation(8000, 2000, 0)
+			//go to a far away location now, star the timer
+			collector.Collect(url, sessionName)
+			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(float64(0)))
+
+			// A long time passes before we collect again... too long! so nothing is tracked
+			testTime.Add(120 * time.Second)
+			updateLocation(1000, 2000, 0)
+			collector.Collect(url, sessionName)
+			val, err = gaugeValue(exporter.VehicleRoundTrip, "1", "Truck", "Path", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(float64(0)))
+		})
 	})
 })
