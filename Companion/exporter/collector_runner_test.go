@@ -45,13 +45,16 @@ var _ = Describe("CollectorRunner", func() {
 			c2 := NewTestCollector()
 			runner := exporter.NewCollectorRunner(ctx, url, c1, c2)
 			go runner.Start()
-			testTime.Add(5 * time.Second)
-			testTime.Add(5 * time.Second)
-			testTime.Add(5 * time.Second)
-			testTime.Add(4 * time.Second)
+
+			for i := 0; i < 18; i++ {
+				testTime.Add(1 * time.Second)
+				if c1.counter >= 3 {
+					break
+				}
+			}
+			Expect(c1.counter).To(Equal(3))
+			Expect(c2.counter).To(Equal(3))
 			cancel()
-			Eventually(c1.counter).Should(Equal(3))
-			Eventually(c2.counter).Should(Equal(3))
 		})
 
 		It("does not run after being canceled", func() {
@@ -62,7 +65,9 @@ var _ = Describe("CollectorRunner", func() {
 			c1 := NewTestCollector()
 			runner := exporter.NewCollectorRunner(ctx, url, c1)
 			go runner.Start()
-			testTime.Add(5 * time.Second)
+			for i := 0; i < 5; i++ {
+				testTime.Add(1 * time.Second)
+			}
 			Eventually(c1.counter).Should(Equal(1))
 			cancel()
 			testTime.Add(5 * time.Second)
