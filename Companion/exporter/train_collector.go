@@ -38,6 +38,7 @@ type TrainDetails struct {
 	ArrivalTime      time.Time
 	StationCounter   int
 	FirstArrivalTime time.Time
+	LastTracked      time.Time
 }
 
 func NewTrainCollector(endpoint string) *TrainCollector {
@@ -96,6 +97,7 @@ func (t *TrainDetails) startTracking(trackedTrains map[string]*TrainDetails) {
 		TrainStation:   t.TrainStation,
 		StationCounter: 0,
 		TimeTable:      t.TimeTable,
+		LastTracked:    Clock.Now(),
 	}
 	trackedTrains[t.TrainName] = &trackedTrain
 }
@@ -104,12 +106,17 @@ func (d *TrainDetails) handleTimingUpdates(trackedTrains map[string]*TrainDetail
 	// track self driving train timing
 	if d.Status == "Self-Driving" {
 		train, exists := trackedTrains[d.TrainName]
-		if exists && !train.FirstArrivalTime.IsZero() {
+		if !exists || train.LastTracked.Before(Clock.Now().Add(-time.Minute)) {
+			d.startTracking(trackedTrains)
+		} else if exists && !train.FirstArrivalTime.IsZero() {
 			train.recordNextStation(d, frmAddress, sessionName)
 		} else if exists {
 			train.markFirstStation(d)
-		} else {
-			d.startTracking(trackedTrains)
+		}
+
+		// mark that we saw this vehicle
+		if exists {
+			train.LastTracked = Clock.Now()
 		}
 	} else {
 		//remove manual trains, nothing to mark

@@ -264,5 +264,31 @@ var _ = Describe("TrainCollector", func() {
 			Expect(val).To(Equal(float64(30)))
 
 		})
+
+		It("does not track 'train_round_trip_seconds' metric when too much time passed", func() {
+			testTime := clock.NewMock()
+			exporter.Clock = testTime
+			updateTrain("Third")
+
+			collector.Collect(url, sessionName)
+			testTime.Add(30 * time.Second)
+
+			// Started recording round trip on first station arrival
+			updateTrain("First")
+			collector.Collect(url, sessionName)
+			testTime.Add(30 * time.Second)
+			updateTrain("Second")
+			collector.Collect(url, sessionName)
+			testTime.Add(30 * time.Second)
+			updateTrain("Third")
+			collector.Collect(url, sessionName)
+			testTime.Add(120 * time.Second)
+			updateTrain("First")
+			collector.Collect(url, sessionName)
+
+			// does not collect as there's too much time before it came back to the first station
+			val, _ := gaugeValue(exporter.TrainRoundTrip, "Train1", url, sessionName)
+			Expect(val).To(Equal(float64(0)))
+		})
 	})
 })
