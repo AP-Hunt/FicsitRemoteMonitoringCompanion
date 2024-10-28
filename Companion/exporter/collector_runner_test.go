@@ -48,6 +48,7 @@ var _ = Describe("CollectorRunner", func() {
 
 			for i := 0; i < 18; i++ {
 				testTime.Add(1 * time.Second)
+				time.Sleep(10 * time.Millisecond)
 				if c1.counter >= 3 {
 					break
 				}
@@ -67,6 +68,7 @@ var _ = Describe("CollectorRunner", func() {
 			go runner.Start()
 			for i := 0; i < 5; i++ {
 				testTime.Add(1 * time.Second)
+				time.Sleep(10 * time.Millisecond)
 			}
 			Eventually(c1.counter).Should(Equal(1))
 			cancel()
