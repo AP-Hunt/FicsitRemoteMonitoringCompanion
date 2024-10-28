@@ -53,6 +53,7 @@ func NewPowerCollector(endpoint string) *PowerCollector {
 			FactoryPowerMax,
 			ResourceSinkPower,
 			ResourceSinkPowerMax,
+			DronePortPower,
 		),
 	}
 }
