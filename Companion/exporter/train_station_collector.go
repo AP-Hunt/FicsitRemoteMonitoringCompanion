@@ -24,7 +24,7 @@ type CargoPlatform struct {
 type TrainStationDetails struct {
 	Name           string          `json:"Name"`
 	Location       Location        `json:"location"`
-	CargoPlatforms []CargoPlatform `json:"CargoPlatforms"`
+	CargoPlatforms []CargoPlatform `json:"CargoInventory"`
 	PowerInfo      PowerInfo       `json:"PowerInfo"`
 }
 
