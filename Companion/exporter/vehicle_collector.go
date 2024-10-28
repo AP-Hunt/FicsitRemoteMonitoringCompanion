@@ -26,8 +26,8 @@ type VehicleDetails struct {
 }
 
 type Fuel struct {
-	Name   string  `json:Name`
-	Amount float64 `json:Amount`
+	Name   string  `json:"Name"`
+	Amount float64 `json:"Amount"`
 }
 
 func (v *VehicleDetails) recordElapsedTime(frmAddress string, sessionName string) {
