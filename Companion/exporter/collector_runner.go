@@ -59,11 +59,12 @@ func (c *CollectorRunner) updateSessionName() {
 func (c *CollectorRunner) Start() {
 	c.updateSessionName()
 	c.Collect(c.frmBaseUrl, c.sessionName)
+	t := Clock.Ticker(5 * time.Second)
 	for {
 		select {
 		case <-c.ctx.Done():
 			return
-		case <-Clock.After(5 * time.Second):
+		case <-t.C:
 			c.updateSessionName()
 			c.Collect(c.frmBaseUrl, c.sessionName)
 		}
