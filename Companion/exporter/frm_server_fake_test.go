@@ -24,6 +24,7 @@ type FRMServerFake struct {
 	extractorData      []exporter.ExtractorDetails
 	portalData         []exporter.PortalDetails
 	hypertubeData      []exporter.HypertubeDetails
+	frackingData      []exporter.FrackingDetails
 }
 
 func NewFRMServerFake() *FRMServerFake {
@@ -48,6 +49,7 @@ func NewFRMServerFake() *FRMServerFake {
 	mux.Handle("/getExtractor", http.HandlerFunc(getStatsHandler(&fake.extractorData)))
 	mux.Handle("/getPortal", http.HandlerFunc(getStatsHandler(&fake.portalData)))
 	mux.Handle("/getHypertube", http.HandlerFunc(getStatsHandler(&fake.hypertubeData)))
+	mux.Handle("/getFrackingActivator", http.HandlerFunc(getStatsHandler(&fake.frackingData)))
 
 	return fake
 }
@@ -116,6 +118,10 @@ func (e *FRMServerFake) ReturnsPortalData(data []exporter.PortalDetails) {
 
 func (e *FRMServerFake) ReturnsHypertubeData(data []exporter.HypertubeDetails) {
 	e.hypertubeData = data
+}
+
+func (e *FRMServerFake) ReturnsFrackingData(data []exporter.FrackingDetails) {
+	e.frackingData = data
 }
 
 func (e *FRMServerFake) ReturnsSessionInfoData(data exporter.SessionInfo) {
