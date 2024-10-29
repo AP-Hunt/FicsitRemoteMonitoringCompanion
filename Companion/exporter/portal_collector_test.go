@@ -6,17 +6,17 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("PumpCollector", func() {
+var _ = Describe("PortalCollector", func() {
 	var url string
 	var sessionName = "default"
-	var collector *exporter.PumpCollector
+	var collector *exporter.PortalCollector
 
 	BeforeEach(func() {
 		FRMServer.Reset()
 		url = FRMServer.server.URL
-		collector = exporter.NewPumpCollector("/getPump")
+		collector = exporter.NewPortalCollector("/getPortal")
 
-		FRMServer.ReturnsPumpData([]exporter.PumpDetails{
+		FRMServer.ReturnsPortalData([]exporter.PortalDetails{
 			{
 				PowerInfo: exporter.PowerInfo{
 					CircuitGroupId:   1,
@@ -45,19 +45,19 @@ var _ = Describe("PumpCollector", func() {
 		collector = nil
 	})
 
-	Describe("pump metrics collection", func() {
-		It("sets the 'pump_power' metric with the right labels", func() {
+	Describe("portal metrics collection", func() {
+		It("sets the 'portal_power' metric with the right labels", func() {
 			collector.Collect(url, sessionName)
 
-			val, err := gaugeValue(exporter.PumpPower, "1", url, sessionName)
+			val, err := gaugeValue(exporter.PortalPower, "1", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(60.1))
 		})
-		It("sets the 'pump_power_max' metric with the right labels", func() {
+		It("sets the 'portal_power_max' metric with the right labels", func() {
 			collector.Collect(url, sessionName)
 
-			val, err := gaugeValue(exporter.PumpPowerMax, "1", url, sessionName)
+			val, err := gaugeValue(exporter.PortalPowerMax, "1", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(90.0))
