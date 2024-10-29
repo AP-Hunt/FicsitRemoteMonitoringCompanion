@@ -21,6 +21,7 @@ type FRMServerFake struct {
 	resourceSinkData   []exporter.ResourceSinkDetails
 	sessionInfoData    exporter.SessionInfo
 	pumpData           []exporter.PumpDetails
+	extractorData           []exporter.ExtractorDetails
 }
 
 func NewFRMServerFake() *FRMServerFake {
@@ -42,6 +43,7 @@ func NewFRMServerFake() *FRMServerFake {
 	mux.Handle("/getResourceSinkBuilding", http.HandlerFunc(getStatsHandler(&fake.resourceSinkData)))
 	mux.Handle("/getSessionInfo", http.HandlerFunc(getStatsHandler(&fake.sessionInfoData)))
 	mux.Handle("/getPump", http.HandlerFunc(getStatsHandler(&fake.pumpData)))
+	mux.Handle("/getExtractor", http.HandlerFunc(getStatsHandler(&fake.extractorData)))
 
 	return fake
 }
@@ -98,6 +100,10 @@ func (e *FRMServerFake) ReturnsResourceSinkData(data []exporter.ResourceSinkDeta
 
 func (e *FRMServerFake) ReturnsPumpData(data []exporter.PumpDetails) {
 	e.pumpData = data
+}
+
+func (e *FRMServerFake) ReturnsExtractorData(data []exporter.ExtractorDetails) {
+	e.extractorData = data
 }
 
 func (e *FRMServerFake) ReturnsSessionInfoData(data exporter.SessionInfo) {
