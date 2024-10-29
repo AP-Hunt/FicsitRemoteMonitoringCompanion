@@ -30,8 +30,9 @@ var _ = Describe("DroneStationCollector", func() {
 				LatestTripIncAmt: 82,
 				LatestTripOutAmt: 50,
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1.0,
-					PowerConsumed:  100,
+					CircuitGroupId:   1.0,
+					PowerConsumed:    100,
+					MaxPowerConsumed: 100,
 				},
 				Fuel: []exporter.DroneFuelInventory{
 					exporter.DroneFuelInventory{
@@ -57,8 +58,9 @@ var _ = Describe("DroneStationCollector", func() {
 				LatestTripIncAmt: 82,
 				LatestTripOutAmt: 50,
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1.0,
-					PowerConsumed:  100,
+					CircuitGroupId:   1.0,
+					PowerConsumed:    100,
+					MaxPowerConsumed: 100,
 				},
 				Fuel: []exporter.DroneFuelInventory{
 					exporter.DroneFuelInventory{

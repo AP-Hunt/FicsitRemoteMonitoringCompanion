@@ -5,20 +5,16 @@ import (
 	"strconv"
 )
 
-var (
-	StationPower       = 0.1 // should be 50, but currently bugged.
-	CargoPlatformPower = 50.0
-)
-
 type TrainStationCollector struct {
-	endpoint        string
+	endpoint string
 }
 
 type CargoPlatform struct {
-	LoadingDock   string  `json:"LoadingDock"`
-	TransferRate  float64 `json:"TransferRate"`
-	LoadingStatus string  `json:"LoadingStatus"` // Idle, Loading, Unloading
-	LoadingMode   string  `json:"LoadingMode"`
+	LoadingDock   string    `json:"LoadingDock"`
+	TransferRate  float64   `json:"TransferRate"`
+	LoadingStatus string    `json:"LoadingStatus"` // Idle, Loading, Unloading
+	LoadingMode   string    `json:"LoadingMode"`
+	PowerInfo     PowerInfo `json:"PowerInfo"`
 }
 
 type TrainStationDetails struct {
@@ -30,7 +26,7 @@ type TrainStationDetails struct {
 
 func NewTrainStationCollector(endpoint string) *TrainStationCollector {
 	return &TrainStationCollector{
-		endpoint:        endpoint,
+		endpoint: endpoint,
 	}
 }
 
@@ -48,17 +44,13 @@ func (c *TrainStationCollector) Collect(frmAddress string, sessionName string) {
 		val, ok := powerInfo[d.PowerInfo.CircuitGroupId]
 		maxval, maxok := maxPowerInfo[d.PowerInfo.CircuitGroupId]
 
-		// some additional calculations: for now, power listed here is only for the station.
-		// add each of the cargo platforms' power info: 0.1MW if Idle, 50MW otherwise
+		// some additional calculations: power listed here is only for the station.
+		// each of the cargo platforms have power stats returned. add up power metrics for total power use.
 		totalPowerConsumed := d.PowerInfo.PowerConsumed
-		maxTotalPowerConsumed := StationPower
+		maxTotalPowerConsumed := d.PowerInfo.MaxPowerConsumed
 		for _, p := range d.CargoPlatforms {
-			maxTotalPowerConsumed = maxTotalPowerConsumed + CargoPlatformPower
-			if p.LoadingStatus == "Idle" {
-				totalPowerConsumed = totalPowerConsumed + 0.1
-			} else {
-				totalPowerConsumed = totalPowerConsumed + CargoPlatformPower
-			}
+			totalPowerConsumed = totalPowerConsumed + p.PowerInfo.PowerConsumed
+			maxTotalPowerConsumed = maxTotalPowerConsumed + p.PowerInfo.MaxPowerConsumed
 		}
 
 		if ok {

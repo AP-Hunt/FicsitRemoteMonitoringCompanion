@@ -67,30 +67,9 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 			powerInfo[building.PowerInfo.CircuitGroupId] = building.PowerInfo.PowerConsumed
 		}
 		val, ok = maxPowerInfo[building.PowerInfo.CircuitGroupId]
-		maxBuildingPower := 0.0
-		switch building.Building {
-		case "Smelter":
-			maxBuildingPower = SmelterPower
-			break
-		case "Constructor":
-			maxBuildingPower = ConstructorPower
-			break
-		case "Assembler":
-			maxBuildingPower = AssemblerPower
-			break
-		case "Manufacturer":
-			maxBuildingPower = ManufacturerPower
-			break
-		case "Blender":
-			maxBuildingPower = BlenderPower
-			break
-		case "Refinery":
-			maxBuildingPower = RefineryPower
-			break
-		case "Particle Accelerator":
-			maxBuildingPower = ParticleAcceleratorPower
-			break
-		}
+		maxBuildingPower := building.PowerInfo.MaxPowerConsumed
+
+		// TODO: check max power consumed...
 		//update max power from clock speed
 		// see https://satisfactory.wiki.gg/wiki/Clock_speed#Clock_speed_for_production_buildings for power info
 		maxBuildingPower = maxBuildingPower * (math.Pow(building.ManuSpeed/100, 1.321928))

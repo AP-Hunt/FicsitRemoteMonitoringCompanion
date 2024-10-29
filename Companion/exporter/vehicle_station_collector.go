@@ -5,8 +5,6 @@ import (
 	"strconv"
 )
 
-var VehicleStationPowerConsumption = 20.0
-
 type VehicleStationCollector struct {
 	endpoint string
 }
@@ -42,9 +40,9 @@ func (c *VehicleStationCollector) Collect(frmAddress string, sessionName string)
 		}
 		val, ok = maxPowerInfo[d.PowerInfo.CircuitGroupId]
 		if ok {
-			maxPowerInfo[d.PowerInfo.CircuitGroupId] = val + VehicleStationPowerConsumption
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = val + d.PowerInfo.MaxPowerConsumed
 		} else {
-			maxPowerInfo[d.PowerInfo.CircuitGroupId] = VehicleStationPowerConsumption
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = d.PowerInfo.MaxPowerConsumed
 		}
 	}
 	for circuitId, powerConsumed := range powerInfo {

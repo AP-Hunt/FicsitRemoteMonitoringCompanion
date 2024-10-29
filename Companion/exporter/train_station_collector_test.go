@@ -25,17 +25,28 @@ var _ = Describe("TrainStationCollector", func() {
 						TransferRate:  66,
 						LoadingStatus: "Idle",
 						LoadingMode:   "Loading",
+						PowerInfo: exporter.PowerInfo{
+							CircuitGroupId:   1,
+							PowerConsumed:    0.1,
+							MaxPowerConsumed: 50,
+						},
 					},
 					{
 						LoadingDock:   "Freight Platform",
 						TransferRate:  66,
 						LoadingStatus: "Idle",
 						LoadingMode:   "Loading",
+						PowerInfo: exporter.PowerInfo{
+							CircuitGroupId:   1,
+							PowerConsumed:    0.1,
+							MaxPowerConsumed: 50,
+						},
 					},
 				},
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1,
-					PowerConsumed:  50,
+					CircuitGroupId:   1,
+					PowerConsumed:    0.1,
+					MaxPowerConsumed: 50,
 				},
 			},
 			{
@@ -46,17 +57,28 @@ var _ = Describe("TrainStationCollector", func() {
 						TransferRate:  66,
 						LoadingStatus: "Unloading",
 						LoadingMode:   "Unloading",
+						PowerInfo: exporter.PowerInfo{
+							CircuitGroupId:   1,
+							PowerConsumed:    50,
+							MaxPowerConsumed: 50,
+						},
 					},
 					{
 						LoadingDock:   "Freight Platform",
 						TransferRate:  66,
 						LoadingStatus: "Idle",
 						LoadingMode:   "Unloading",
+						PowerInfo: exporter.PowerInfo{
+							CircuitGroupId:   1,
+							PowerConsumed:    0.1,
+							MaxPowerConsumed: 50,
+						},
 					},
 				},
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1,
-					PowerConsumed:  50,
+					CircuitGroupId:   1,
+					PowerConsumed:    0.1,
+					MaxPowerConsumed: 50,
 				},
 			},
 		})
@@ -73,7 +95,7 @@ var _ = Describe("TrainStationCollector", func() {
 			val, err := gaugeValue(exporter.TrainStationPower, "1", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(Equal(float64(150.3)))
+			Expect(val).To(Equal(float64(50.5)))
 		})
 
 		It("sets the 'train_station_power_max' metric with the right labels", func() {
@@ -82,7 +104,7 @@ var _ = Describe("TrainStationCollector", func() {
 			val, err := gaugeValue(exporter.TrainStationPowerMax, "1", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(Equal(float64(200.2)))
+			Expect(val).To(Equal(float64(300.0)))
 		})
 	})
 })

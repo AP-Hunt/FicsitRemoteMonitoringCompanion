@@ -19,20 +19,23 @@ var _ = Describe("ResourceSinkCollector", func() {
 		FRMServer.ReturnsResourceSinkData([]exporter.ResourceSinkDetails{
 			{
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1,
-					PowerConsumed:  30,
+					CircuitGroupId:   1,
+					PowerConsumed:    30,
+					MaxPowerConsumed: 30,
 				},
 			},
 			{
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1,
-					PowerConsumed:  30,
+					CircuitGroupId:   1,
+					PowerConsumed:    30,
+					MaxPowerConsumed: 30,
 				},
 			},
 			{
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1,
-					PowerConsumed:  0.1,
+					CircuitGroupId:   1,
+					PowerConsumed:    0.1,
+					MaxPowerConsumed: 30,
 				},
 			},
 		})

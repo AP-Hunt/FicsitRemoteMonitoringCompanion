@@ -57,6 +57,7 @@ var _ = Describe("FactoryBuildingCollector", func() {
 				PowerInfo: exporter.PowerInfo{
 					CircuitGroupId: 1,
 					PowerConsumed:  23,
+					MaxPowerConsumed:  4,
 				},
 			},
 		})
@@ -74,7 +75,7 @@ var _ = Describe("FactoryBuildingCollector", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(23.0))
 			val2, _ := gaugeValue(exporter.FactoryPowerMax, "1", url, sessionName)
-			Expect(val2).To(Equal(exporter.SmelterPower))
+			Expect(val2).To(Equal(4.0))
 		})
 	})
 

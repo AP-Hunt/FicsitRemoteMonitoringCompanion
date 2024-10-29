@@ -79,6 +79,7 @@ var _ = Describe("TrainCollector", func() {
 				PowerInfo: exporter.PowerInfo{
 					CircuitGroupId: 1,
 					PowerConsumed: 67,
+					MaxPowerConsumed: 120,
 				},
 			},
 			{
@@ -98,6 +99,7 @@ var _ = Describe("TrainCollector", func() {
 				PowerInfo: exporter.PowerInfo{
 					CircuitGroupId: 1,
 					PowerConsumed: 22,
+					MaxPowerConsumed: 120,
 				},
 			},
 			{
@@ -109,6 +111,7 @@ var _ = Describe("TrainCollector", func() {
 				PowerInfo: exporter.PowerInfo{
 					CircuitGroupId: 0,
 					PowerConsumed: 0,
+					MaxPowerConsumed: 120,
 				},
 			},
 		})
@@ -147,12 +150,13 @@ var _ = Describe("TrainCollector", func() {
 		})
 
 		It("sets the 'train_power_circuit_consumed_max' metric with the right labels", func() {
+			maxTrainPowerConsumption := 120.0
 			collector.Collect(url, sessionName)
 
 			val, err := gaugeValue(exporter.TrainCircuitPowerMax, "1", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(Equal(exporter.MaxTrainPowerConsumption * 3))
+			Expect(val).To(Equal(maxTrainPowerConsumption * 3))
 		})
 
 		It("sets the mass metrics with the right labels", func() {

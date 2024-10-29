@@ -8,8 +8,9 @@ import (
 )
 
 type PowerInfo struct {
-	CircuitGroupId float64 `json:"CircuitGroupID"`
-	PowerConsumed  float64 `json:"PowerConsumed"`
+	CircuitGroupId   float64 `json:"CircuitGroupID"`
+	PowerConsumed    float64 `json:"PowerConsumed"`
+	MaxPowerConsumed float64 `json:"MaxPowerConsumed"`
 }
 
 type PowerCollector struct {

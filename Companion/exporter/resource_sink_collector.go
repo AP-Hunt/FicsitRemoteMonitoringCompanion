@@ -5,8 +5,6 @@ import (
 	"strconv"
 )
 
-var ResourceSinkPowerConsumption = 30.0
-
 type ResourceSinkCollector struct {
 	endpoint string
 }
@@ -17,7 +15,7 @@ type ResourceSinkDetails struct {
 }
 
 func NewResourceSinkCollector(endpoint string) *ResourceSinkCollector {
-	return &ResourceSinkCollector {
+	return &ResourceSinkCollector{
 		endpoint: endpoint,
 	}
 }
@@ -41,9 +39,9 @@ func (c *ResourceSinkCollector) Collect(frmAddress string, sessionName string) {
 		}
 		val, ok = maxPowerInfo[d.PowerInfo.CircuitGroupId]
 		if ok {
-			maxPowerInfo[d.PowerInfo.CircuitGroupId] = val + ResourceSinkPowerConsumption
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = val + d.PowerInfo.MaxPowerConsumed
 		} else {
-			maxPowerInfo[d.PowerInfo.CircuitGroupId] = ResourceSinkPowerConsumption
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = d.PowerInfo.MaxPowerConsumed
 		}
 	}
 	for circuitId, powerConsumed := range powerInfo {

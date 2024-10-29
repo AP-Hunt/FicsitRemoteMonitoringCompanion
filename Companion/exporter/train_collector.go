@@ -8,8 +8,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var MaxTrainPowerConsumption = 110.0
-
 type TrainCollector struct {
 	endpoint       string
 	TrackedTrains  map[string]*TrainDetails
@@ -156,7 +154,7 @@ func (c *TrainCollector) Collect(frmAddress string, sessionName string) {
 
 		// for now, the total power consumed is a multiple of the reported power consumed by the number of locomotives
 		trainPowerConsumed := d.PowerInfo.PowerConsumed * locomotives
-		maxTrainPowerConsumed := MaxTrainPowerConsumption * locomotives
+		maxTrainPowerConsumed := d.PowerInfo.MaxPowerConsumed * locomotives
 
 		TrainPower.WithLabelValues(d.TrainName, frmAddress, sessionName).Set(trainPowerConsumed)
 		TrainTotalMass.WithLabelValues(d.TrainName, frmAddress, sessionName).Set(totalMass)
