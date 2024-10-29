@@ -55,8 +55,17 @@ func NewPowerCollector(endpoint string) *PowerCollector {
 			ResourceSinkPower,
 			ResourceSinkPowerMax,
 			DronePortPower,
+			DronePortPowerMax,
 			PumpPower,
 			PumpPowerMax,
+			ExtractorPower,
+			ExtractorPowerMax,
+			HypertubePower,
+			HypertubePowerMax,
+			PortalPower,
+			PortalPowerMax,
+			FrackingPower,
+			FrackingPowerMax,
 		),
 	}
 }

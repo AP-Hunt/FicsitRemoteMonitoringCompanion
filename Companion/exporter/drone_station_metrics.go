@@ -35,4 +35,10 @@ var (
 	}, []string{
 		"circuit_id",
 	})
+	DronePortPowerMax = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "drone_port_power_max",
+		Help: "Max drone port power in MW",
+	}, []string{
+		"circuit_id",
+	})
 )

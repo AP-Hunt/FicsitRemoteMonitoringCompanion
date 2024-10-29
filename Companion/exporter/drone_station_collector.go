@@ -61,7 +61,6 @@ func NewDroneStationCollector(endpoint string) *DroneStationCollector {
 			DronePortFuelRate,
 			DronePortFuelAmount,
 			DronePortRndTrip,
-			DronePortPower,
 		),
 	}
 }
@@ -76,6 +75,7 @@ func (c *DroneStationCollector) Collect(frmAddress string, sessionName string) {
 	}
 
 	powerInfo := map[float64]float64{}
+	maxPowerInfo := map[float64]float64{}
 	for _, d := range details {
 		c.metricsDropper.CacheFreshMetricLabel(prometheus.Labels{"url": frmAddress, "session_name": sessionName, "id": d.Id})
 		id := d.Id
@@ -93,6 +93,12 @@ func (c *DroneStationCollector) Collect(frmAddress string, sessionName string) {
 			powerInfo[d.PowerInfo.CircuitGroupId] = val + d.PowerInfo.PowerConsumed
 		} else {
 			powerInfo[d.PowerInfo.CircuitGroupId] = d.PowerInfo.PowerConsumed
+		}
+		val, ok = maxPowerInfo[d.PowerInfo.CircuitGroupId]
+		if ok {
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = val + d.PowerInfo.MaxPowerConsumed
+		} else {
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = d.PowerInfo.MaxPowerConsumed
 		}
 	}
 
