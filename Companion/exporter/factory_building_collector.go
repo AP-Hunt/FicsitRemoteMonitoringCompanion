@@ -2,7 +2,6 @@ package exporter
 
 import (
 	"log"
-	"math"
 	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -69,10 +68,6 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 		val, ok = maxPowerInfo[building.PowerInfo.CircuitGroupId]
 		maxBuildingPower := building.PowerInfo.MaxPowerConsumed
 
-		// TODO: check max power consumed...
-		//update max power from clock speed
-		// see https://satisfactory.wiki.gg/wiki/Clock_speed#Clock_speed_for_production_buildings for power info
-		maxBuildingPower = maxBuildingPower * (math.Pow(building.ManuSpeed/100, 1.321928))
 		if ok {
 			maxPowerInfo[building.PowerInfo.CircuitGroupId] = val + maxBuildingPower
 		} else {
