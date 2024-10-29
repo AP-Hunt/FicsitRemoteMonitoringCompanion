@@ -20,6 +20,7 @@ type FRMServerFake struct {
 	trainStationData   []exporter.TrainStationDetails
 	resourceSinkData   []exporter.ResourceSinkDetails
 	sessionInfoData    exporter.SessionInfo
+	pumpData           []exporter.PumpDetails
 }
 
 func NewFRMServerFake() *FRMServerFake {
@@ -40,6 +41,7 @@ func NewFRMServerFake() *FRMServerFake {
 	mux.Handle("/getTrainStation", http.HandlerFunc(getStatsHandler(&fake.trainStationData)))
 	mux.Handle("/getResourceSinkBuilding", http.HandlerFunc(getStatsHandler(&fake.resourceSinkData)))
 	mux.Handle("/getSessionInfo", http.HandlerFunc(getStatsHandler(&fake.sessionInfoData)))
+	mux.Handle("/getPump", http.HandlerFunc(getStatsHandler(&fake.pumpData)))
 
 	return fake
 }
@@ -92,6 +94,10 @@ func (e *FRMServerFake) ReturnsTrainStationData(data []exporter.TrainStationDeta
 
 func (e *FRMServerFake) ReturnsResourceSinkData(data []exporter.ResourceSinkDetails) {
 	e.resourceSinkData = data
+}
+
+func (e *FRMServerFake) ReturnsPumpData(data []exporter.PumpDetails) {
+	e.pumpData = data
 }
 
 func (e *FRMServerFake) ReturnsSessionInfoData(data exporter.SessionInfo) {
