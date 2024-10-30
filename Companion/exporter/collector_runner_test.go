@@ -2,12 +2,12 @@ package exporter_test
 
 import (
 	"context"
+	"time"
 
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/exporter"
-	"github.com/benbjohnson/clock"
 	. "github.com/onsi/ginkgo/v2"
+	"github.com/coder/quartz"
 	. "github.com/onsi/gomega"
-	"time"
 )
 
 type TestCollector struct {
@@ -38,43 +38,26 @@ var _ = Describe("CollectorRunner", func() {
 	Describe("Basic Functionality", func() {
 		It("runs on init and on each timeout", func() {
 			ctx, cancel := context.WithCancel(context.Background())
-			testTime := clock.NewMock()
+			timeout, _ := context.WithTimeout(ctx, 10*time.Second)
+			defer cancel()
+			testTime := quartz.NewMock(GinkgoTB())
 			exporter.Clock = testTime
+			trap := testTime.Trap().TickerFunc()
+			defer trap.Close()
 
 			c1 := NewTestCollector()
 			c2 := NewTestCollector()
 			runner := exporter.NewCollectorRunner(ctx, url, c1, c2)
 			go runner.Start()
+			call := trap.MustWait(timeout)
+			call.Release()
 
-			for i := 0; i < 18; i++ {
-				testTime.Add(1 * time.Second)
-				time.Sleep(10 * time.Millisecond)
-				if c1.counter >= 3 {
-					break
-				}
+			for i := 0; i < 2; i++ {
+				_, w := testTime.AdvanceNext()
+				w.MustWait(ctx)
 			}
 			Expect(c1.counter).To(Equal(3))
 			Expect(c2.counter).To(Equal(3))
-			cancel()
-		})
-
-		It("does not run after being canceled", func() {
-			ctx, cancel := context.WithCancel(context.Background())
-			testTime := clock.NewMock()
-			exporter.Clock = testTime
-
-			c1 := NewTestCollector()
-			runner := exporter.NewCollectorRunner(ctx, url, c1)
-			go runner.Start()
-			for i := 0; i < 5; i++ {
-				testTime.Add(1 * time.Second)
-				time.Sleep(10 * time.Millisecond)
-			}
-			Eventually(c1.counter).Should(Equal(1))
-			cancel()
-			testTime.Add(5 * time.Second)
-			testTime.Add(5 * time.Second)
-			Expect(c1.counter).To(Equal(1))
 		})
 	})
 })

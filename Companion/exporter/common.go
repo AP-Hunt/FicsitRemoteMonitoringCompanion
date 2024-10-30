@@ -3,7 +3,7 @@ package exporter
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/benbjohnson/clock"
+	"github.com/coder/quartz"
 	"log"
 	"net/http"
 	"regexp"
@@ -13,7 +13,7 @@ import (
 
 var timeRegex = regexp.MustCompile(`\d\d:\d\d:\d\d`)
 
-var Clock = clock.New()
+var Clock = quartz.NewReal()
 
 func parseTimeSeconds(timeStr string) *float64 {
 	match := timeRegex.FindStringSubmatch(timeStr)

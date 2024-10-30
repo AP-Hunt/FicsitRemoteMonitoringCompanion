@@ -5,17 +5,17 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/benbjohnson/clock"
+	"github.com/coder/quartz"
 	"time"
 )
 
 func updateTrain(station string) {
 	FRMServer.ReturnsTrainData([]exporter.TrainDetails{
 		{
-			TrainName:     "Train1",
-			TrainStation:  station,
-			Derailed:      false,
-			Status:        "Self-Driving",
+			TrainName:    "Train1",
+			TrainStation: station,
+			Derailed:     false,
+			Status:       "Self-Driving",
 			TimeTable: []exporter.TimeTable{
 				{StationName: "First"},
 				{StationName: "Second"},
@@ -27,14 +27,14 @@ func updateTrain(station string) {
 			},
 			PowerInfo: exporter.PowerInfo{
 				CircuitGroupId: 1,
-				PowerConsumed: 0,
+				PowerConsumed:  0,
 			},
 		},
 		{
-			TrainName:     "Not In Use",
-			TrainStation:  "Offsite",
-			Derailed:      false,
-			Status:        "Parked",
+			TrainName:    "Not In Use",
+			TrainStation: "Offsite",
+			Derailed:     false,
+			Status:       "Parked",
 			TimeTable: []exporter.TimeTable{
 				{StationName: "Offsite"},
 			},
@@ -44,7 +44,7 @@ func updateTrain(station string) {
 			},
 			PowerInfo: exporter.PowerInfo{
 				CircuitGroupId: 1,
-				PowerConsumed: 0,
+				PowerConsumed:  0,
 			},
 		},
 	})
@@ -62,10 +62,10 @@ var _ = Describe("TrainCollector", func() {
 
 		FRMServer.ReturnsTrainData([]exporter.TrainDetails{
 			{
-				TrainName:     "Train1",
-				TrainStation:  "NextStation",
-				Derailed:      false,
-				Status:        "Self-Driving",
+				TrainName:    "Train1",
+				TrainStation: "NextStation",
+				Derailed:     false,
+				Status:       "Self-Driving",
 				TimeTable: []exporter.TimeTable{
 					{StationName: "First"},
 					{StationName: "Second"},
@@ -77,16 +77,16 @@ var _ = Describe("TrainCollector", func() {
 					{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
 				},
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1,
-					PowerConsumed: 67,
+					CircuitGroupId:   1,
+					PowerConsumed:    67,
 					MaxPowerConsumed: 120,
 				},
 			},
 			{
-				TrainName:     "Train2",
-				TrainStation:  "NextStation",
-				Derailed:      false,
-				Status:        "Self-Driving",
+				TrainName:    "Train2",
+				TrainStation: "NextStation",
+				Derailed:     false,
+				Status:       "Self-Driving",
 				TimeTable: []exporter.TimeTable{
 					{StationName: "Second"},
 					{StationName: "Third"},
@@ -97,20 +97,20 @@ var _ = Describe("TrainCollector", func() {
 					{Name: "Freight Car", TotalMass: 47584, PayloadMass: 17584, MaxPayloadMass: 70000},
 				},
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1,
-					PowerConsumed: 22,
+					CircuitGroupId:   1,
+					PowerConsumed:    22,
 					MaxPowerConsumed: 120,
 				},
 			},
 			{
-				TrainName:     "DerailedTrain",
-				TrainStation:  "NextStation",
-				Derailed:      true,
-				Status:        "Derailed",
-				TrainCars:  []exporter.TrainCar{},
+				TrainName:    "DerailedTrain",
+				TrainStation: "NextStation",
+				Derailed:     true,
+				Status:       "Derailed",
+				TrainCars:    []exporter.TrainCar{},
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 0,
-					PowerConsumed: 0,
+					CircuitGroupId:   0,
+					PowerConsumed:    0,
 					MaxPowerConsumed: 120,
 				},
 			},
@@ -172,7 +172,7 @@ var _ = Describe("TrainCollector", func() {
 
 		It("sets 'train_segment_trip_seconds' metric with the right labels", func() {
 
-			testTime := clock.NewMock()
+			testTime := quartz.NewMock(GinkgoTB())
 			exporter.Clock = testTime
 			updateTrain("First")
 
@@ -180,11 +180,11 @@ var _ = Describe("TrainCollector", func() {
 			val, err := gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second", url, sessionName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
-			testTime.Add(5 * time.Second)
+			testTime.Advance(5 * time.Second)
 			collector.Collect(url, sessionName)
 			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second", url, sessionName)
 			Expect(val).To(Equal(float64(0)))
-			testTime.Add(25 * time.Second)
+			testTime.Advance(25 * time.Second)
 
 			// Start timing the trains here - No metrics yet because we just got our first "start" marker from the station change.
 			updateTrain("Second")
@@ -192,15 +192,15 @@ var _ = Describe("TrainCollector", func() {
 			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second", url, sessionName)
 			Expect(val).To(Equal(float64(0)))
 
-			testTime.Add(15 * time.Second)
+			testTime.Advance(15 * time.Second)
 			collector.Collect(url, sessionName)
-			testTime.Add(10 * time.Second)
+			testTime.Advance(10 * time.Second)
 			collector.Collect(url, sessionName)
 			// No stats again since train is still "en route"
 			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "First", "Second", url, sessionName)
 			Expect(val).To(Equal(float64(0)))
 
-			testTime.Add(5 * time.Second)
+			testTime.Advance(5 * time.Second)
 
 			// Can record elapsed time between Second and Third stations
 			updateTrain("Third")
@@ -208,13 +208,13 @@ var _ = Describe("TrainCollector", func() {
 			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "Second", "Third", url, sessionName)
 			Expect(val).To(Equal(float64(30)))
 
-			testTime.Add(30 * time.Second)
+			testTime.Advance(30 * time.Second)
 			updateTrain("First")
 			collector.Collect(url, sessionName)
 			val, err = gaugeValue(exporter.TrainSegmentTrip, "Train1", "Third", "First", url, sessionName)
 			Expect(val).To(Equal(float64(30)))
 
-			testTime.Add(30 * time.Second)
+			testTime.Advance(30 * time.Second)
 			updateTrain("Second")
 			collector.Collect(url, sessionName)
 
@@ -224,7 +224,7 @@ var _ = Describe("TrainCollector", func() {
 		})
 
 		It("sets 'train_round_trip_seconds' metric with the right labels", func() {
-			testTime := clock.NewMock()
+			testTime := quartz.NewMock(GinkgoTB())
 			exporter.Clock = testTime
 			updateTrain("Third")
 
@@ -232,7 +232,7 @@ var _ = Describe("TrainCollector", func() {
 			val, err := gaugeValue(exporter.TrainRoundTrip, "Train1", url, sessionName)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(0)))
-			testTime.Add(30 * time.Second)
+			testTime.Advance(30 * time.Second)
 
 			// Started recording round trip on first station arrival
 			updateTrain("First")
@@ -240,13 +240,13 @@ var _ = Describe("TrainCollector", func() {
 			val, err = gaugeValue(exporter.TrainRoundTrip, "Train1", url, sessionName)
 			Expect(val).To(Equal(float64(0)))
 
-			testTime.Add(30 * time.Second)
+			testTime.Advance(30 * time.Second)
 			updateTrain("Second")
 			collector.Collect(url, sessionName)
-			testTime.Add(30 * time.Second)
+			testTime.Advance(30 * time.Second)
 			updateTrain("Third")
 			collector.Collect(url, sessionName)
-			testTime.Add(30 * time.Second)
+			testTime.Advance(30 * time.Second)
 			updateTrain("First")
 			collector.Collect(url, sessionName)
 
@@ -254,13 +254,13 @@ var _ = Describe("TrainCollector", func() {
 			Expect(val).To(Equal(float64(90)))
 
 			//second round trip should also record properly
-			testTime.Add(10 * time.Second)
+			testTime.Advance(10 * time.Second)
 			updateTrain("Second")
 			collector.Collect(url, sessionName)
-			testTime.Add(10 * time.Second)
+			testTime.Advance(10 * time.Second)
 			updateTrain("Third")
 			collector.Collect(url, sessionName)
-			testTime.Add(10 * time.Second)
+			testTime.Advance(10 * time.Second)
 			updateTrain("First")
 			collector.Collect(url, sessionName)
 
@@ -270,23 +270,23 @@ var _ = Describe("TrainCollector", func() {
 		})
 
 		It("does not track 'train_round_trip_seconds' metric when too much time passed", func() {
-			testTime := clock.NewMock()
+			testTime := quartz.NewMock(GinkgoTB())
 			exporter.Clock = testTime
 			updateTrain("Third")
 
 			collector.Collect(url, sessionName)
-			testTime.Add(30 * time.Second)
+			testTime.Advance(30 * time.Second)
 
 			// Started recording round trip on first station arrival
 			updateTrain("First")
 			collector.Collect(url, sessionName)
-			testTime.Add(30 * time.Second)
+			testTime.Advance(30 * time.Second)
 			updateTrain("Second")
 			collector.Collect(url, sessionName)
-			testTime.Add(30 * time.Second)
+			testTime.Advance(30 * time.Second)
 			updateTrain("Third")
 			collector.Collect(url, sessionName)
-			testTime.Add(120 * time.Second)
+			testTime.Advance(120 * time.Second)
 			updateTrain("First")
 			collector.Collect(url, sessionName)
 

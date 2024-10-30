@@ -56,19 +56,15 @@ func (c *CollectorRunner) updateSessionName() {
 	}
 }
 
-func (c *CollectorRunner) Start() {
+func (c *CollectorRunner) Start() error {
 	c.updateSessionName()
 	c.Collect(c.frmBaseUrl, c.sessionName)
-	t := Clock.Ticker(5 * time.Second)
-	for {
-		select {
-		case <-c.ctx.Done():
-			return
-		case <-t.C:
-			c.updateSessionName()
-			c.Collect(c.frmBaseUrl, c.sessionName)
-		}
-	}
+	t := Clock.TickerFunc(c.ctx, 5 * time.Second, func() error {
+		c.updateSessionName()
+		c.Collect(c.frmBaseUrl, c.sessionName)
+		return nil
+	})
+	return t.Wait()
 }
 
 func (c *CollectorRunner) Stop() {
