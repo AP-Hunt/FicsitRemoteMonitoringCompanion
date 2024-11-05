@@ -182,6 +182,6 @@ func generateReadme() {
 		},
 	)
 	if err != nil {
-		fmt.Printf("Error writing readme", err)
+		fmt.Printf("Error writing readme: %s", err)
 	}
 }
