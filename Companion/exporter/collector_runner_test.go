@@ -59,5 +59,9 @@ var _ = Describe("CollectorRunner", func() {
 			Expect(c1.counter).To(Equal(3))
 			Expect(c2.counter).To(Equal(3))
 		})
+
+		It("sanitizes session name", func() {
+			Expect(exporter.SanitizeSessionName(`it's giving -- 123456!@#$%^&*() yo hollar "'"`)).To(Equal(`its giving  123456 yo hollar ` ))
+		})
 	})
 })

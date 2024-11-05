@@ -3,10 +3,16 @@ package exporter
 import (
 	"context"
 	"log"
+	"regexp"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
+
+func SanitizeSessionName(sessionName string) string {
+	re := regexp.MustCompile(`[^\w\s]`)
+	return re.ReplaceAllString(sessionName, "")
+}
 
 type CollectorRunner struct {
 	collectors  []Collector
@@ -43,7 +49,7 @@ func (c *CollectorRunner) updateSessionName() {
 		log.Printf("error reading session name from FRM: %s\n", err)
 		return
 	}
-	newSessionName := details.SessionName
+	newSessionName := SanitizeSessionName(details.SessionName)
 	if newSessionName != "" && newSessionName != c.sessionName {
 		log.Printf("%s has a new session name: %s\n", c.frmBaseUrl, newSessionName)
 		for _, metric := range RegisteredMetrics {
@@ -59,7 +65,7 @@ func (c *CollectorRunner) updateSessionName() {
 func (c *CollectorRunner) Start() error {
 	c.updateSessionName()
 	c.Collect(c.frmBaseUrl, c.sessionName)
-	t := Clock.TickerFunc(c.ctx, 5 * time.Second, func() error {
+	t := Clock.TickerFunc(c.ctx, 5*time.Second, func() error {
 		c.updateSessionName()
 		c.Collect(c.frmBaseUrl, c.sessionName)
 		return nil
