@@ -20,7 +20,7 @@ FRMC offers two tools for visualising the data being collected:
 
 The realtime map shows your factory buildings on the Satisfactory game world map, and charts their production levels in the last 5 minutes. 
 
-The [Prometheus mertics server](https://prometheus.io/) allows you to [explore the data being exported](https://prometheus.io/docs/prometheus/latest/querying/basics) using the full power of Prometheus.
+The [Prometheus metrics server](https://prometheus.io/) allows you to [explore the data being exported](https://prometheus.io/docs/prometheus/latest/querying/basics) using the full power of Prometheus.
 
 (&#42; Link goes to the address on your local system. If FRMC is not running, you will see an error)
 
