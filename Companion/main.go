@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"text/template"
 	"log"
 	"os"
 	"os/signal"
@@ -11,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+	"text/template"
 
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/exporter"
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/prometheus"
