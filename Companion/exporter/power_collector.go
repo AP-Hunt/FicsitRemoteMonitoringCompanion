@@ -3,19 +3,23 @@ package exporter
 import (
 	"log"
 	"strconv"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type PowerInfo struct {
-	CircuitId     float64 `json:"ID"`
-	PowerConsumed float64 `json:"PowerConsumed"`
+	CircuitGroupId   float64 `json:"CircuitGroupID"`
+	PowerConsumed    float64 `json:"PowerConsumed"`
+	MaxPowerConsumed float64 `json:"MaxPowerConsumed"`
 }
 
 type PowerCollector struct {
-	FRMAddress string
+	endpoint       string
+	metricsDropper *MetricsDropper
 }
 
 type PowerDetails struct {
-	CircuitId           float64 `json:"CircuitID"`
+	CircuitGroupId      float64 `json:"CircuitGroupID"`
 	PowerConsumed       float64 `json:"PowerConsumed"`
 	PowerCapacity       float64 `json:"PowerCapacity"`
 	PowerMaxConsumed    float64 `json:"PowerMaxConsumed"`
@@ -27,37 +31,75 @@ type PowerDetails struct {
 	FuseTriggered       bool    `json:"FuseTriggered"`
 }
 
-func NewPowerCollector(frmAddress string) *PowerCollector {
+func NewPowerCollector(endpoint string) *PowerCollector {
 	return &PowerCollector{
-		FRMAddress: frmAddress,
+		endpoint: endpoint,
+		metricsDropper: NewMetricsDropper(
+			PowerConsumed,
+			PowerCapacity,
+			PowerMaxConsumed,
+			BatteryDifferential,
+			BatteryPercent,
+			BatteryCapacity,
+			BatterySecondsEmpty,
+			BatterySecondsFull,
+			FuseTriggered,
+			TrainCircuitPower,
+			TrainCircuitPowerMax,
+			TrainStationPower,
+			TrainStationPowerMax,
+			VehicleStationPower,
+			VehicleStationPowerMax,
+			FactoryPower,
+			FactoryPowerMax,
+			ResourceSinkPower,
+			ResourceSinkPowerMax,
+			DronePortPower,
+			DronePortPowerMax,
+			PumpPower,
+			PumpPowerMax,
+			ExtractorPower,
+			ExtractorPowerMax,
+			HypertubePower,
+			HypertubePowerMax,
+			PortalPower,
+			PortalPowerMax,
+			FrackingPower,
+			FrackingPowerMax,
+		),
 	}
 }
 
-func (c *PowerCollector) Collect() {
+func (c *PowerCollector) Collect(frmAddress string, sessionName string) {
 	details := []PowerDetails{}
-	err := retrieveData(c.FRMAddress, &details)
+	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
+		c.metricsDropper.DropStaleMetricLabels()
 		log.Printf("error reading power statistics from FRM: %s\n", err)
 		return
 	}
 
 	for _, d := range details {
-		circuitId := strconv.FormatFloat(d.CircuitId, 'f', -1, 64)
-		PowerConsumed.WithLabelValues(circuitId).Set(d.PowerConsumed)
-		PowerCapacity.WithLabelValues(circuitId).Set(d.PowerCapacity)
-		PowerMaxConsumed.WithLabelValues(circuitId).Set(d.PowerMaxConsumed)
-		BatteryDifferential.WithLabelValues(circuitId).Set(d.BatteryDifferential)
-		BatteryPercent.WithLabelValues(circuitId).Set(d.BatteryPercent)
-		BatteryCapacity.WithLabelValues(circuitId).Set(d.BatteryCapacity)
+		circuitId := strconv.FormatFloat(d.CircuitGroupId, 'f', -1, 64)
+		c.metricsDropper.CacheFreshMetricLabel(prometheus.Labels{"url": frmAddress, "session_name": sessionName, "circuit_id": circuitId})
+		PowerConsumed.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.PowerConsumed)
+		PowerCapacity.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.PowerCapacity)
+		PowerMaxConsumed.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.PowerMaxConsumed)
+		BatteryDifferential.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.BatteryDifferential)
+		BatteryPercent.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.BatteryPercent)
+		BatteryCapacity.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.BatteryCapacity)
 		batterySecondsRemaining := parseTimeSeconds(d.BatteryTimeEmpty)
 		if batterySecondsRemaining != nil {
-			BatterySecondsEmpty.WithLabelValues(circuitId).Set(*batterySecondsRemaining)
+			BatterySecondsEmpty.WithLabelValues(circuitId, frmAddress, sessionName).Set(*batterySecondsRemaining)
 		}
 		batterySecondsFull := parseTimeSeconds(d.BatteryTimeFull)
 		if batterySecondsFull != nil {
-			BatterySecondsFull.WithLabelValues(circuitId).Set(*batterySecondsFull)
+			BatterySecondsFull.WithLabelValues(circuitId, frmAddress, sessionName).Set(*batterySecondsFull)
 		}
 		fuseTriggered := parseBool(d.FuseTriggered)
-		FuseTriggered.WithLabelValues(circuitId).Set(fuseTriggered)
+		FuseTriggered.WithLabelValues(circuitId, frmAddress, sessionName).Set(fuseTriggered)
 	}
+	c.metricsDropper.DropStaleMetricLabels()
 }
+
+func (c *PowerCollector) DropCache() {}

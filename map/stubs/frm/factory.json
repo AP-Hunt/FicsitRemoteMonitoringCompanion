@@ -34,7 +34,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 15,
+    "CircuitGroupID": 15,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -82,7 +82,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 15,
+    "CircuitGroupID": 15,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -130,7 +130,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 15,
+    "CircuitGroupID": 15,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -178,7 +178,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 15,
+    "CircuitGroupID": 15,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -226,7 +226,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -274,7 +274,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -322,7 +322,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -370,7 +370,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -418,7 +418,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -466,7 +466,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -514,7 +514,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 0,
+    "CircuitGroupID": 0,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -562,7 +562,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 0,
+    "CircuitGroupID": 0,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -610,7 +610,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 0,
+    "CircuitGroupID": 0,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -658,7 +658,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 0,
+    "CircuitGroupID": 0,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -706,7 +706,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 0,
+    "CircuitGroupID": 0,
     "features": {
       "properties": { "type": "Assembler" },
       "geometry": {
@@ -748,7 +748,7 @@
     "IsConfigured": true,
     "IsProducing": true,
     "IsPaused": false,
-    "CircuitID": 3,
+    "CircuitGroupID": 3,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -790,7 +790,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 13,
+    "CircuitGroupID": 13,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -832,7 +832,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 7,
+    "CircuitGroupID": 7,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -874,7 +874,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 7,
+    "CircuitGroupID": 7,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -916,7 +916,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 10,
+    "CircuitGroupID": 10,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -958,7 +958,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 10,
+    "CircuitGroupID": 10,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1000,7 +1000,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 10,
+    "CircuitGroupID": 10,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1042,7 +1042,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 10,
+    "CircuitGroupID": 10,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1084,7 +1084,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 1,
+    "CircuitGroupID": 1,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1126,7 +1126,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 1,
+    "CircuitGroupID": 1,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1168,7 +1168,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 1,
+    "CircuitGroupID": 1,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1210,7 +1210,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 1,
+    "CircuitGroupID": 1,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1252,7 +1252,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 13,
+    "CircuitGroupID": 13,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1294,7 +1294,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 13,
+    "CircuitGroupID": 13,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1336,7 +1336,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1378,7 +1378,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1420,7 +1420,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1462,7 +1462,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1504,7 +1504,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1546,7 +1546,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1588,7 +1588,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1630,7 +1630,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1672,7 +1672,7 @@
     "IsConfigured": true,
     "IsProducing": true,
     "IsPaused": false,
-    "CircuitID": 12,
+    "CircuitGroupID": 12,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1714,7 +1714,7 @@
     "IsConfigured": true,
     "IsProducing": true,
     "IsPaused": false,
-    "CircuitID": 12,
+    "CircuitGroupID": 12,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1756,7 +1756,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 12,
+    "CircuitGroupID": 12,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1798,7 +1798,7 @@
     "IsConfigured": true,
     "IsProducing": true,
     "IsPaused": false,
-    "CircuitID": 12,
+    "CircuitGroupID": 12,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1840,7 +1840,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1882,7 +1882,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1924,7 +1924,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -1966,7 +1966,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 12,
+    "CircuitGroupID": 12,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2008,7 +2008,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 12,
+    "CircuitGroupID": 12,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2050,7 +2050,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 12,
+    "CircuitGroupID": 12,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2092,7 +2092,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 12,
+    "CircuitGroupID": 12,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2134,7 +2134,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2176,7 +2176,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2218,7 +2218,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2260,7 +2260,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2302,7 +2302,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 4,
+    "CircuitGroupID": 4,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2344,7 +2344,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2386,7 +2386,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2428,7 +2428,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2470,7 +2470,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2512,7 +2512,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2554,7 +2554,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2596,7 +2596,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2638,7 +2638,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2680,7 +2680,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2722,7 +2722,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 18,
+    "CircuitGroupID": 18,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -2764,7 +2764,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 5,
+    "CircuitGroupID": 5,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -2806,7 +2806,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 5,
+    "CircuitGroupID": 5,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -2848,7 +2848,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 5,
+    "CircuitGroupID": 5,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -2890,7 +2890,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 5,
+    "CircuitGroupID": 5,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -2932,7 +2932,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -2974,7 +2974,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3016,7 +3016,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3058,7 +3058,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3100,7 +3100,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3142,7 +3142,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3184,7 +3184,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3226,7 +3226,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3268,7 +3268,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3310,7 +3310,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3352,7 +3352,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3394,7 +3394,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3436,7 +3436,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3478,7 +3478,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3520,7 +3520,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3562,7 +3562,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3604,7 +3604,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Smelter" },
       "geometry": {
@@ -3646,7 +3646,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {
@@ -3688,7 +3688,7 @@
     "IsConfigured": true,
     "IsProducing": false,
     "IsPaused": false,
-    "CircuitID": 17,
+    "CircuitGroupID": 17,
     "features": {
       "properties": { "type": "Constructor" },
       "geometry": {

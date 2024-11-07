@@ -5,13 +5,21 @@ import (
 )
 
 var (
-	DronePortBatteryRate = RegisterNewGaugeVec(prometheus.GaugeOpts{
-		Name: "drone_port_battery_rate",
-		Help: "Rate of batteries used",
+	DronePortFuelRate = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "drone_port_fuel_rate",
+		Help: "Rate of fuel used",
 	}, []string{
 		"id",
 		"home_station",
-		"paired_station",
+		"fuel_name",
+	})
+	DronePortFuelAmount = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "drone_port_fuel_amount",
+		Help: "Amount of fuel in inventory",
+	}, []string{
+		"id",
+		"home_station",
+		"fuel_name",
 	})
 	DronePortRndTrip = RegisterNewGaugeVec(prometheus.GaugeOpts{
 		Name: "drone_port_round_trip_seconds",
@@ -24,6 +32,12 @@ var (
 	DronePortPower = RegisterNewGaugeVec(prometheus.GaugeOpts{
 		Name: "drone_port_power",
 		Help: "Drone port power in MW",
+	}, []string{
+		"circuit_id",
+	})
+	DronePortPowerMax = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "drone_port_power_max",
+		Help: "Max drone port power in MW",
 	}, []string{
 		"circuit_id",
 	})

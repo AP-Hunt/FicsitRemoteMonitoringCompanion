@@ -3,29 +3,46 @@ package exporter
 import (
 	"log"
 	"strconv"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
-type VehicleStationCollector struct {
+var (
+	FrackingPower = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "fracking_power",
+		Help: "fracking power use in MW",
+	}, []string{
+		"circuit_id",
+	})
+
+	FrackingPowerMax = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "fracking_power_max",
+		Help: "fracking max power use in MW",
+	}, []string{
+		"circuit_id",
+	})
+)
+
+type FrackingCollector struct {
 	endpoint string
 }
 
-type VehicleStationDetails struct {
-	Name      string    `json:"Name"`
+type FrackingDetails struct {
 	Location  Location  `json:"location"`
 	PowerInfo PowerInfo `json:"PowerInfo"`
 }
 
-func NewVehicleStationCollector(endpoint string) *VehicleStationCollector {
-	return &VehicleStationCollector{
+func NewFrackingCollector(endpoint string) *FrackingCollector {
+	return &FrackingCollector{
 		endpoint: endpoint,
 	}
 }
 
-func (c *VehicleStationCollector) Collect(frmAddress string, sessionName string) {
-	details := []VehicleStationDetails{}
+func (c *FrackingCollector) Collect(frmAddress string, sessionName string) {
+	details := []FrackingDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
-		log.Printf("error reading vehicle station statistics from FRM: %s\n", err)
+		log.Printf("error reading fracking statistics from FRM: %s\n", err)
 		return
 	}
 
@@ -47,12 +64,12 @@ func (c *VehicleStationCollector) Collect(frmAddress string, sessionName string)
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		VehicleStationPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
+		FrackingPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 	for circuitId, powerConsumed := range maxPowerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		VehicleStationPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
+		FrackingPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }
 
-func (c *VehicleStationCollector) DropCache() {}
+func (c *FrackingCollector) DropCache() {}

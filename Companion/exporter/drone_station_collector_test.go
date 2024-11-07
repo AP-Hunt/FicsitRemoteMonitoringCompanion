@@ -8,10 +8,13 @@ import (
 
 var _ = Describe("DroneStationCollector", func() {
 	var collector *exporter.DroneStationCollector
+	var url string
+	var sessionName = "default"
 
 	BeforeEach(func() {
 		FRMServer.Reset()
-		collector = exporter.NewDroneStationCollector("http://localhost:9080/getDroneStation")
+		url = FRMServer.server.URL
+		collector = exporter.NewDroneStationCollector("/getDroneStation")
 
 		FRMServer.ReturnsDroneStationData([]exporter.DroneStationDetails{
 			{
@@ -23,13 +26,23 @@ var _ = Describe("DroneStationCollector", func() {
 				AvgOutRate:       1,
 				LatestIncStack:   0.2,
 				LatestOutStack:   0.3,
-				LatestRndTrip:    "00:04:24",
+				LatestRndTrip:    264,
 				LatestTripIncAmt: 82,
 				LatestTripOutAmt: 50,
-				EstBatteryRate:   30,
 				PowerInfo: exporter.PowerInfo{
-					CircuitId:     1.0,
-					PowerConsumed: 100,
+					CircuitGroupId:   1.0,
+					PowerConsumed:    100,
+					MaxPowerConsumed: 100,
+				},
+				Fuel: []exporter.DroneFuelInventory{
+					exporter.DroneFuelInventory{
+						Name:   "Battery",
+						Amount: 200,
+					},
+				},
+				ActiveFuel: exporter.DroneActiveFuel{
+					Name: "Battery",
+					Rate: 20,
 				},
 			},
 			{
@@ -41,13 +54,23 @@ var _ = Describe("DroneStationCollector", func() {
 				AvgOutRate:       1,
 				LatestIncStack:   0.2,
 				LatestOutStack:   0.3,
-				LatestRndTrip:    "00:04:24",
+				LatestRndTrip:    264,
 				LatestTripIncAmt: 82,
 				LatestTripOutAmt: 50,
-				EstBatteryRate:   30,
 				PowerInfo: exporter.PowerInfo{
-					CircuitId:     1.0,
-					PowerConsumed: 100,
+					CircuitGroupId:   1.0,
+					PowerConsumed:    100,
+					MaxPowerConsumed: 100,
+				},
+				Fuel: []exporter.DroneFuelInventory{
+					exporter.DroneFuelInventory{
+						Name:   "Battery",
+						Amount: 200,
+					},
+				},
+				ActiveFuel: exporter.DroneActiveFuel{
+					Name: "Battery",
+					Rate: 30,
 				},
 			},
 		})
@@ -59,25 +82,28 @@ var _ = Describe("DroneStationCollector", func() {
 
 	Describe("Drone metrics collection", func() {
 		It("sets the 'drone_port_battery_rate' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, sessionName)
 
-			val, err := gaugeValue(exporter.DronePortBatteryRate, "1", "home", "remote station")
+			val, err := gaugeValue(exporter.DronePortFuelRate, "1", "home", "Battery", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(Equal(float64(30)))
+			Expect(val).To(Equal(float64(20)))
+			val, err = gaugeValue(exporter.DronePortFuelAmount, "1", "home", "Battery", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(float64(200)))
 		})
 		It("sets the 'drone_port_round_trip_seconds' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, sessionName)
 
-			val, err := gaugeValue(exporter.DronePortRndTrip, "1", "home", "remote station")
+			val, err := gaugeValue(exporter.DronePortRndTrip, "1", "home", "remote station", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(float64(264)))
 		})
 		It("sets the 'drone_port_power' metric with the right labels", func() {
-			collector.Collect()
+			collector.Collect(url, sessionName)
 
-			val, _ := gaugeValue(exporter.DronePortPower, "1")
+			val, _ := gaugeValue(exporter.DronePortPower, "1", url, sessionName)
 			Expect(val).To(Equal(200.0))
 		})
 	})

@@ -3,12 +3,13 @@ package exporter_test
 import (
 	"encoding/json"
 	"net/http"
+	"net/http/httptest"
 
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/exporter"
 )
 
 type FRMServerFake struct {
-	server             *http.Server
+	server             *httptest.Server
 	productionData     []exporter.ProductionDetails
 	powerData          []exporter.PowerDetails
 	factoryBuildings   []exporter.BuildingDetail
@@ -17,14 +18,18 @@ type FRMServerFake struct {
 	droneData          []exporter.DroneStationDetails
 	vehicleStationData []exporter.VehicleStationDetails
 	trainStationData   []exporter.TrainStationDetails
+	resourceSinkData   []exporter.ResourceSinkDetails
+	sessionInfoData    exporter.SessionInfo
+	pumpData           []exporter.PumpDetails
+	extractorData      []exporter.ExtractorDetails
+	portalData         []exporter.PortalDetails
+	hypertubeData      []exporter.HypertubeDetails
+	frackingData      []exporter.FrackingDetails
 }
 
 func NewFRMServerFake() *FRMServerFake {
 	mux := http.NewServeMux()
-	server := &http.Server{
-		Handler: mux,
-		Addr:    ":9080",
-	}
+	server := httptest.NewServer(mux)
 
 	fake := &FRMServerFake{
 		server: server,
@@ -38,21 +43,20 @@ func NewFRMServerFake() *FRMServerFake {
 	mux.Handle("/getVehicles", http.HandlerFunc(getStatsHandler(&fake.vehicleData)))
 	mux.Handle("/getTruckStation", http.HandlerFunc(getStatsHandler(&fake.vehicleStationData)))
 	mux.Handle("/getTrainStation", http.HandlerFunc(getStatsHandler(&fake.trainStationData)))
+	mux.Handle("/getResourceSinkBuilding", http.HandlerFunc(getStatsHandler(&fake.resourceSinkData)))
+	mux.Handle("/getSessionInfo", http.HandlerFunc(getStatsHandler(&fake.sessionInfoData)))
+	mux.Handle("/getPump", http.HandlerFunc(getStatsHandler(&fake.pumpData)))
+	mux.Handle("/getExtractor", http.HandlerFunc(getStatsHandler(&fake.extractorData)))
+	mux.Handle("/getPortal", http.HandlerFunc(getStatsHandler(&fake.portalData)))
+	mux.Handle("/getHypertube", http.HandlerFunc(getStatsHandler(&fake.hypertubeData)))
+	mux.Handle("/getFrackingActivator", http.HandlerFunc(getStatsHandler(&fake.frackingData)))
 
 	return fake
 }
 
-func (f *FRMServerFake) Start() {
-
-	go func() {
-		f.server.ListenAndServe()
-	}()
-}
-
-func (e *FRMServerFake) Stop() error {
-	err := e.server.Close()
+func (e *FRMServerFake) Stop() {
+	e.server.Close()
 	e.Reset()
-	return err
 }
 
 func (e *FRMServerFake) Reset() {
@@ -94,6 +98,34 @@ func (e *FRMServerFake) ReturnsVehicleStationData(data []exporter.VehicleStation
 
 func (e *FRMServerFake) ReturnsTrainStationData(data []exporter.TrainStationDetails) {
 	e.trainStationData = data
+}
+
+func (e *FRMServerFake) ReturnsResourceSinkData(data []exporter.ResourceSinkDetails) {
+	e.resourceSinkData = data
+}
+
+func (e *FRMServerFake) ReturnsPumpData(data []exporter.PumpDetails) {
+	e.pumpData = data
+}
+
+func (e *FRMServerFake) ReturnsExtractorData(data []exporter.ExtractorDetails) {
+	e.extractorData = data
+}
+
+func (e *FRMServerFake) ReturnsPortalData(data []exporter.PortalDetails) {
+	e.portalData = data
+}
+
+func (e *FRMServerFake) ReturnsHypertubeData(data []exporter.HypertubeDetails) {
+	e.hypertubeData = data
+}
+
+func (e *FRMServerFake) ReturnsFrackingData(data []exporter.FrackingDetails) {
+	e.frackingData = data
+}
+
+func (e *FRMServerFake) ReturnsSessionInfoData(data exporter.SessionInfo) {
+	e.sessionInfoData = data
 }
 
 func getStatsHandler(data any) func(w http.ResponseWriter, r *http.Request) {

@@ -2,7 +2,8 @@ package exporter
 
 import (
 	"encoding/json"
-	"github.com/benbjohnson/clock"
+	"fmt"
+	"github.com/coder/quartz"
 	"log"
 	"net/http"
 	"regexp"
@@ -12,7 +13,7 @@ import (
 
 var timeRegex = regexp.MustCompile(`\d\d:\d\d:\d\d`)
 
-var Clock = clock.New()
+var Clock = quartz.NewReal()
 
 func parseTimeSeconds(timeStr string) *float64 {
 	match := timeRegex.FindStringSubmatch(timeStr)
@@ -40,6 +41,10 @@ func retrieveData(frmAddress string, details any) error {
 	if err != nil {
 		log.Printf("error fetching statistics from FRM: %s\n", err)
 		return err
+	}
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("non-200 returned when retireving data: %d", resp.StatusCode)
 	}
 
 	defer resp.Body.Close()

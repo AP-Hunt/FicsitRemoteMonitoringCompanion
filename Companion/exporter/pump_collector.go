@@ -3,29 +3,46 @@ package exporter
 import (
 	"log"
 	"strconv"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
-type VehicleStationCollector struct {
+var (
+	PumpPower = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "pump_power",
+		Help: "pump power use in MW",
+	}, []string{
+		"circuit_id",
+	})
+
+	PumpPowerMax = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "pump_power_max",
+		Help: "pump max power use in MW",
+	}, []string{
+		"circuit_id",
+	})
+)
+
+type PumpCollector struct {
 	endpoint string
 }
 
-type VehicleStationDetails struct {
-	Name      string    `json:"Name"`
+type PumpDetails struct {
 	Location  Location  `json:"location"`
 	PowerInfo PowerInfo `json:"PowerInfo"`
 }
 
-func NewVehicleStationCollector(endpoint string) *VehicleStationCollector {
-	return &VehicleStationCollector{
+func NewPumpCollector(endpoint string) *PumpCollector {
+	return &PumpCollector{
 		endpoint: endpoint,
 	}
 }
 
-func (c *VehicleStationCollector) Collect(frmAddress string, sessionName string) {
-	details := []VehicleStationDetails{}
+func (c *PumpCollector) Collect(frmAddress string, sessionName string) {
+	details := []PumpDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
-		log.Printf("error reading vehicle station statistics from FRM: %s\n", err)
+		log.Printf("error reading pump statistics from FRM: %s\n", err)
 		return
 	}
 
@@ -47,12 +64,12 @@ func (c *VehicleStationCollector) Collect(frmAddress string, sessionName string)
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		VehicleStationPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
+		PumpPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 	for circuitId, powerConsumed := range maxPowerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		VehicleStationPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
+		PumpPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }
 
-func (c *VehicleStationCollector) DropCache() {}
+func (c *PumpCollector) DropCache() {}

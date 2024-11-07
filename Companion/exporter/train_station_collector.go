@@ -5,40 +5,34 @@ import (
 	"strconv"
 )
 
-var(
-	StationPower = 0.1 // should be 50, but currently bugged.
-	CargoPlatformPower = 50.0
-)
-
 type TrainStationCollector struct {
-	FRMAddress      string
-	TrackedStations *map[string]TrainStationDetails
+	endpoint string
 }
 
 type CargoPlatform struct {
-	LoadingDock   string  `json:"LoadingDock"`
-	TransferRate  float64 `json:"TransferRate"`
-	LoadingStatus string  `json:"LoadingStatus"` // Idle, Loading, Unloading
-	LoadingMode   string  `json:"LoadingMode"`
+	LoadingDock   string    `json:"LoadingDock"`
+	TransferRate  float64   `json:"TransferRate"`
+	LoadingStatus string    `json:"LoadingStatus"` // Idle, Loading, Unloading
+	LoadingMode   string    `json:"LoadingMode"`
+	PowerInfo     PowerInfo `json:"PowerInfo"`
 }
 
 type TrainStationDetails struct {
 	Name           string          `json:"Name"`
 	Location       Location        `json:"location"`
-	CargoPlatforms []CargoPlatform `json:"CargoPlatforms"`
+	CargoPlatforms []CargoPlatform `json:"CargoInventory"`
 	PowerInfo      PowerInfo       `json:"PowerInfo"`
 }
 
-func NewTrainStationCollector(frmAddress string, trackedStations *map[string]TrainStationDetails) *TrainStationCollector {
+func NewTrainStationCollector(endpoint string) *TrainStationCollector {
 	return &TrainStationCollector{
-		FRMAddress:      frmAddress,
-		TrackedStations: trackedStations,
+		endpoint: endpoint,
 	}
 }
 
-func (c *TrainStationCollector) Collect() {
+func (c *TrainStationCollector) Collect(frmAddress string, sessionName string) {
 	details := []TrainStationDetails{}
-	err := retrieveData(c.FRMAddress, &details)
+	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading train station statistics from FRM: %s\n", err)
 		return
@@ -47,43 +41,38 @@ func (c *TrainStationCollector) Collect() {
 	powerInfo := map[float64]float64{}
 	maxPowerInfo := map[float64]float64{}
 	for _, d := range details {
-		val, ok := powerInfo[d.PowerInfo.CircuitId]
-		maxval, maxok := maxPowerInfo[d.PowerInfo.CircuitId]
+		val, ok := powerInfo[d.PowerInfo.CircuitGroupId]
+		maxval, maxok := maxPowerInfo[d.PowerInfo.CircuitGroupId]
 
-		// some additional calculations: for now, power listed here is only for the station.
-		// add each of the cargo platforms' power info: 0.1MW if Idle, 50MW otherwise
+		// some additional calculations: power listed here is only for the station.
+		// each of the cargo platforms have power stats returned. add up power metrics for total power use.
 		totalPowerConsumed := d.PowerInfo.PowerConsumed
-		maxTotalPowerConsumed := StationPower
+		maxTotalPowerConsumed := d.PowerInfo.MaxPowerConsumed
 		for _, p := range d.CargoPlatforms {
-			maxTotalPowerConsumed = maxTotalPowerConsumed + CargoPlatformPower
-			if p.LoadingStatus == "Idle" {
-				totalPowerConsumed = totalPowerConsumed + 0.1
-			} else {
-				totalPowerConsumed = totalPowerConsumed + CargoPlatformPower
-			}
+			totalPowerConsumed = totalPowerConsumed + p.PowerInfo.PowerConsumed
+			maxTotalPowerConsumed = maxTotalPowerConsumed + p.PowerInfo.MaxPowerConsumed
 		}
 
 		if ok {
-			powerInfo[d.PowerInfo.CircuitId] = val + totalPowerConsumed
+			powerInfo[d.PowerInfo.CircuitGroupId] = val + totalPowerConsumed
 		} else {
-			powerInfo[d.PowerInfo.CircuitId] = totalPowerConsumed
+			powerInfo[d.PowerInfo.CircuitGroupId] = totalPowerConsumed
 		}
 
 		if maxok {
-			maxPowerInfo[d.PowerInfo.CircuitId] = maxval + maxTotalPowerConsumed
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = maxval + maxTotalPowerConsumed
 		} else {
-			maxPowerInfo[d.PowerInfo.CircuitId] = maxTotalPowerConsumed
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = maxTotalPowerConsumed
 		}
-
-		//also cache stations so other metrics can figure out a circuit id from a station name
-		(*c.TrackedStations)[d.Name] = d
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		TrainStationPower.WithLabelValues(cid).Set(powerConsumed)
+		TrainStationPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 	for circuitId, powerConsumed := range maxPowerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		TrainStationPowerMax.WithLabelValues(cid).Set(powerConsumed)
+		TrainStationPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }
+
+func (c *TrainStationCollector) DropCache() {}

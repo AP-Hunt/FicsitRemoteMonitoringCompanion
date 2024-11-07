@@ -5,24 +5,23 @@ import (
 	"strconv"
 )
 
-type VehicleStationCollector struct {
+type ResourceSinkCollector struct {
 	endpoint string
 }
 
-type VehicleStationDetails struct {
-	Name      string    `json:"Name"`
+type ResourceSinkDetails struct {
 	Location  Location  `json:"location"`
 	PowerInfo PowerInfo `json:"PowerInfo"`
 }
 
-func NewVehicleStationCollector(endpoint string) *VehicleStationCollector {
-	return &VehicleStationCollector{
+func NewResourceSinkCollector(endpoint string) *ResourceSinkCollector {
+	return &ResourceSinkCollector{
 		endpoint: endpoint,
 	}
 }
 
-func (c *VehicleStationCollector) Collect(frmAddress string, sessionName string) {
-	details := []VehicleStationDetails{}
+func (c *ResourceSinkCollector) Collect(frmAddress string, sessionName string) {
+	details := []ResourceSinkDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading vehicle station statistics from FRM: %s\n", err)
@@ -47,12 +46,12 @@ func (c *VehicleStationCollector) Collect(frmAddress string, sessionName string)
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		VehicleStationPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
+		ResourceSinkPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 	for circuitId, powerConsumed := range maxPowerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		VehicleStationPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
+		ResourceSinkPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }
 
-func (c *VehicleStationCollector) DropCache() {}
+func (c *ResourceSinkCollector) DropCache() {}

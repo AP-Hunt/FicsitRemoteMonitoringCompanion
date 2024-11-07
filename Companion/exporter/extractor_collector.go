@@ -3,29 +3,46 @@ package exporter
 import (
 	"log"
 	"strconv"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
-type VehicleStationCollector struct {
+var (
+	ExtractorPower = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "extractor_power",
+		Help: "extractor power use in MW",
+	}, []string{
+		"circuit_id",
+	})
+
+	ExtractorPowerMax = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "extractor_power_max",
+		Help: "extractor max power use in MW",
+	}, []string{
+		"circuit_id",
+	})
+)
+
+type ExtractorCollector struct {
 	endpoint string
 }
 
-type VehicleStationDetails struct {
-	Name      string    `json:"Name"`
+type ExtractorDetails struct {
 	Location  Location  `json:"location"`
 	PowerInfo PowerInfo `json:"PowerInfo"`
 }
 
-func NewVehicleStationCollector(endpoint string) *VehicleStationCollector {
-	return &VehicleStationCollector{
+func NewExtractorCollector(endpoint string) *ExtractorCollector {
+	return &ExtractorCollector{
 		endpoint: endpoint,
 	}
 }
 
-func (c *VehicleStationCollector) Collect(frmAddress string, sessionName string) {
-	details := []VehicleStationDetails{}
+func (c *ExtractorCollector) Collect(frmAddress string, sessionName string) {
+	details := []ExtractorDetails{}
 	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
-		log.Printf("error reading vehicle station statistics from FRM: %s\n", err)
+		log.Printf("error reading extractor statistics from FRM: %s\n", err)
 		return
 	}
 
@@ -47,12 +64,12 @@ func (c *VehicleStationCollector) Collect(frmAddress string, sessionName string)
 	}
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		VehicleStationPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
+		ExtractorPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 	for circuitId, powerConsumed := range maxPowerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
-		VehicleStationPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
+		ExtractorPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 }
 
-func (c *VehicleStationCollector) DropCache() {}
+func (c *ExtractorCollector) DropCache() {}

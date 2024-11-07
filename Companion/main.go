@@ -3,15 +3,14 @@ package main
 import (
 	"flag"
 	"fmt"
-	"html/template"
 	"log"
 	"os"
 	"os/signal"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"syscall"
+	"text/template"
 
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/exporter"
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/prometheus"
@@ -20,20 +19,36 @@ import (
 
 var Version = "0.0.0-dev"
 
+func lookupEnvWithDefault(variable string, defaultVal string) string {
+	val, exist := os.LookupEnv(variable)
+	if exist {
+		return val
+	}
+	return defaultVal
+}
+
 func main() {
 
 	var frmHostname string
 	flag.StringVar(&frmHostname, "hostname", "localhost", "hostname of Ficsit Remote Monitoring webserver")
-	var frmPort int
-	flag.IntVar(&frmPort, "port", 8080, "port of Ficsit Remote Monitoring webserver")
-	var showMetrics bool
-	flag.BoolVar(&showMetrics, "ShowMetrics", false, "Show metrics and exit")
+	var frmPort string
+	flag.StringVar(&frmPort, "port", "8080", "port of Ficsit Remote Monitoring webserver")
+
+	var frmHostnames string
+	flag.StringVar(&frmHostnames, "hostnames", "", "comma separated values of multiple Ficsit Remote Monitoring webservers, of the form http://myserver1:8080,http://myserver2:8080. If defined, this will be used instead of hostname+port")
+
+	var genReadme bool
+	flag.BoolVar(&genReadme, "GenerateReadme", false, "Generate readme and exit")
 	var noProm bool
 	flag.BoolVar(&noProm, "noprom", false, "Do not run prometheus with the app.")
 	flag.Parse()
 
-	if showMetrics {
-		exportMetrics()
+	frmHostname = lookupEnvWithDefault("FRM_HOST", frmHostname)
+	frmPort = lookupEnvWithDefault("FRM_PORT", frmPort)
+	frmHostnames = lookupEnvWithDefault("FRM_HOSTS", frmHostnames)
+
+	if genReadme {
+		generateReadme()
 		os.Exit(0)
 	}
 
@@ -45,7 +60,19 @@ func main() {
 	log.Default().SetOutput(logFile)
 
 	// Create exporter
-	promExporter := exporter.NewPrometheusExporter("http://" + frmHostname + ":" + strconv.Itoa(frmPort))
+	frmUrls := []string{}
+	if frmHostnames == "" {
+		frmUrls = append(frmUrls, "http://"+frmHostname+":"+frmPort)
+	} else {
+		for _, frmServer := range strings.Split(frmHostnames, ",") {
+			if !strings.HasPrefix(frmServer, "http://") && !strings.HasPrefix(frmServer, "https://") {
+				frmServer = "http://" + frmServer
+			}
+			frmUrls = append(frmUrls, frmServer)
+		}
+	}
+	var promExporter *exporter.PrometheusExporter
+	promExporter = exporter.NewPrometheusExporter(frmUrls)
 
 	var prom *prometheus.PrometheusWrapper
 	if !noProm {
@@ -137,38 +164,16 @@ func createLogFile() (*os.File, error) {
 	return os.Create(path.Join(curExeDir, "frmc.log"))
 }
 
-func exportMetrics() {
-	tpl := template.New("metrics_table")
+func generateReadme() {
+
+	tpl := template.New("readme.tpl.md")
 	tpl.Funcs(template.FuncMap{
 		"List": strings.Join,
 	})
 
-	tpl, err := tpl.Parse(`
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Labels</th>
-        </tr>
-    </thead>
-    <tbody>
-		{{range .Metrics}}
-        <tr>
-            <td>{{.Name}}</td>
-            <td>{{.Help}}</td>
-            <td>{{List .Labels ", "}}</td>
-        </tr>
-		{{ end -}}
-	</tbody>
-</table>
-`)
-	if err != nil {
-		fmt.Printf("Error generating metrics table: %s", err)
-		os.Exit(1)
-	}
+	tpl = template.Must(tpl.ParseFiles("../readme/readme.tpl.md"))
 
-	tpl.Execute(
+	err := tpl.Execute(
 		os.Stdout,
 		struct {
 			Metrics []exporter.MetricVectorDetails
@@ -176,4 +181,7 @@ func exportMetrics() {
 			Metrics: exporter.RegisteredMetricVectors,
 		},
 	)
+	if err != nil {
+		fmt.Printf("Error writing readme: %s", err)
+	}
 }

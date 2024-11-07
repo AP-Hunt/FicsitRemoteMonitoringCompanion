@@ -49,4 +49,4 @@ $(GOBIN)\semver-cli.exe:
 
 .PHONY: readme
 readme:
-	cd readme/; ./Generate-Readme.ps1 > ../README.md
+	cd Companion/; go run main.go -GenerateReadme > ../README.md

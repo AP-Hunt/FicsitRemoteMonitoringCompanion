@@ -3,11 +3,14 @@ package exporter
 import (
 	"log"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type VehicleCollector struct {
-	FRMAddress      string
+	endpoint        string
 	TrackedVehicles map[string]*VehicleDetails
+	metricsDropper *MetricsDropper
 }
 
 type VehicleDetails struct {
@@ -15,22 +18,23 @@ type VehicleDetails struct {
 	VehicleType  string   `json:"Name"`
 	Location     Location `json:"location"`
 	ForwardSpeed float64  `json:"ForwardSpeed"`
-	AutoPilot    bool     `json:"AutoPilot"`
-	Fuel         []Fuel   `json:Fuel`
+	AutoPilot    bool     `json:"Autopilot"`
+	Fuel         []Fuel   `json:"FuelInventory"`
 	PathName     string   `json:"PathName"`
 	DepartTime   time.Time
 	Departed     bool
+	LastTracked time.Time
 }
 
 type Fuel struct {
-	Name   string  `json:Name`
-	Amount float64 `json:Amount`
+	Name   string  `json:"Name"`
+	Amount float64 `json:"Amount"`
 }
 
-func (v *VehicleDetails) recordElapsedTime() {
+func (v *VehicleDetails) recordElapsedTime(frmAddress string, sessionName string) {
 	now := Clock.Now()
 	tripSeconds := now.Sub(v.DepartTime).Seconds()
-	VehicleRoundTrip.WithLabelValues(v.Id, v.VehicleType, v.PathName).Set(tripSeconds)
+	VehicleRoundTrip.WithLabelValues(v.Id, v.VehicleType, v.PathName, frmAddress, sessionName).Set(tripSeconds)
 	v.Departed = false
 }
 
@@ -54,21 +58,27 @@ func (v *VehicleDetails) startTracking(trackedVehicles map[string]*VehicleDetail
 			VehicleType: v.VehicleType,
 			PathName:    v.PathName,
 			Departed:    false,
+			LastTracked: Clock.Now(),
 		}
 		trackedVehicles[v.Id] = &trackedVehicle
 	}
 }
 
-func (d *VehicleDetails) handleTimingUpdates(trackedVehicles map[string]*VehicleDetails) {
+func (d *VehicleDetails) handleTimingUpdates(trackedVehicles map[string]*VehicleDetails, frmAddress string, sessionName string) {
 	if d.AutoPilot {
 		vehicle, exists := trackedVehicles[d.Id]
-		if exists && vehicle.isCompletingTrip(d.Location) {
-			vehicle.recordElapsedTime()
+		if !exists || vehicle.LastTracked.Before(Clock.Now().Add(-time.Minute)) {
+			d.startTracking(trackedVehicles)
+		} else if exists && vehicle.isCompletingTrip(d.Location) {
+			vehicle.recordElapsedTime(frmAddress, sessionName)
 		} else if exists && vehicle.isStartingTrip(d.Location) {
 			vehicle.Departed = true
 			vehicle.DepartTime = Clock.Now()
-		} else if !exists {
-			d.startTracking(trackedVehicles)
+		}
+
+		// mark that we saw this vehicle
+		if exists {
+			vehicle.LastTracked = Clock.Now()
 		}
 	} else {
 		//remove manual vehicles, nothing to mark
@@ -79,26 +89,38 @@ func (d *VehicleDetails) handleTimingUpdates(trackedVehicles map[string]*Vehicle
 	}
 }
 
-func NewVehicleCollector(frmAddress string) *VehicleCollector {
+func NewVehicleCollector(endpoint string) *VehicleCollector {
 	return &VehicleCollector{
-		FRMAddress:      frmAddress,
+		endpoint:        endpoint,
 		TrackedVehicles: make(map[string]*VehicleDetails),
+		metricsDropper: NewMetricsDropper(
+			VehicleRoundTrip,
+			VehicleFuel,
+		),
 	}
 }
 
-func (c *VehicleCollector) Collect() {
+func (c *VehicleCollector) Collect(frmAddress string, sessionName string) {
 	details := []VehicleDetails{}
-	err := retrieveData(c.FRMAddress, &details)
+	err := retrieveData(frmAddress+c.endpoint, &details)
 	if err != nil {
+		c.metricsDropper.DropStaleMetricLabels()
 		log.Printf("error reading vehicle statistics from FRM: %s\n", err)
 		return
 	}
 
 	for _, d := range details {
+		c.metricsDropper.CacheFreshMetricLabel(prometheus.Labels{"url": frmAddress, "session_name": sessionName, "id": d.Id})
 		if len(d.Fuel) > 0 {
-			VehicleFuel.WithLabelValues(d.Id, d.VehicleType, d.Fuel[0].Name).Set(d.Fuel[0].Amount)
+			VehicleFuel.WithLabelValues(d.Id, d.VehicleType, d.Fuel[0].Name, frmAddress, sessionName).Set(d.Fuel[0].Amount)
 		}
 
-		d.handleTimingUpdates(c.TrackedVehicles)
+		d.handleTimingUpdates(c.TrackedVehicles, frmAddress, sessionName)
 	}
+
+	c.metricsDropper.DropStaleMetricLabels()
+}
+
+func (c *VehicleCollector) DropCache() {
+	c.TrackedVehicles = map[string]*VehicleDetails{}
 }

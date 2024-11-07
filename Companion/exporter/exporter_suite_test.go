@@ -16,7 +16,6 @@ func TestExporter(t *testing.T) {
 
 	BeforeSuite(func() {
 		FRMServer = NewFRMServerFake()
-		FRMServer.Start()
 	})
 
 	AfterSuite(func() {
