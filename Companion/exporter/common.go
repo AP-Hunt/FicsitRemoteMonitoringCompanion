@@ -37,6 +37,7 @@ func parseBool(b bool) float64 {
 
 func retrieveData(frmAddress string, details any) error {
 	resp, err := http.Get(frmAddress)
+	defer resp.Body.Close()
 
 	if err != nil {
 		log.Printf("error fetching statistics from FRM: %s\n", err)
@@ -46,8 +47,6 @@ func retrieveData(frmAddress string, details any) error {
 	if resp.StatusCode != 200 {
 		return fmt.Errorf("non-200 returned when retireving data: %d", resp.StatusCode)
 	}
-
-	defer resp.Body.Close()
 
 	decoder := json.NewDecoder(resp.Body)
 
