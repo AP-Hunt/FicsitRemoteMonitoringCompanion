@@ -10,7 +10,7 @@ import (
 type VehicleCollector struct {
 	endpoint        string
 	TrackedVehicles map[string]*VehicleDetails
-	metricsDropper *MetricsDropper
+	metricsDropper  *MetricsDropper
 }
 
 type VehicleDetails struct {
@@ -23,7 +23,7 @@ type VehicleDetails struct {
 	PathName     string   `json:"PathName"`
 	DepartTime   time.Time
 	Departed     bool
-	LastTracked time.Time
+	LastTracked  time.Time
 }
 
 type Fuel struct {

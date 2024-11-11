@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 	"text/template"
@@ -46,18 +47,21 @@ func main() {
 	frmHostname = lookupEnvWithDefault("FRM_HOST", frmHostname)
 	frmPort = lookupEnvWithDefault("FRM_PORT", frmPort)
 	frmHostnames = lookupEnvWithDefault("FRM_HOSTS", frmHostnames)
+	logStdout, _ := strconv.ParseBool(lookupEnvWithDefault("FRM_LOG_STDOUT", "0"))
 
 	if genReadme {
 		generateReadme()
 		os.Exit(0)
 	}
 
-	logFile, err := createLogFile()
-	if err != nil {
-		fmt.Printf("error creating log file: %s", err)
-		os.Exit(1)
+	if !logStdout {
+		logFile, err := createLogFile()
+		if err != nil {
+			fmt.Printf("error creating log file: %s", err)
+			os.Exit(1)
+		}
+		log.Default().SetOutput(logFile)
 	}
-	log.Default().SetOutput(logFile)
 
 	// Create exporter
 	frmUrls := []string{}
@@ -75,6 +79,7 @@ func main() {
 	promExporter = exporter.NewPrometheusExporter(frmUrls)
 
 	var prom *prometheus.PrometheusWrapper
+	var err error
 	if !noProm {
 		// Create prometheus
 		prom, err = prometheus.NewPrometheusWrapper()
