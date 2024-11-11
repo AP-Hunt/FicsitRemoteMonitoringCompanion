@@ -24,6 +24,16 @@ The [Prometheus metrics server](https://prometheus.io/) allows you to [explore t
 
 (&#42; Link goes to the address on your local system. If FRMC is not running, you will see an error)
 
+### Env vars
+
+`FRM_HOST`: The host to the Ficsit Remote Monitoring server. EG: `172.17.0.1`.
+
+`FRM_PORT`: The port of the Ficist Remote Monitoring server. EG: `8080`.
+
+`FRM_HOSTS`: A comma separated list of Ficsit Remote Monitoring servers. If protocol is unspecified, it defaults to http. EG: `http://myserver1.frm.example:8080,myserver2.frm.example:8080,https://myserver3.frm.example:8081`
+
+`FRM_LOG_STDOUT`: If FRMC should print to stdout rather than a separate logfile. Useful for docker/containerization. default false.
+
 ## What metrics are available
 
 
