@@ -55,9 +55,9 @@ var _ = Describe("FactoryBuildingCollector", func() {
 				IsPaused:       false,
 				CircuitGroupId: 0,
 				PowerInfo: exporter.PowerInfo{
-					CircuitGroupId: 1,
-					PowerConsumed:  23,
-					MaxPowerConsumed:  4,
+					CircuitGroupId:   1,
+					PowerConsumed:    23,
+					MaxPowerConsumed: 4,
 				},
 			},
 		})

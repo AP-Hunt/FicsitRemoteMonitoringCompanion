@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/AP-Hunt/FicsitRemoteMonitoringCompanion/Companion/exporter"
-	. "github.com/onsi/ginkgo/v2"
 	"github.com/coder/quartz"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
@@ -61,7 +61,7 @@ var _ = Describe("CollectorRunner", func() {
 		})
 
 		It("sanitizes session name", func() {
-			Expect(exporter.SanitizeSessionName(`it's giving -- 123456!@#$%^&*() yo hollar "'"`)).To(Equal(`its giving  123456 yo hollar ` ))
+			Expect(exporter.SanitizeSessionName(`it's giving -- 123456!@#$%^&*() yo hollar "'"`)).To(Equal(`its giving  123456 yo hollar `))
 		})
 	})
 })

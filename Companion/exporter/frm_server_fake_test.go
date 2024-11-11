@@ -24,7 +24,7 @@ type FRMServerFake struct {
 	extractorData      []exporter.ExtractorDetails
 	portalData         []exporter.PortalDetails
 	hypertubeData      []exporter.HypertubeDetails
-	frackingData      []exporter.FrackingDetails
+	frackingData       []exporter.FrackingDetails
 }
 
 func NewFRMServerFake() *FRMServerFake {
