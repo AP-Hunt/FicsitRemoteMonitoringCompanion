@@ -227,6 +227,21 @@ The [Prometheus metrics server](https://prometheus.io/) allows you to [explore t
             <td>circuit_id, url, session_name</td>
         </tr>
         <tr>
+            <td>resource_sink_total_points</td>
+            <td>AWESOME sink total points</td>
+            <td>url, session_name</td>
+        </tr>
+        <tr>
+            <td>resource_sink_points_to_coupon</td>
+            <td>AWESOME sink points to next coupon</td>
+            <td>url, session_name</td>
+        </tr>
+        <tr>
+            <td>resource_sink_collected_coupons</td>
+            <td>AWESOME sink collected coupons</td>
+            <td>url, session_name</td>
+        </tr>
+        <tr>
             <td>train_round_trip_seconds</td>
             <td>Recorded train round trip time in seconds</td>
             <td>name, url, session_name</td>
