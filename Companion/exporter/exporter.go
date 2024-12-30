@@ -38,7 +38,7 @@ func NewPrometheusExporter(frmApiHosts []string) *PrometheusExporter {
 		vehicleStationCollector := NewVehicleStationCollector("/getTruckStation")
 		trainCollector := NewTrainCollector("/getTrains")
 		trainStationCollector := NewTrainStationCollector("/getTrainStation")
-		resourceSinkCollector := NewResourceSinkCollector("/getResourceSinkBuilding")
+		resourceSinkCollector := NewResourceSinkCollector("/getResourceSinkBuilding", "/getResourceSink")
 		pumpCollector := NewPumpCollector("/getPump")
 		extractorCollector := NewExtractorCollector("/getExtractor")
 		portalCollector := NewPortalCollector("/getPortal")

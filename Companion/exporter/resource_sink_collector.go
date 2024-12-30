@@ -6,7 +6,8 @@ import (
 )
 
 type ResourceSinkCollector struct {
-	endpoint string
+	buildingEndpoint string
+	globalEndpoint   string
 }
 
 type ResourceSinkDetails struct {
@@ -14,23 +15,43 @@ type ResourceSinkDetails struct {
 	PowerInfo PowerInfo `json:"PowerInfo"`
 }
 
-func NewResourceSinkCollector(endpoint string) *ResourceSinkCollector {
+type ResourceSinkGlobalDetails struct {
+	NumCoupon      int `json:"NumCoupon"`
+	TotalPoints    int `json:"TotalPoints"`
+	PointsToCoupon int `json:"PointsToCoupon"`
+}
+
+func NewResourceSinkCollector(buildingEndpoint, globalEndpoint string) *ResourceSinkCollector {
 	return &ResourceSinkCollector{
-		endpoint: endpoint,
+		buildingEndpoint: buildingEndpoint,
+		globalEndpoint:   globalEndpoint,
 	}
 }
 
 func (c *ResourceSinkCollector) Collect(frmAddress string, sessionName string) {
-	details := []ResourceSinkDetails{}
-	err := retrieveData(frmAddress+c.endpoint, &details)
+	buildingDetails := []ResourceSinkDetails{}
+	err := retrieveData(frmAddress+c.buildingEndpoint, &buildingDetails)
 	if err != nil {
-		log.Printf("error reading vehicle station statistics from FRM: %s\n", err)
+		log.Printf("error reading resource sink details statistics from FRM: %s\n", err)
 		return
+	}
+
+	globalDetails := []ResourceSinkGlobalDetails{}
+	err = retrieveData(frmAddress+c.globalEndpoint, &globalDetails)
+	if err != nil {
+		log.Printf("error reading global resource sink statistics from FRM: %s\n", err)
+		return
+	}
+
+	for _, d := range globalDetails {
+		ResourceSinkTotalPoints.WithLabelValues(frmAddress, sessionName).Set(float64(d.TotalPoints))
+		ResourceSinkPointsToCoupon.WithLabelValues(frmAddress, sessionName).Set(float64(d.PointsToCoupon))
+		ResourceSinkCollectedCoupons.WithLabelValues(frmAddress, sessionName).Set(float64(d.NumCoupon))
 	}
 
 	powerInfo := map[float64]float64{}
 	maxPowerInfo := map[float64]float64{}
-	for _, d := range details {
+	for _, d := range buildingDetails {
 		val, ok := powerInfo[d.PowerInfo.CircuitGroupId]
 		if ok {
 			powerInfo[d.PowerInfo.CircuitGroupId] = val + d.PowerInfo.PowerConsumed

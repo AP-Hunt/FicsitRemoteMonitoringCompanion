@@ -14,7 +14,7 @@ var _ = Describe("ResourceSinkCollector", func() {
 	BeforeEach(func() {
 		FRMServer.Reset()
 		url = FRMServer.server.URL
-		collector = exporter.NewResourceSinkCollector("/getResourceSinkBuilding")
+		collector = exporter.NewResourceSinkCollector("/getResourceSinkBuilding", "/getResourceSink")
 
 		FRMServer.ReturnsResourceSinkData([]exporter.ResourceSinkDetails{
 			{
@@ -39,6 +39,14 @@ var _ = Describe("ResourceSinkCollector", func() {
 				},
 			},
 		})
+
+		FRMServer.ReturnsGlobalResourceSinkData([]exporter.ResourceSinkGlobalDetails{
+			{
+				TotalPoints:    100,
+				PointsToCoupon: 200,
+				NumCoupon:      1,
+			},
+		})
 	})
 
 	AfterEach(func() {
@@ -61,6 +69,33 @@ var _ = Describe("ResourceSinkCollector", func() {
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(90.0))
+		})
+	})
+
+	Describe("Resource sink global metrics collection", func() {
+		It("sets the 'resource_sink_total_points' metric with the right labels", func() {
+			collector.Collect(url, sessionName)
+
+			val, err := gaugeValue(exporter.ResourceSinkTotalPoints, url, sessionName)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(100.0))
+		})
+		It("sets the 'resource_sink_points_to_coupon' metric with the right labels", func() {
+			collector.Collect(url, sessionName)
+
+			val, err := gaugeValue(exporter.ResourceSinkPointsToCoupon, url, sessionName)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(200.0))
+		})
+		It("sets the 'resource_sink_collected_coupons' metric with the right labels", func() {
+			collector.Collect(url, sessionName)
+
+			val, err := gaugeValue(exporter.ResourceSinkCollectedCoupons, url, sessionName)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(1.0))
 		})
 	})
 })

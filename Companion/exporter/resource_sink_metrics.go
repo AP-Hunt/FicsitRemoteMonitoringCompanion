@@ -18,4 +18,19 @@ var (
 	}, []string{
 		"circuit_id",
 	})
+
+	ResourceSinkTotalPoints = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "resource_sink_total_points",
+		Help: "AWESOME sink total points",
+	}, []string{})
+
+	ResourceSinkPointsToCoupon = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "resource_sink_points_to_coupon",
+		Help: "AWESOME sink points to next coupon",
+	}, []string{})
+
+	ResourceSinkCollectedCoupons = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "resource_sink_collected_coupons",
+		Help: "AWESOME sink collected coupons",
+	}, []string{})
 )
