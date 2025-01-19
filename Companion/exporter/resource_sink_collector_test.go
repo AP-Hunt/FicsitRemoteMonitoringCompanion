@@ -42,8 +42,15 @@ var _ = Describe("ResourceSinkCollector", func() {
 
 		FRMServer.ReturnsGlobalResourceSinkData([]exporter.ResourceSinkGlobalDetails{
 			{
+				SinkType: "Resource",
 				TotalPoints:    100,
 				PointsToCoupon: 200,
+				NumCoupon:      1,
+			},
+			{
+				SinkType: "Exploration",
+				TotalPoints:    1000,
+				PointsToCoupon: 2000,
 				NumCoupon:      1,
 			},
 		})
@@ -76,7 +83,7 @@ var _ = Describe("ResourceSinkCollector", func() {
 		It("sets the 'resource_sink_total_points' metric with the right labels", func() {
 			collector.Collect(url, sessionName)
 
-			val, err := gaugeValue(exporter.ResourceSinkTotalPoints, url, sessionName)
+			val, err := gaugeValue(exporter.ResourceSinkTotalPoints, "Resource", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(100.0))
@@ -84,10 +91,26 @@ var _ = Describe("ResourceSinkCollector", func() {
 		It("sets the 'resource_sink_points_to_coupon' metric with the right labels", func() {
 			collector.Collect(url, sessionName)
 
-			val, err := gaugeValue(exporter.ResourceSinkPointsToCoupon, url, sessionName)
+			val, err := gaugeValue(exporter.ResourceSinkPointsToCoupon, "Resource", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(val).To(Equal(200.0))
+		})
+		It("sets the 'resource_sink_points_to_coupon' metric with the right labels for exploration", func() {
+			collector.Collect(url, sessionName)
+
+			val, err := gaugeValue(exporter.ResourceSinkTotalPoints, "Exploration", url, sessionName)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(1000.0))
+		})
+		It("sets the 'resource_sink_points_to_coupon' metric with the right labels for exploration", func() {
+			collector.Collect(url, sessionName)
+
+			val, err := gaugeValue(exporter.ResourceSinkPointsToCoupon, "Exploration", url, sessionName)
+
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(2000.0))
 		})
 		It("sets the 'resource_sink_collected_coupons' metric with the right labels", func() {
 			collector.Collect(url, sessionName)

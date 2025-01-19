@@ -16,9 +16,10 @@ type ResourceSinkDetails struct {
 }
 
 type ResourceSinkGlobalDetails struct {
-	NumCoupon      int `json:"NumCoupon"`
-	TotalPoints    int `json:"TotalPoints"`
-	PointsToCoupon int `json:"PointsToCoupon"`
+	SinkType       string `json:"Name"`
+	NumCoupon      int    `json:"NumCoupon"`
+	TotalPoints    int    `json:"TotalPoints"`
+	PointsToCoupon int    `json:"PointsToCoupon"`
 }
 
 func NewResourceSinkCollector(buildingEndpoint, globalEndpoint string) *ResourceSinkCollector {
@@ -44,8 +45,8 @@ func (c *ResourceSinkCollector) Collect(frmAddress string, sessionName string) {
 	}
 
 	for _, d := range globalDetails {
-		ResourceSinkTotalPoints.WithLabelValues(frmAddress, sessionName).Set(float64(d.TotalPoints))
-		ResourceSinkPointsToCoupon.WithLabelValues(frmAddress, sessionName).Set(float64(d.PointsToCoupon))
+		ResourceSinkTotalPoints.WithLabelValues(d.SinkType, frmAddress, sessionName).Set(float64(d.TotalPoints))
+		ResourceSinkPointsToCoupon.WithLabelValues(d.SinkType, frmAddress, sessionName).Set(float64(d.PointsToCoupon))
 		ResourceSinkCollectedCoupons.WithLabelValues(frmAddress, sessionName).Set(float64(d.NumCoupon))
 	}
 
