@@ -229,12 +229,12 @@ The [Prometheus metrics server](https://prometheus.io/) allows you to [explore t
         <tr>
             <td>resource_sink_total_points</td>
             <td>AWESOME sink total points</td>
-            <td>url, session_name</td>
+            <td>sink_type, url, session_name</td>
         </tr>
         <tr>
             <td>resource_sink_points_to_coupon</td>
             <td>AWESOME sink points to next coupon</td>
-            <td>url, session_name</td>
+            <td>sink_type, url, session_name</td>
         </tr>
         <tr>
             <td>resource_sink_collected_coupons</td>
