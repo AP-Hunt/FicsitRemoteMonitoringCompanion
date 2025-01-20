@@ -33,6 +33,13 @@ var (
 		"sink_type",
 	})
 
+	ResourceSinkPercent = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "resource_sink_percent",
+		Help: "AWESOME sink percent to next coupon",
+	}, []string{
+		"sink_type",
+	})
+
 	ResourceSinkCollectedCoupons = RegisterNewGaugeVec(prometheus.GaugeOpts{
 		Name: "resource_sink_collected_coupons",
 		Help: "AWESOME sink collected coupons",

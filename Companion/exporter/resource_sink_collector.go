@@ -6,9 +6,9 @@ import (
 )
 
 type ResourceSinkCollector struct {
-	buildingEndpoint       string
-	globalResourceEndpoint string
-	globalExplorationEndpoint  string
+	buildingEndpoint          string
+	globalResourceEndpoint    string
+	globalExplorationEndpoint string
 }
 
 type ResourceSinkDetails struct {
@@ -17,17 +17,18 @@ type ResourceSinkDetails struct {
 }
 
 type GlobalSinkDetails struct {
-	SinkType       string `json:"Name"`
-	NumCoupon      int    `json:"NumCoupon"`
-	TotalPoints    int    `json:"TotalPoints"`
-	PointsToCoupon int    `json:"PointsToCoupon"`
+	SinkType       string  `json:"Name"`
+	NumCoupon      int     `json:"NumCoupon"`
+	TotalPoints    int     `json:"TotalPoints"`
+	PointsToCoupon int     `json:"PointsToCoupon"`
+	Percent        float64 `json:"Percent"`
 }
 
 func NewResourceSinkCollector(buildingEndpoint, globalResourceEndpoint, globalExplorationEndpoint string) *ResourceSinkCollector {
 	return &ResourceSinkCollector{
-		buildingEndpoint:       buildingEndpoint,
-		globalResourceEndpoint: globalResourceEndpoint,
-		globalExplorationEndpoint:  globalExplorationEndpoint,
+		buildingEndpoint:          buildingEndpoint,
+		globalResourceEndpoint:    globalResourceEndpoint,
+		globalExplorationEndpoint: globalExplorationEndpoint,
 	}
 }
 
@@ -49,6 +50,7 @@ func (c *ResourceSinkCollector) Collect(frmAddress string, sessionName string) {
 	for _, d := range globalResourceDetails {
 		ResourceSinkTotalPoints.WithLabelValues(d.SinkType, frmAddress, sessionName).Set(float64(d.TotalPoints))
 		ResourceSinkPointsToCoupon.WithLabelValues(d.SinkType, frmAddress, sessionName).Set(float64(d.PointsToCoupon))
+		ResourceSinkPercent.WithLabelValues(d.SinkType, frmAddress, sessionName).Set(float64(d.Percent))
 		ResourceSinkCollectedCoupons.WithLabelValues(frmAddress, sessionName).Set(float64(d.NumCoupon))
 	}
 
@@ -62,6 +64,7 @@ func (c *ResourceSinkCollector) Collect(frmAddress string, sessionName string) {
 	for _, d := range globalExplorationDetails {
 		ResourceSinkTotalPoints.WithLabelValues(d.SinkType, frmAddress, sessionName).Set(float64(d.TotalPoints))
 		ResourceSinkPointsToCoupon.WithLabelValues(d.SinkType, frmAddress, sessionName).Set(float64(d.PointsToCoupon))
+		ResourceSinkPercent.WithLabelValues(d.SinkType, frmAddress, sessionName).Set(float64(d.Percent))
 	}
 
 	powerInfo := map[float64]float64{}
