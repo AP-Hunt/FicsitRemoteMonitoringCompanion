@@ -29,7 +29,6 @@ func NewPrometheusExporter(frmApiHosts []string) *PrometheusExporter {
 	collectorRunners := []*CollectorRunner{}
 
 	for _, frmApiHost := range frmApiHosts {
-		//TODO: missing extractors!!!!
 		productionCollector := NewProductionCollector("/getProdStats")
 		powerCollector := NewPowerCollector("/getPower")
 		buildingCollector := NewFactoryBuildingCollector("/getFactory")
@@ -38,7 +37,7 @@ func NewPrometheusExporter(frmApiHosts []string) *PrometheusExporter {
 		vehicleStationCollector := NewVehicleStationCollector("/getTruckStation")
 		trainCollector := NewTrainCollector("/getTrains")
 		trainStationCollector := NewTrainStationCollector("/getTrainStation")
-		resourceSinkCollector := NewResourceSinkCollector("/getResourceSinkBuilding", "/getResourceSink")
+		resourceSinkCollector := NewResourceSinkCollector("/getResourceSinkBuilding", "/getResourceSink", "/getExplorationSink")
 		pumpCollector := NewPumpCollector("/getPump")
 		extractorCollector := NewExtractorCollector("/getExtractor")
 		portalCollector := NewPortalCollector("/getPortal")

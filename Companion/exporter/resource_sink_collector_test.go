@@ -14,7 +14,7 @@ var _ = Describe("ResourceSinkCollector", func() {
 	BeforeEach(func() {
 		FRMServer.Reset()
 		url = FRMServer.server.URL
-		collector = exporter.NewResourceSinkCollector("/getResourceSinkBuilding", "/getResourceSink")
+		collector = exporter.NewResourceSinkCollector("/getResourceSinkBuilding", "/getResourceSink", "/getExplorationSink")
 
 		FRMServer.ReturnsResourceSinkData([]exporter.ResourceSinkDetails{
 			{
@@ -40,13 +40,16 @@ var _ = Describe("ResourceSinkCollector", func() {
 			},
 		})
 
-		FRMServer.ReturnsGlobalResourceSinkData([]exporter.ResourceSinkGlobalDetails{
+		FRMServer.ReturnsGlobalResourceSinkData([]exporter.GlobalSinkDetails{
 			{
 				SinkType: "Resource",
 				TotalPoints:    100,
 				PointsToCoupon: 200,
 				NumCoupon:      1,
 			},
+		})
+
+		FRMServer.ReturnsGlobalExplorationSinkData([]exporter.GlobalSinkDetails{
 			{
 				SinkType: "Exploration",
 				TotalPoints:    1000,

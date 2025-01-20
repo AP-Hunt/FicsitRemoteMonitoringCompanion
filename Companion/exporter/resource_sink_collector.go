@@ -6,8 +6,9 @@ import (
 )
 
 type ResourceSinkCollector struct {
-	buildingEndpoint string
-	globalEndpoint   string
+	buildingEndpoint       string
+	globalResourceEndpoint string
+	globalExplorationEndpoint  string
 }
 
 type ResourceSinkDetails struct {
@@ -15,17 +16,18 @@ type ResourceSinkDetails struct {
 	PowerInfo PowerInfo `json:"PowerInfo"`
 }
 
-type ResourceSinkGlobalDetails struct {
+type GlobalSinkDetails struct {
 	SinkType       string `json:"Name"`
 	NumCoupon      int    `json:"NumCoupon"`
 	TotalPoints    int    `json:"TotalPoints"`
 	PointsToCoupon int    `json:"PointsToCoupon"`
 }
 
-func NewResourceSinkCollector(buildingEndpoint, globalEndpoint string) *ResourceSinkCollector {
+func NewResourceSinkCollector(buildingEndpoint, globalResourceEndpoint, globalExplorationEndpoint string) *ResourceSinkCollector {
 	return &ResourceSinkCollector{
-		buildingEndpoint: buildingEndpoint,
-		globalEndpoint:   globalEndpoint,
+		buildingEndpoint:       buildingEndpoint,
+		globalResourceEndpoint: globalResourceEndpoint,
+		globalExplorationEndpoint:  globalExplorationEndpoint,
 	}
 }
 
@@ -37,17 +39,29 @@ func (c *ResourceSinkCollector) Collect(frmAddress string, sessionName string) {
 		return
 	}
 
-	globalDetails := []ResourceSinkGlobalDetails{}
-	err = retrieveData(frmAddress+c.globalEndpoint, &globalDetails)
+	globalResourceDetails := []GlobalSinkDetails{}
+	err = retrieveData(frmAddress+c.globalResourceEndpoint, &globalResourceDetails)
 	if err != nil {
 		log.Printf("error reading global resource sink statistics from FRM: %s\n", err)
 		return
 	}
 
-	for _, d := range globalDetails {
+	for _, d := range globalResourceDetails {
 		ResourceSinkTotalPoints.WithLabelValues(d.SinkType, frmAddress, sessionName).Set(float64(d.TotalPoints))
 		ResourceSinkPointsToCoupon.WithLabelValues(d.SinkType, frmAddress, sessionName).Set(float64(d.PointsToCoupon))
 		ResourceSinkCollectedCoupons.WithLabelValues(frmAddress, sessionName).Set(float64(d.NumCoupon))
+	}
+
+	globalExplorationDetails := []GlobalSinkDetails{}
+	err = retrieveData(frmAddress+c.globalExplorationEndpoint, &globalExplorationDetails)
+	if err != nil {
+		log.Printf("error reading global resource sink statistics from FRM: %s\n", err)
+		return
+	}
+
+	for _, d := range globalExplorationDetails {
+		ResourceSinkTotalPoints.WithLabelValues(d.SinkType, frmAddress, sessionName).Set(float64(d.TotalPoints))
+		ResourceSinkPointsToCoupon.WithLabelValues(d.SinkType, frmAddress, sessionName).Set(float64(d.PointsToCoupon))
 	}
 
 	powerInfo := map[float64]float64{}

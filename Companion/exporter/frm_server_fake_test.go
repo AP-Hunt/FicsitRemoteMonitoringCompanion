@@ -9,23 +9,24 @@ import (
 )
 
 type FRMServerFake struct {
-	server                *httptest.Server
-	productionData        []exporter.ProductionDetails
-	powerData             []exporter.PowerDetails
-	factoryBuildings      []exporter.BuildingDetail
-	vehicleData           []exporter.VehicleDetails
-	trainData             []exporter.TrainDetails
-	droneData             []exporter.DroneStationDetails
-	vehicleStationData    []exporter.VehicleStationDetails
-	trainStationData      []exporter.TrainStationDetails
-	resourceSinkData      []exporter.ResourceSinkDetails
-	gloalResourceSinkData []exporter.ResourceSinkGlobalDetails
-	sessionInfoData       exporter.SessionInfo
-	pumpData              []exporter.PumpDetails
-	extractorData         []exporter.ExtractorDetails
-	portalData            []exporter.PortalDetails
-	hypertubeData         []exporter.HypertubeDetails
-	frackingData          []exporter.FrackingDetails
+	server                   *httptest.Server
+	productionData           []exporter.ProductionDetails
+	powerData                []exporter.PowerDetails
+	factoryBuildings         []exporter.BuildingDetail
+	vehicleData              []exporter.VehicleDetails
+	trainData                []exporter.TrainDetails
+	droneData                []exporter.DroneStationDetails
+	vehicleStationData       []exporter.VehicleStationDetails
+	trainStationData         []exporter.TrainStationDetails
+	resourceSinkData         []exporter.ResourceSinkDetails
+	gloalResourceSinkData    []exporter.GlobalSinkDetails
+	gloalExplorationSinkData []exporter.GlobalSinkDetails
+	sessionInfoData          exporter.SessionInfo
+	pumpData                 []exporter.PumpDetails
+	extractorData            []exporter.ExtractorDetails
+	portalData               []exporter.PortalDetails
+	hypertubeData            []exporter.HypertubeDetails
+	frackingData             []exporter.FrackingDetails
 }
 
 func NewFRMServerFake() *FRMServerFake {
@@ -45,6 +46,7 @@ func NewFRMServerFake() *FRMServerFake {
 	mux.Handle("/getTruckStation", http.HandlerFunc(getStatsHandler(&fake.vehicleStationData)))
 	mux.Handle("/getTrainStation", http.HandlerFunc(getStatsHandler(&fake.trainStationData)))
 	mux.Handle("/getResourceSink", http.HandlerFunc(getStatsHandler(&fake.gloalResourceSinkData)))
+	mux.Handle("/getExplorationSink", http.HandlerFunc(getStatsHandler(&fake.gloalExplorationSinkData)))
 	mux.Handle("/getResourceSinkBuilding", http.HandlerFunc(getStatsHandler(&fake.resourceSinkData)))
 	mux.Handle("/getSessionInfo", http.HandlerFunc(getStatsHandler(&fake.sessionInfoData)))
 	mux.Handle("/getPump", http.HandlerFunc(getStatsHandler(&fake.pumpData)))
@@ -106,8 +108,12 @@ func (e *FRMServerFake) ReturnsResourceSinkData(data []exporter.ResourceSinkDeta
 	e.resourceSinkData = data
 }
 
-func (e *FRMServerFake) ReturnsGlobalResourceSinkData(data []exporter.ResourceSinkGlobalDetails) {
+func (e *FRMServerFake) ReturnsGlobalResourceSinkData(data []exporter.GlobalSinkDetails) {
 	e.gloalResourceSinkData = data
+}
+
+func (e *FRMServerFake) ReturnsGlobalExplorationSinkData(data []exporter.GlobalSinkDetails) {
+	e.gloalExplorationSinkData = data
 }
 
 func (e *FRMServerFake) ReturnsPumpData(data []exporter.PumpDetails) {
