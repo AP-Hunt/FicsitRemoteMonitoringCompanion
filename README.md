@@ -237,6 +237,11 @@ The [Prometheus metrics server](https://prometheus.io/) allows you to [explore t
             <td>sink_type, url, session_name</td>
         </tr>
         <tr>
+            <td>resource_sink_percent</td>
+            <td>AWESOME sink percent to next coupon</td>
+            <td>sink_type, url, session_name</td>
+        </tr>
+        <tr>
             <td>resource_sink_collected_coupons</td>
             <td>AWESOME sink collected coupons</td>
             <td>url, session_name</td>
