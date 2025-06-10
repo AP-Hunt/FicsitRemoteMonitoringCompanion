@@ -14,7 +14,7 @@ var _ = Describe("HypertubeCollector", func() {
 	BeforeEach(func() {
 		FRMServer.Reset()
 		url = FRMServer.server.URL
-		collector = exporter.NewHypertubeCollector("/getHypertube")
+		collector = exporter.NewHypertubeCollector("/getHyperEntrance")
 
 		FRMServer.ReturnsHypertubeData([]exporter.HypertubeDetails{
 			{

@@ -52,7 +52,7 @@ func NewFRMServerFake() *FRMServerFake {
 	mux.Handle("/getPump", http.HandlerFunc(getStatsHandler(&fake.pumpData)))
 	mux.Handle("/getExtractor", http.HandlerFunc(getStatsHandler(&fake.extractorData)))
 	mux.Handle("/getPortal", http.HandlerFunc(getStatsHandler(&fake.portalData)))
-	mux.Handle("/getHypertube", http.HandlerFunc(getStatsHandler(&fake.hypertubeData)))
+	mux.Handle("/getHyperEntrance", http.HandlerFunc(getStatsHandler(&fake.hypertubeData)))
 	mux.Handle("/getFrackingActivator", http.HandlerFunc(getStatsHandler(&fake.frackingData)))
 
 	return fake
