@@ -66,7 +66,20 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 			powerInfo[building.PowerInfo.CircuitGroupId] = building.PowerInfo.PowerConsumed
 		}
 		val, ok = maxPowerInfo[building.PowerInfo.CircuitGroupId]
+
+		// TODO: max factory power is bugged in the base game
+		// for converters, quantum encoders, and particle accelerators.
+		// Replace with reported values when they are correct.
+		sloops := building.Somersloops
 		maxBuildingPower := building.PowerInfo.MaxPowerConsumed
+		switch building.Building {
+		case "Converter":
+			maxBuildingPower = powerMultiplier(building.ManuSpeed, sloops, 2.0) * MaxConverterPower
+		case "Quantum Encoder":
+			maxBuildingPower = powerMultiplier(building.ManuSpeed, sloops, 4.0) * MaxQuantumEncoderPower
+		case "Particle Accelerator":
+			maxBuildingPower = powerMultiplier(building.ManuSpeed, sloops, 4.0) * MaxParticleAcceleratorPower(building.Recipe)
+		}
 
 		if ok {
 			maxPowerInfo[building.PowerInfo.CircuitGroupId] = val + maxBuildingPower

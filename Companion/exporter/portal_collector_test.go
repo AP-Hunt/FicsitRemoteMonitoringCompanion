@@ -60,7 +60,8 @@ var _ = Describe("PortalCollector", func() {
 			val, err := gaugeValue(exporter.PortalPowerMax, "1", url, sessionName)
 
 			Expect(err).ToNot(HaveOccurred())
-			Expect(val).To(Equal(90.0))
+			// max is overridden here to 1000 per portal. see power_info.go.
+			Expect(val).To(Equal(3000.0))
 		})
 	})
 })

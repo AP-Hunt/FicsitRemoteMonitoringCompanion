@@ -56,10 +56,12 @@ func (c *PortalCollector) Collect(frmAddress string, sessionName string) {
 			powerInfo[d.PowerInfo.CircuitGroupId] = d.PowerInfo.PowerConsumed
 		}
 		val, ok = maxPowerInfo[d.PowerInfo.CircuitGroupId]
+		// TODO: max portal power is bugged in the base game.
+		// Replace with reported values when they are correct.
 		if ok {
-			maxPowerInfo[d.PowerInfo.CircuitGroupId] = val + d.PowerInfo.MaxPowerConsumed
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = val + MaxPortalPower
 		} else {
-			maxPowerInfo[d.PowerInfo.CircuitGroupId] = d.PowerInfo.MaxPowerConsumed
+			maxPowerInfo[d.PowerInfo.CircuitGroupId] = MaxPortalPower
 		}
 	}
 	for circuitId, powerConsumed := range powerInfo {

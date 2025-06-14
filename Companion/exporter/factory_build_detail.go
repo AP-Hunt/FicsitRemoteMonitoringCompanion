@@ -12,6 +12,7 @@ type BuildingDetail struct {
 	IsPaused       bool         `json:"IsPaused"`
 	CircuitGroupId int          `json:"CircuitGroupID"`
 	PowerInfo      PowerInfo    `json:"PowerInfo"`
+	Somersloops    float64      `json:"Somersloops"`
 }
 
 type Production struct {

@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
+	dto "github.com/prometheus/client_model/go"
 )
 
 type PowerInfo struct {
@@ -29,6 +30,47 @@ type PowerDetails struct {
 	BatteryTimeEmpty    string  `json:"BatteryTimeEmpty"`
 	BatteryTimeFull     string  `json:"BatteryTimeFull"`
 	FuseTriggered       bool    `json:"FuseTriggered"`
+}
+
+// power max calculated via aggregate.
+// actual max is either reported max, or calculated max. Take the higher one.
+// see power_info.go for details about the bug we're working around.
+func calculateMaxPowerCategory(gauge *prometheus.GaugeVec, circuitId string, frmAddress string, sessionName string) float64 {
+	var m = &dto.Metric{}
+	err := gauge.WithLabelValues(circuitId, frmAddress, sessionName).Write(m)
+	if err != nil {
+		return 0
+	}
+	return m.Gauge.GetValue()
+}
+func calculateMaxPower(reportedMaxPower float64, circuitId string, frmAddress string, sessionName string) float64 {
+	maxConsumed := reportedMaxPower
+	factoryPowerMax := calculateMaxPowerCategory(FactoryPowerMax, circuitId, frmAddress, sessionName)
+	extractorPowerMax := calculateMaxPowerCategory(ExtractorPowerMax, circuitId, frmAddress, sessionName)
+	dronePowerMax := calculateMaxPowerCategory(DronePortPowerMax, circuitId, frmAddress, sessionName)
+	frackingPowerMax := calculateMaxPowerCategory(FrackingPowerMax, circuitId, frmAddress, sessionName)
+	hypertubePowerMax := calculateMaxPowerCategory(HypertubePowerMax, circuitId, frmAddress, sessionName)
+	portalPowerMax := calculateMaxPowerCategory(PortalPowerMax, circuitId, frmAddress, sessionName)
+	pumpPowerMax := calculateMaxPowerCategory(PumpPowerMax, circuitId, frmAddress, sessionName)
+	resourceSinkPowerMax := calculateMaxPowerCategory(ResourceSinkPowerMax, circuitId, frmAddress, sessionName)
+	trainPowerMax := calculateMaxPowerCategory(TrainCircuitPowerMax, circuitId, frmAddress, sessionName)
+	trainStationPowerMax := calculateMaxPowerCategory(TrainStationPowerMax, circuitId, frmAddress, sessionName)
+	vehicleStationPowerMax := calculateMaxPowerCategory(VehicleStationPowerMax, circuitId, frmAddress, sessionName)
+	calculatedMaxConsumed := factoryPowerMax +
+		extractorPowerMax +
+		dronePowerMax +
+		frackingPowerMax +
+		hypertubePowerMax +
+		portalPowerMax +
+		pumpPowerMax +
+		resourceSinkPowerMax +
+		trainPowerMax +
+		trainStationPowerMax +
+		vehicleStationPowerMax
+	if calculatedMaxConsumed > maxConsumed {
+		maxConsumed = calculatedMaxConsumed
+	}
+	return maxConsumed
 }
 
 func NewPowerCollector(endpoint string) *PowerCollector {
@@ -84,7 +126,10 @@ func (c *PowerCollector) Collect(frmAddress string, sessionName string) {
 		c.metricsDropper.CacheFreshMetricLabel(prometheus.Labels{"url": frmAddress, "session_name": sessionName, "circuit_id": circuitId})
 		PowerConsumed.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.PowerConsumed)
 		PowerCapacity.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.PowerCapacity)
-		PowerMaxConsumed.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.PowerMaxConsumed)
+
+		maxConsumed := calculateMaxPower(d.PowerMaxConsumed, circuitId, frmAddress, sessionName)
+		PowerMaxConsumed.WithLabelValues(circuitId, frmAddress, sessionName).Set(maxConsumed)
+
 		BatteryDifferential.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.BatteryDifferential)
 		BatteryPercent.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.BatteryPercent)
 		BatteryCapacity.WithLabelValues(circuitId, frmAddress, sessionName).Set(d.BatteryCapacity)

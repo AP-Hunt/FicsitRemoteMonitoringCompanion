@@ -5,6 +5,8 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
+	"math"
 )
 
 var _ = Describe("FactoryBuildingCollector", func() {
@@ -137,6 +139,153 @@ var _ = Describe("FactoryBuildingCollector", func() {
 				ironNothing, err := gaugeValue(exporter.MachineItemsProducedEffiency, "Iron Nothing", "Smelter", "100", "200", "-300", url, sessionName)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(ironNothing).To(Equal(float64(0.25)))
+			})
+		})
+
+		Describe("with power particle accelerator making diamonds", func() {
+			BeforeEach(func() {
+				FRMServer.Reset()
+				url = FRMServer.server.URL
+				collector = exporter.NewFactoryBuildingCollector("/getFactory")
+
+				FRMServer.ReturnsFactoryBuildings([]exporter.BuildingDetail{
+					{
+						Building:       "Particle Accelerator",
+						Recipe:         "Diamonds",
+						ManuSpeed:      100.0,
+						CircuitGroupId: 0,
+						PowerInfo: exporter.PowerInfo{
+							CircuitGroupId: 1,
+							PowerConsumed:  23,
+							// value will be ignored for this - the recipe here is set to 750 in power_info.go
+							MaxPowerConsumed: 4,
+						},
+					},
+				})
+			})
+			It("recalculates max power use", func() {
+				collector.Collect(url, sessionName)
+
+				val, err := gaugeValue(exporter.FactoryPowerMax, "1", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(val).To(Equal(750.0))
+			})
+		})
+		Describe("with an overclocked accelerator", func() {
+			BeforeEach(func() {
+				FRMServer.Reset()
+				url = FRMServer.server.URL
+				collector = exporter.NewFactoryBuildingCollector("/getFactory")
+
+				FRMServer.ReturnsFactoryBuildings([]exporter.BuildingDetail{
+					{
+						Building:       "Particle Accelerator",
+						Recipe:         "Nuclear Pasta",
+						ManuSpeed:      250.0,
+						CircuitGroupId: 0,
+						PowerInfo: exporter.PowerInfo{
+							CircuitGroupId: 1,
+							PowerConsumed:  23,
+							// value will be ignored for this - the recipe here is set to 750 in power_info.go
+							MaxPowerConsumed: 4,
+						},
+					},
+				})
+			})
+			It("recalculates max power use", func() {
+				collector.Collect(url, sessionName)
+
+				val, err := gaugeValue(exporter.FactoryPowerMax, "1", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(val).To(Equal(math.Pow((250.0/100), exporter.ClockspeedExponent) * 1500.0))
+			})
+		})
+		Describe("with an underclocked converter", func() {
+			BeforeEach(func() {
+				FRMServer.Reset()
+				url = FRMServer.server.URL
+				collector = exporter.NewFactoryBuildingCollector("/getFactory")
+
+				FRMServer.ReturnsFactoryBuildings([]exporter.BuildingDetail{
+					{
+						Building:       "Converter",
+						Recipe:         "Coal",
+						ManuSpeed:      50.0,
+						CircuitGroupId: 0,
+						PowerInfo: exporter.PowerInfo{
+							CircuitGroupId: 1,
+							PowerConsumed:  23,
+							// value will be ignored for this - the recipe here is set to 400 * clockspeed in power_info.go
+							MaxPowerConsumed: 4,
+						},
+					},
+				})
+			})
+			It("recalculates max power use", func() {
+				collector.Collect(url, sessionName)
+
+				val, err := gaugeValue(exporter.FactoryPowerMax, "1", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(val).To(Equal(math.Pow((50.0/100), exporter.ClockspeedExponent) * 400.0))
+			})
+		})
+		Describe("with an overclocked quantum encoder", func() {
+			BeforeEach(func() {
+				FRMServer.Reset()
+				url = FRMServer.server.URL
+				collector = exporter.NewFactoryBuildingCollector("/getFactory")
+
+				FRMServer.ReturnsFactoryBuildings([]exporter.BuildingDetail{
+					{
+						Building:       "Quantum Encoder",
+						Recipe:         "Power Shard",
+						ManuSpeed:      250.0,
+						CircuitGroupId: 0,
+						PowerInfo: exporter.PowerInfo{
+							CircuitGroupId: 1,
+							PowerConsumed:  23,
+							// value will be ignored for this - the recipe here is set to 2000 * clockspeed in power_info.go
+							MaxPowerConsumed: 4,
+						},
+					},
+				})
+			})
+			It("recalculates max power use", func() {
+				collector.Collect(url, sessionName)
+
+				val, err := gaugeValue(exporter.FactoryPowerMax, "1", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(val).To(Equal(math.Pow((250.0/100), exporter.ClockspeedExponent) * 2000.0))
+			})
+		})
+		Describe("with a somerslooped quantum encoder", func() {
+			BeforeEach(func() {
+				FRMServer.Reset()
+				url = FRMServer.server.URL
+				collector = exporter.NewFactoryBuildingCollector("/getFactory")
+
+				FRMServer.ReturnsFactoryBuildings([]exporter.BuildingDetail{
+					{
+						Building:       "Quantum Encoder",
+						Recipe:         "Power Shard",
+						ManuSpeed:      100.0,
+						CircuitGroupId: 0,
+						Somersloops: 4,
+						PowerInfo: exporter.PowerInfo{
+							CircuitGroupId: 1,
+							PowerConsumed:  23,
+							// value will be ignored for this - the recipe here is set to 2000 * clockspeed in power_info.go
+							MaxPowerConsumed: 4,
+						},
+					},
+				})
+			})
+			It("recalculates max power use", func() {
+				collector.Collect(url, sessionName)
+
+				val, err := gaugeValue(exporter.FactoryPowerMax, "1", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(val).To(Equal(4 * 2000.0))
 			})
 		})
 	})

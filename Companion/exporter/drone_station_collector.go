@@ -30,7 +30,7 @@ type DroneStationDetails struct {
 	AvgIncRate             float64              `json:"AvgIncRate"`
 	AvgIncStack            float64              `json:"AvgIncStack"`
 	AvgOutRate             float64              `json:"AvgOutRate"`
-	AvgOutStack            float64              `json"AvgOutStack"`
+	AvgOutStack            float64              `json:"AvgOutStack"`
 	AvgRndTrip             string               `json:"AvgRndTrip"`
 	AvgTotalIncRate        float64              `json:"AvgTotalIncRate"`
 	AvgTotalIncStack       float64              `json:"AvgTotalIncStack"`
@@ -105,6 +105,10 @@ func (c *DroneStationCollector) Collect(frmAddress string, sessionName string) {
 	for circuitId, powerConsumed := range powerInfo {
 		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
 		DronePortPower.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
+	}
+	for circuitId, powerConsumed := range maxPowerInfo {
+		cid := strconv.FormatFloat(circuitId, 'f', -1, 64)
+		DronePortPowerMax.WithLabelValues(cid, frmAddress, sessionName).Set(powerConsumed)
 	}
 
 	c.metricsDropper.DropStaleMetricLabels()
