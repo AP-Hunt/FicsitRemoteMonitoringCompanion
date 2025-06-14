@@ -42,13 +42,13 @@ func MaxParticleAcceleratorPower(recipe string) float64 {
 		"Ficsonium":                   1500.0,
 		"Nuclear Pasta":               1500.0,
 		"Plutonium Pellet":            750.0,
-		"Cloudy Diamonds":             750.0,
-		"Dark Matter Crystallization": 1500.0,
-		"Dark Matter Trap":            1500.0,
-		"Instant Plutonium Cell":      750.0,
-		"Oil-Based Diamonds":          750.0,
-		"Petroleum Diamonds":          750.0,
-		"Turbo Diamonds":              750.0,
+		"Alternate: Cloudy Diamonds":             750.0,
+		"Alternate: Dark Matter Crystallization": 1500.0,
+		"Alternate: Dark Matter Trap":            1500.0,
+		"Alternate: Instant Plutonium Cell":      750.0,
+		"Alternate: Oil-Based Diamonds":          750.0,
+		"Alternate: Petroleum Diamonds":          750.0,
+		"Alternate: Turbo Diamonds":              750.0,
 	}
 	maxPower, ok := recipes[recipe]
 	if ok {
