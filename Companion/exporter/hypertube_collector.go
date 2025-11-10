@@ -40,7 +40,7 @@ func NewHypertubeCollector(endpoint string) *HypertubeCollector {
 
 func (c *HypertubeCollector) Collect(frmAddress string, sessionName string) {
 	details := []HypertubeDetails{}
-	err := retrieveData(frmAddress+c.endpoint, &details)
+	err := retrieveData(frmAddress, c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading hypertube statistics from FRM: %s\n", err)
 		return

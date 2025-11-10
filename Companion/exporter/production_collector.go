@@ -37,7 +37,7 @@ func NewProductionCollector(endpoint string) *ProductionCollector {
 
 func (c *ProductionCollector) Collect(frmAddress string, sessionName string) {
 	details := []ProductionDetails{}
-	err := retrieveData(frmAddress+c.endpoint, &details)
+	err := retrieveData(frmAddress, c.endpoint, &details)
 	if err != nil {
 		c.metricsDropper.DropStaleMetricLabels()
 		log.Printf("error reading production statistics from FRM: %s\n", err)

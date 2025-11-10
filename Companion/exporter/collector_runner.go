@@ -44,7 +44,7 @@ func NewCollectorRunner(ctx context.Context, frmBaseUrl string, collectors ...Co
 
 func (c *CollectorRunner) updateSessionName() {
 	details := SessionInfo{}
-	err := retrieveData(c.frmBaseUrl+"/getSessionInfo", &details)
+	err := retrieveData(c.frmBaseUrl, "/getSessionInfo", &details)
 	if err != nil {
 		log.Printf("error reading session name from FRM: %s\n", err)
 		return

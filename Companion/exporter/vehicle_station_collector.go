@@ -23,7 +23,7 @@ func NewVehicleStationCollector(endpoint string) *VehicleStationCollector {
 
 func (c *VehicleStationCollector) Collect(frmAddress string, sessionName string) {
 	details := []VehicleStationDetails{}
-	err := retrieveData(frmAddress+c.endpoint, &details)
+	err := retrieveData(frmAddress, c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading vehicle station statistics from FRM: %s\n", err)
 		return

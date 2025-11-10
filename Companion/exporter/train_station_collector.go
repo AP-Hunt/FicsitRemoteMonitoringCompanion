@@ -32,7 +32,7 @@ func NewTrainStationCollector(endpoint string) *TrainStationCollector {
 
 func (c *TrainStationCollector) Collect(frmAddress string, sessionName string) {
 	details := []TrainStationDetails{}
-	err := retrieveData(frmAddress+c.endpoint, &details)
+	err := retrieveData(frmAddress, c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading train station statistics from FRM: %s\n", err)
 		return

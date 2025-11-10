@@ -127,7 +127,7 @@ func (d *TrainDetails) handleTimingUpdates(trackedTrains map[string]*TrainDetail
 
 func (c *TrainCollector) Collect(frmAddress string, sessionName string) {
 	details := []TrainDetails{}
-	err := retrieveData(frmAddress+c.endpoint, &details)
+	err := retrieveData(frmAddress, c.endpoint, &details)
 	if err != nil {
 		c.metricsDropper.DropStaleMetricLabels()
 		log.Printf("error reading train statistics from FRM: %s\n", err)

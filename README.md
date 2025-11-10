@@ -30,7 +30,11 @@ The [Prometheus metrics server](https://prometheus.io/) allows you to [explore t
 
 `FRM_PORT`: The port of the Ficist Remote Monitoring server. EG: `8080`.
 
-`FRM_HOSTS`: A comma separated list of Ficsit Remote Monitoring servers. If protocol is unspecified, it defaults to http. EG: `http://myserver1.frm.example:8080,myserver2.frm.example:8080,https://myserver3.frm.example:8081`
+`FRM_HOSTS`: A comma separated list of Ficsit Remote Monitoring servers. This variable supports two connection modes:
+* **Standard FRM Web Server:** Provide the base URL. If protocol is unspecified, it defaults to `http`.
+    * *Example:* `http://myserver1.frm.example:8080,http://myserver2.frm.example:8080`
+* **Dedicated Server API:** Provide the full path to the server's built-in API. This will automatically switch to using the secure `POST` method.
+    * *Example:* `https://my-dedicated-server.example:7777/api/v1`
 
 `FRM_LOG_STDOUT`: If FRMC should print to stdout rather than a separate logfile. Useful for docker/containerization. default false.
 

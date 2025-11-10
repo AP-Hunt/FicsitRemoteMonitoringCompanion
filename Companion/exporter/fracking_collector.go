@@ -40,7 +40,7 @@ func NewFrackingCollector(endpoint string) *FrackingCollector {
 
 func (c *FrackingCollector) Collect(frmAddress string, sessionName string) {
 	details := []FrackingDetails{}
-	err := retrieveData(frmAddress+c.endpoint, &details)
+	err := retrieveData(frmAddress, c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading fracking statistics from FRM: %s\n", err)
 		return
