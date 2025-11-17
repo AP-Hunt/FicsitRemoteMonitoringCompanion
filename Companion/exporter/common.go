@@ -22,6 +22,7 @@ type FrmApiRequest struct {
 }
 
 // Reusable HTTP client for HTTPS w/ self-signed certs
+// InsecureSkipVerify: true isn't technically "safe," but dedicated servers default to self-signed certs
 var tlsClient = &http.Client{
 	Timeout: 10 * time.Second,
 	Transport: &http.Transport{
