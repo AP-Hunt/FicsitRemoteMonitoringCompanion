@@ -5,13 +5,14 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"github.com/coder/quartz"
 	"log"
 	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/coder/quartz"
 )
 
 // Struct for the JSON body of POST requests
@@ -78,21 +79,18 @@ func retrieveDataViaPOST(frmApiUrl string, endpointName string, details any) err
 	}
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
-		log.Printf("error marshalling request body: %s\n", err)
-		return err
+		return fmt.Errorf("error marshalling request body: %s\n", err.Error())
 	}
 
 	req, err := http.NewRequest("POST", frmApiUrl, bytes.NewBuffer(jsonData))
 	if err != nil {
-		log.Printf("error creating POST request: %s\n", err)
-		return err
+		return fmt.Errorf("error creating POST request: %s\n", err.Error())
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := tlsClient.Do(req)
 	if err != nil {
-		log.Printf("error fetching statistics from FRM: %s\n", err)
-		return err
+		return fmt.Errorf("error fetching statistics from FRM: %s\n", err.Error())
 	}
 	defer resp.Body.Close()
 
