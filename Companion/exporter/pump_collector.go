@@ -40,7 +40,7 @@ func NewPumpCollector(endpoint string) *PumpCollector {
 
 func (c *PumpCollector) Collect(frmAddress string, sessionName string) {
 	details := []PumpDetails{}
-	err := retrieveData(frmAddress+c.endpoint, &details)
+	err := retrieveData(frmAddress, c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading pump statistics from FRM: %s\n", err)
 		return

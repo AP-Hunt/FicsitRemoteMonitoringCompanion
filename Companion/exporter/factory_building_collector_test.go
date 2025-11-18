@@ -270,7 +270,7 @@ var _ = Describe("FactoryBuildingCollector", func() {
 						Recipe:         "Power Shard",
 						ManuSpeed:      100.0,
 						CircuitGroupId: 0,
-						Somersloops: 4,
+						Somersloops:    4,
 						PowerInfo: exporter.PowerInfo{
 							CircuitGroupId: 1,
 							PowerConsumed:  23,

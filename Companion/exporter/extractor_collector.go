@@ -40,7 +40,7 @@ func NewExtractorCollector(endpoint string) *ExtractorCollector {
 
 func (c *ExtractorCollector) Collect(frmAddress string, sessionName string) {
 	details := []ExtractorDetails{}
-	err := retrieveData(frmAddress+c.endpoint, &details)
+	err := retrieveData(frmAddress, c.endpoint, &details)
 	if err != nil {
 		log.Printf("error reading extractor statistics from FRM: %s\n", err)
 		return

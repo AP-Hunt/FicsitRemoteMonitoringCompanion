@@ -67,7 +67,7 @@ func NewDroneStationCollector(endpoint string) *DroneStationCollector {
 
 func (c *DroneStationCollector) Collect(frmAddress string, sessionName string) {
 	details := []DroneStationDetails{}
-	err := retrieveData(frmAddress+c.endpoint, &details)
+	err := retrieveData(frmAddress, c.endpoint, &details)
 	if err != nil {
 		c.metricsDropper.DropStaleMetricLabels()
 		log.Printf("error reading drone station statistics from FRM: %s\n", err)

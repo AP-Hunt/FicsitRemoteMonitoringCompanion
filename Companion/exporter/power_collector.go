@@ -114,7 +114,7 @@ func NewPowerCollector(endpoint string) *PowerCollector {
 
 func (c *PowerCollector) Collect(frmAddress string, sessionName string) {
 	details := []PowerDetails{}
-	err := retrieveData(frmAddress+c.endpoint, &details)
+	err := retrieveData(frmAddress, c.endpoint, &details)
 	if err != nil {
 		c.metricsDropper.DropStaleMetricLabels()
 		log.Printf("error reading power statistics from FRM: %s\n", err)

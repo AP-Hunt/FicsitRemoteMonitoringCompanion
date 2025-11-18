@@ -102,7 +102,7 @@ func NewVehicleCollector(endpoint string) *VehicleCollector {
 
 func (c *VehicleCollector) Collect(frmAddress string, sessionName string) {
 	details := []VehicleDetails{}
-	err := retrieveData(frmAddress+c.endpoint, &details)
+	err := retrieveData(frmAddress, c.endpoint, &details)
 	if err != nil {
 		c.metricsDropper.DropStaleMetricLabels()
 		log.Printf("error reading vehicle statistics from FRM: %s\n", err)
