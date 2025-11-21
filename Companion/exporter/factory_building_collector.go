@@ -57,6 +57,43 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
 				frmAddress, sessionName,
 			).Set(prod.ProdPercent)
+
+		for _, item := range building.InputInventory {
+			MachineInputInventory.WithLabelValues(
+				item.Name,
+				building.Building,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(float64(item.Amount))
+			MachineInputInventoryMax.WithLabelValues(
+				item.Name,
+				building.Building,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(float64(item.MaxAmount))
+		}
+
+		for _, item := range building.OutputInventory {
+			MachineOutputInventory.WithLabelValues(
+				item.Name,
+				building.Building,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(float64(item.Amount))
+			MachineOutputInventoryMax.WithLabelValues(
+				item.Name,
+				building.Building,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(float64(item.MaxAmount))
 		}
 
 		val, ok := powerInfo[building.PowerInfo.CircuitGroupId]
