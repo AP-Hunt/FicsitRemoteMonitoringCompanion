@@ -58,6 +58,16 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 				frmAddress, sessionName,
 			).Set(prod.ProdPercent)
 
+			MachineItemsProducedMax.WithLabelValues(
+				prod.Name,
+				building.Building,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(prod.MaxProd)
+		}
+
 		for _, item := range building.InputInventory {
 			MachineInputInventory.WithLabelValues(
 				item.Name,
