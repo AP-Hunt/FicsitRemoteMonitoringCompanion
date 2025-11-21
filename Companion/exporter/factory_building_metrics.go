@@ -27,6 +27,17 @@ var (
 		"z",
 	})
 
+	MachineItemsProducedMax = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "machine_items_produced_max",
+		Help: "The maximum of a certain item which the machine can produce",
+	}, []string{
+		"item_name",
+		"machine_name",
+		"x",
+		"y",
+		"z",
+	})
+
 	MachineInputInventory = RegisterNewGaugeVec(prometheus.GaugeOpts{
 		Name: "machine_input_inventory",
 		Help: "How much of an item a building has stored in its input",
