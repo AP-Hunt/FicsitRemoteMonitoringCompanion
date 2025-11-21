@@ -1,18 +1,20 @@
 package exporter
 
 type BuildingDetail struct {
-	Building       string       `json:"Name"`
-	Location       Location     `json:"location"`
-	Recipe         string       `json:"Recipe"`
-	Production     []Production `json:"production"`
-	Ingredients    []Ingredient `json:"ingredients"`
-	ManuSpeed      float64      `json:"ManuSpeed"`
-	IsConfigured   bool         `json:"IsConfigured"`
-	IsProducing    bool         `json:"IsProducing"`
-	IsPaused       bool         `json:"IsPaused"`
-	CircuitGroupId int          `json:"CircuitGroupID"`
-	PowerInfo      PowerInfo    `json:"PowerInfo"`
-	Somersloops    float64      `json:"Somersloops"`
+	Building        string          `json:"Name"`
+	Location        Location        `json:"location"`
+	Recipe          string          `json:"Recipe"`
+	Production      []Production    `json:"production"`
+	Ingredients     []Ingredient    `json:"ingredients"`
+	ManuSpeed       float64         `json:"ManuSpeed"`
+	IsConfigured    bool            `json:"IsConfigured"`
+	IsProducing     bool            `json:"IsProducing"`
+	IsPaused        bool            `json:"IsPaused"`
+	CircuitGroupId  int             `json:"CircuitGroupID"`
+	PowerInfo       PowerInfo       `json:"PowerInfo"`
+	Somersloops     float64         `json:"Somersloops"`
+	InputInventory  []InventoryItem `json:"InputInventory"`
+	OutputInventory []InventoryItem `json:"OutputInventory"`
 }
 
 type Production struct {
