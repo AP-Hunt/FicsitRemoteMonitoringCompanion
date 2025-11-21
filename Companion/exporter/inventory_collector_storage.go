@@ -50,6 +50,16 @@ func (c *StorageInventoryCollector) Collect(frmAddress string, sessionName strin
 				frmAddress,
 				sessionName,
 			).Set(float64(item.Amount))
+
+			StorageInventoryMax.WithLabelValues(
+				item.Name,
+				detail.Name,
+				strconv.FormatFloat(detail.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(detail.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(detail.Location.Z, 'f', -1, 64),
+				frmAddress,
+				sessionName,
+			).Set(float64(item.MaxAmount))
 		}
 	}
 	c.metricsDropper.DropStaleMetricLabels()
