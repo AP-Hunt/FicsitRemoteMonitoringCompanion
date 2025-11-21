@@ -37,11 +37,11 @@ func powerMultiplier(clockspeed float64, sloops float64, slots float64) float64 
 
 func MaxParticleAcceleratorPower(recipe string) float64 {
 	recipes := map[string]float64{
-		"Dark Matter Crystal":         1500.0,
-		"Diamonds":                    750.0,
-		"Ficsonium":                   1500.0,
-		"Nuclear Pasta":               1500.0,
-		"Plutonium Pellet":            750.0,
+		"Dark Matter Crystal":                    1500.0,
+		"Diamonds":                               750.0,
+		"Ficsonium":                              1500.0,
+		"Nuclear Pasta":                          1500.0,
+		"Plutonium Pellet":                       750.0,
 		"Alternate: Cloudy Diamonds":             750.0,
 		"Alternate: Dark Matter Crystallization": 1500.0,
 		"Alternate: Dark Matter Trap":            1500.0,
