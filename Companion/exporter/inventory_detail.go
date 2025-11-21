@@ -1,9 +1,9 @@
 package exporter
 
 type InventoryItem struct {
-	Name      string `json:"Name"`
-	Amount    int    `json:"Amount"`
-	MaxAmount int    `json:"MaxAmount"`
+	Name      string  `json:"Name"`
+	Amount    float64 `json:"Amount"`
+	MaxAmount float64 `json:"MaxAmount"`
 }
 
 type ContainerDetail struct {
