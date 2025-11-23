@@ -27,6 +27,10 @@ type FRMServerFake struct {
 	portalData               []exporter.PortalDetails
 	hypertubeData            []exporter.HypertubeDetails
 	frackingData             []exporter.FrackingDetails
+	cloudInventoryData       []exporter.InventoryItem
+	worldInventoryData       []exporter.InventoryItem
+	storageContainerData     []exporter.ContainerDetail
+	crateData                []exporter.ContainerDetail
 }
 
 func NewFRMServerFake() *FRMServerFake {
@@ -54,6 +58,10 @@ func NewFRMServerFake() *FRMServerFake {
 	mux.Handle("/getPortal", http.HandlerFunc(getStatsHandler(&fake.portalData)))
 	mux.Handle("/getHyperEntrance", http.HandlerFunc(getStatsHandler(&fake.hypertubeData)))
 	mux.Handle("/getFrackingActivator", http.HandlerFunc(getStatsHandler(&fake.frackingData)))
+	mux.Handle("/getCloudInventory", http.HandlerFunc(getStatsHandler(&fake.cloudInventoryData)))
+	mux.Handle("/getWorldInventory", http.HandlerFunc(getStatsHandler(&fake.worldInventoryData)))
+	mux.Handle("/getStorage", http.HandlerFunc(getStatsHandler(&fake.storageContainerData)))
+	mux.Handle("/getCrates", http.HandlerFunc(getStatsHandler(&fake.crateData)))
 
 	return fake
 }
@@ -138,6 +146,22 @@ func (e *FRMServerFake) ReturnsFrackingData(data []exporter.FrackingDetails) {
 
 func (e *FRMServerFake) ReturnsSessionInfoData(data exporter.SessionInfo) {
 	e.sessionInfoData = data
+}
+
+func (e *FRMServerFake) ReturnsCloudInventoryData(data []exporter.InventoryItem) {
+	e.cloudInventoryData = data
+}
+
+func (e *FRMServerFake) ReturnsWorldInventoryData(data []exporter.InventoryItem) {
+	e.worldInventoryData = data
+}
+
+func (e *FRMServerFake) ReturnsStorageContainerData(data []exporter.ContainerDetail) {
+	e.storageContainerData = data
+}
+
+func (e *FRMServerFake) ReturnsCrateData(data []exporter.ContainerDetail) {
+	e.crateData = data
 }
 
 func getStatsHandler(data any) func(w http.ResponseWriter, r *http.Request) {
