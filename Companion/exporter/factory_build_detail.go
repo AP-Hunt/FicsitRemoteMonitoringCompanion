@@ -1,6 +1,7 @@
 package exporter
 
 type BuildingDetail struct {
+	Id              string          `json:"ID"`
 	Building        string          `json:"Name"`
 	Location        Location        `json:"location"`
 	Recipe          string          `json:"Recipe"`

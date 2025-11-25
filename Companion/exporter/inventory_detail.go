@@ -7,6 +7,7 @@ type InventoryItem struct {
 }
 
 type ContainerDetail struct {
+	Id        string          `json:"ID"`
 	Name      string          `json:"Name"`
 	Location  Location        `json:"location"`
 	Inventory []InventoryItem `json:"Inventory"`

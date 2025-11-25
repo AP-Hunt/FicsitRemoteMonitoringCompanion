@@ -33,12 +33,9 @@ func (c *StorageInventoryCollector) Collect(frmAddress string, sessionName strin
 
 	for _, detail := range details {
 		c.metricsDropper.CacheFreshMetricLabel(prometheus.Labels{
-			"url":            frmAddress,
-			"session_name":   sessionName,
-			"container_name": detail.Name,
-			"x":              strconv.FormatFloat(detail.Location.X, 'f', -1, 64),
-			"y":              strconv.FormatFloat(detail.Location.Y, 'f', -1, 64),
-			"z":              strconv.FormatFloat(detail.Location.Z, 'f', -1, 64),
+			"url":          frmAddress,
+			"session_name": sessionName,
+			"id":           detail.Id,
 		})
 		for _, item := range detail.Inventory {
 			StorageInventory.WithLabelValues(
