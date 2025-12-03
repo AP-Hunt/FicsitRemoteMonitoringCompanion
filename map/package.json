@@ -1,6 +1,6 @@
 {
   "name": "map",
-  "version": "1.4.0",
+  "version": "1.4.8",
   "description": "Realtime map for Ficsit Remote Monitoring Companion",
   "author": "Andy Hunt <github@andyhunt.me>",
   "main": "index.js",
