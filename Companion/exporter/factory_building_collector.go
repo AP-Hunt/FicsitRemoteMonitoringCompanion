@@ -34,11 +34,7 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 	powerInfo := map[float64]float64{}
 	maxPowerInfo := map[float64]float64{}
 	for _, building := range details {
-		c.metricsDropper.CacheFreshMetricLabel(prometheus.Labels{"url": frmAddress, "session_name": sessionName, "machine_name": building.Building,
-			"x": strconv.FormatFloat(building.Location.X, 'f', -1, 64),
-			"y": strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
-			"z": strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
-		})
+		c.metricsDropper.CacheFreshMetricLabel(prometheus.Labels{"url": frmAddress, "session_name": sessionName, "id": building.Id})
 		for _, prod := range building.Production {
 			MachineItemsProducedPerMin.WithLabelValues(
 				prod.Name,
@@ -57,6 +53,53 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
 				frmAddress, sessionName,
 			).Set(prod.ProdPercent)
+
+			MachineItemsProducedMax.WithLabelValues(
+				prod.Name,
+				building.Building,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(prod.MaxProd)
+		}
+
+		for _, item := range building.InputInventory {
+			MachineInputInventory.WithLabelValues(
+				item.Name,
+				building.Building,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(float64(item.Amount))
+			MachineInputInventoryMax.WithLabelValues(
+				item.Name,
+				building.Building,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(float64(item.MaxAmount))
+		}
+
+		for _, item := range building.OutputInventory {
+			MachineOutputInventory.WithLabelValues(
+				item.Name,
+				building.Building,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(float64(item.Amount))
+			MachineOutputInventoryMax.WithLabelValues(
+				item.Name,
+				building.Building,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(float64(item.MaxAmount))
 		}
 
 		val, ok := powerInfo[building.PowerInfo.CircuitGroupId]

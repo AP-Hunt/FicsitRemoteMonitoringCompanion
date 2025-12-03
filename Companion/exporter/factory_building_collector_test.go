@@ -61,6 +61,30 @@ var _ = Describe("FactoryBuildingCollector", func() {
 					PowerConsumed:    23,
 					MaxPowerConsumed: 4,
 				},
+				InputInventory: []exporter.InventoryItem{
+					{
+						Name:      "Iron Ore",
+						Amount:    64,
+						MaxAmount: 100,
+					},
+					{
+						Name:      "Second input",
+						Amount:    32,
+						MaxAmount: 1000,
+					},
+				},
+				OutputInventory: []exporter.InventoryItem{
+					{
+						Name:      "Iron Ingot",
+						Amount:    33,
+						MaxAmount: 200,
+					},
+					{
+						Name:      "Second output",
+						Amount:    44,
+						MaxAmount: 2000,
+					},
+				},
 			},
 		})
 	})
@@ -108,6 +132,161 @@ var _ = Describe("FactoryBuildingCollector", func() {
 				ironNothing, err := gaugeValue(exporter.MachineItemsProducedPerMin, "Iron Nothing", "Smelter", "100", "200", "-300", url, sessionName)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(ironNothing).To(Equal(float64(1000.0)))
+			})
+		})
+	})
+
+	Describe("Machine item max production metrics", func() {
+		It("records a metric with labels for the produced item name, machine type, and x, y, z coordinates", func() {
+			collector.Collect(url, sessionName)
+			metric, err := getMetric(exporter.MachineItemsProducedMax, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(metric).ToNot(BeNil())
+		})
+
+		It("records the current max production as the metric value", func() {
+			collector.Collect(url, sessionName)
+
+			val, err := gaugeValue(exporter.MachineItemsProducedMax, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(float64(10)))
+		})
+
+		Describe("when a machine has multiple outputs", func() {
+			It("records a metric per item", func() {
+				collector.Collect(url, sessionName)
+
+				ironIngots, err := gaugeValue(exporter.MachineItemsProducedMax, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ironIngots).To(Equal(float64(10.0)))
+
+				ironNothing, err := gaugeValue(exporter.MachineItemsProducedMax, "Iron Nothing", "Smelter", "100", "200", "-300", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ironNothing).To(Equal(float64(4000.0)))
+			})
+		})
+	})
+
+	Describe("Machine input inventory metrics", func() {
+		It("records a metric with labels for the stored item name, machine type, and x, y, z coordinates", func() {
+			collector.Collect(url, sessionName)
+			metric, err := getMetric(exporter.MachineInputInventory, "Iron Ore", "Smelter", "100", "200", "-300", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(metric).ToNot(BeNil())
+		})
+
+		It("records the current input invetory as the metric value", func() {
+			collector.Collect(url, sessionName)
+
+			val, err := gaugeValue(exporter.MachineInputInventory, "Iron Ore", "Smelter", "100", "200", "-300", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(float64(64.0)))
+		})
+
+		Describe("when a machine has multiple inputs", func() {
+			It("records a metric per item", func() {
+				collector.Collect(url, sessionName)
+
+				ironIngots, err := gaugeValue(exporter.MachineInputInventory, "Iron Ore", "Smelter", "100", "200", "-300", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ironIngots).To(Equal(float64(64.0)))
+
+				ironNothing, err := gaugeValue(exporter.MachineInputInventory, "Second input", "Smelter", "100", "200", "-300", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ironNothing).To(Equal(float64(32.0)))
+			})
+		})
+	})
+
+	Describe("Machine input inventory max metrics", func() {
+		It("records a metric with labels for the stored item name, machine type, and x, y, z coordinates", func() {
+			collector.Collect(url, sessionName)
+			metric, err := getMetric(exporter.MachineInputInventoryMax, "Iron Ore", "Smelter", "100", "200", "-300", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(metric).ToNot(BeNil())
+		})
+
+		It("records the current input invetory max as the metric value", func() {
+			collector.Collect(url, sessionName)
+
+			val, err := gaugeValue(exporter.MachineInputInventoryMax, "Iron Ore", "Smelter", "100", "200", "-300", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(float64(100.0)))
+		})
+
+		Describe("when a machine has multiple inputs", func() {
+			It("records a metric per item", func() {
+				collector.Collect(url, sessionName)
+
+				ironIngots, err := gaugeValue(exporter.MachineInputInventoryMax, "Iron Ore", "Smelter", "100", "200", "-300", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ironIngots).To(Equal(float64(100.0)))
+
+				ironNothing, err := gaugeValue(exporter.MachineInputInventoryMax, "Second input", "Smelter", "100", "200", "-300", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ironNothing).To(Equal(float64(1000.0)))
+			})
+		})
+	})
+
+	Describe("Machine input inventory metrics", func() {
+		It("records a metric with labels for the stored item name, machine type, and x, y, z coordinates", func() {
+			collector.Collect(url, sessionName)
+			metric, err := getMetric(exporter.MachineInputInventory, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(metric).ToNot(BeNil())
+		})
+
+		It("records the current output invetory as the metric value", func() {
+			collector.Collect(url, sessionName)
+
+			val, err := gaugeValue(exporter.MachineOutputInventory, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(float64(33.0)))
+		})
+
+		Describe("when a machine has multiple outputs", func() {
+			It("records a metric per item", func() {
+				collector.Collect(url, sessionName)
+
+				ironIngots, err := gaugeValue(exporter.MachineOutputInventory, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ironIngots).To(Equal(float64(33.0)))
+
+				ironNothing, err := gaugeValue(exporter.MachineOutputInventory, "Second output", "Smelter", "100", "200", "-300", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ironNothing).To(Equal(float64(44.0)))
+			})
+		})
+	})
+
+	Describe("Machine output inventory max metrics", func() {
+		It("records a metric with labels for the stored item name, machine type, and x, y, z coordinates", func() {
+			collector.Collect(url, sessionName)
+			metric, err := getMetric(exporter.MachineOutputInventoryMax, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(metric).ToNot(BeNil())
+		})
+
+		It("records the current output invetory max as the metric value", func() {
+			collector.Collect(url, sessionName)
+
+			val, err := gaugeValue(exporter.MachineOutputInventoryMax, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(val).To(Equal(float64(200.0)))
+		})
+
+		Describe("when a machine has multiple outputs", func() {
+			It("records a metric per item", func() {
+				collector.Collect(url, sessionName)
+
+				ironIngots, err := gaugeValue(exporter.MachineOutputInventoryMax, "Iron Ingot", "Smelter", "100", "200", "-300", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ironIngots).To(Equal(float64(200.0)))
+
+				ironNothing, err := gaugeValue(exporter.MachineOutputInventoryMax, "Second output", "Smelter", "100", "200", "-300", url, sessionName)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(ironNothing).To(Equal(float64(2000.0)))
 			})
 		})
 	})

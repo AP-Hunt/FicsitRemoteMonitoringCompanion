@@ -96,6 +96,31 @@ The [Prometheus metrics server](https://prometheus.io/) allows you to [explore t
             <td>item_name, machine_name, x, y, z, url, session_name</td>
         </tr>
         <tr>
+            <td>machine_items_produced_max</td>
+            <td>Maximum production rate of an item a building can produce per minute</td>
+            <td>item_name, machine_name, x, y, z, url, session_name</td>
+        </tr>
+        <tr>
+            <td>machine_input_inventory</td>
+            <td>How much of an item a building has stored in its input</td>
+            <td>item_name, machine_name, x, y, z, url, session_name</td>
+        </tr>
+        <tr>
+            <td>machine_input_inventory_max</td>
+            <td>How much of an item a building can store in its input</td>
+            <td>item_name, machine_name, x, y, z, url, session_name</td>
+        </tr>
+        <tr>
+            <td>machine_output_inventory</td>
+            <td>How much of an item a building has stored in its output</td>
+            <td>item_name, machine_name, x, y, z, url, session_name</td>
+        </tr>
+        <tr>
+            <td>machine_output_inventory_max</td>
+            <td>How much of an item a building can store in its output</td>
+            <td>item_name, machine_name, x, y, z, url, session_name</td>
+        </tr>
+        <tr>
             <td>factory_power</td>
             <td>Power draw from factory machines in MW. Does not include extractors.</td>
             <td>circuit_id, url, session_name</td>
@@ -324,6 +349,46 @@ The [Prometheus metrics server](https://prometheus.io/) allows you to [explore t
             <td>vehicle_station_power_max</td>
             <td>Vehicle station max power use in MW</td>
             <td>circuit_id, url, session_name</td>
+        </tr>
+        <tr>
+            <td>cloud_inventory</td>
+            <td>Items stored in the dimensional depot</td>
+            <td>item_name, url, session_name</td>
+        </tr>
+        <tr>
+            <td>cloud_inventory_max</td>
+            <td>Stack size for items in the dimensional depot</td>
+            <td>item_name, url, session_name</td>
+        </tr>
+        <tr>
+            <td>world_inventory</td>
+            <td>Inventory of the world regardless of location (All buildings whom purpose is to provide storage)</td>
+            <td>item_name, url, session_name</td>
+        </tr>
+        <tr>
+            <td>world_inventory_max</td>
+            <td>Stack size for items in the world invetory</td>
+            <td>item_name, url, session_name</td>
+        </tr>
+        <tr>
+            <td>storage_inventory</td>
+            <td>Items stored inside storage containers</td>
+            <td>item_name, container_name, x, y, z, url, session_name</td>
+        </tr>
+        <tr>
+            <td>storage_inventory_max</td>
+            <td>Stack size for items stored in storage containers</td>
+            <td>item_name, container_name, x, y, z, url, session_name</td>
+        </tr>
+        <tr>
+            <td>crate_inventory</td>
+            <td>Items stored inside crates</td>
+            <td>item_name, container_name, x, y, z, url, session_name</td>
+        </tr>
+        <tr>
+            <td>crate_inventory_max</td>
+            <td>Stack size for items stored in crates</td>
+            <td>item_name, container_name, x, y, z, url, session_name</td>
         </tr>
 	</tbody>
 </table>
