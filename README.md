@@ -88,17 +88,32 @@ The [Prometheus metrics server](https://prometheus.io/) allows you to [explore t
         <tr>
             <td>machine_items_produced_per_min</td>
             <td>How much of an item a building is producing</td>
-            <td>item_name, machine_name, x, y, z, url, session_name</td>
+            <td>item_name, machine_name, recipe, x, y, z, url, session_name</td>
         </tr>
         <tr>
             <td>machine_items_produced_pc</td>
             <td>The efficiency with which a building is producing an item</td>
-            <td>item_name, machine_name, x, y, z, url, session_name</td>
+            <td>item_name, machine_name, recipe, x, y, z, url, session_name</td>
         </tr>
         <tr>
             <td>machine_items_produced_max</td>
             <td>Maximum production rate of an item a building can produce per minute</td>
-            <td>item_name, machine_name, x, y, z, url, session_name</td>
+            <td>item_name, machine_name, recipe, x, y, z, url, session_name</td>
+        </tr>
+        <tr>
+            <td>machine_items_consumed_per_min</td>
+            <td>How much of an item a building is consuming</td>
+            <td>item_name, machine_name, recipe, x, y, z, url, session_name</td>
+        </tr>
+        <tr>
+            <td>machine_items_consumed_pc</td>
+            <td>The efficiency with which a building is consuming an item</td>
+            <td>item_name, machine_name, recipe, x, y, z, url, session_name</td>
+        </tr>
+        <tr>
+            <td>machine_items_consumed_max</td>
+            <td>Maximum consumption rate of an item a building can consume per minute</td>
+            <td>item_name, machine_name, recipe, x, y, z, url, session_name</td>
         </tr>
         <tr>
             <td>machine_input_inventory</td>

@@ -11,6 +11,7 @@ var (
 	}, []string{
 		"item_name",
 		"machine_name",
+		"recipe",
 		"x",
 		"y",
 		"z",
@@ -22,6 +23,7 @@ var (
 	}, []string{
 		"item_name",
 		"machine_name",
+		"recipe",
 		"x",
 		"y",
 		"z",
@@ -33,6 +35,43 @@ var (
 	}, []string{
 		"item_name",
 		"machine_name",
+		"recipe",
+		"x",
+		"y",
+		"z",
+	})
+
+	MachineItemsConsumedPerMin = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "machine_items_consumed_per_min",
+		Help: "How much of an item a building is consuming",
+	}, []string{
+		"item_name",
+		"machine_name",
+		"recipe",
+		"x",
+		"y",
+		"z",
+	})
+
+	MachineItemsConsumedEffiency = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "machine_items_consumed_pc",
+		Help: "The efficiency with which a building is consuming an item",
+	}, []string{
+		"item_name",
+		"machine_name",
+		"recipe",
+		"x",
+		"y",
+		"z",
+	})
+
+	MachineItemsConsumedMax = RegisterNewGaugeVec(prometheus.GaugeOpts{
+		Name: "machine_items_consumed_max",
+		Help: "The maximum of a certain item which the machine can consume",
+	}, []string{
+		"item_name",
+		"machine_name",
+		"recipe",
 		"x",
 		"y",
 		"z",

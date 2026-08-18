@@ -18,6 +18,9 @@ func NewFactoryBuildingCollector(endpoint string) *FactoryBuildingCollector {
 		metricsDropper: NewMetricsDropper(
 			MachineItemsProducedPerMin,
 			MachineItemsProducedEffiency,
+			MachineItemsConsumedPerMin,
+			MachineItemsConsumedEffiency,
+			MachineItemsConsumedMax,
 		),
 	}
 }
@@ -39,6 +42,7 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 			MachineItemsProducedPerMin.WithLabelValues(
 				prod.Name,
 				building.Building,
+				building.Recipe,
 				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
@@ -48,6 +52,7 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 			MachineItemsProducedEffiency.WithLabelValues(
 				prod.Name,
 				building.Building,
+				building.Recipe,
 				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
@@ -57,11 +62,44 @@ func (c *FactoryBuildingCollector) Collect(frmAddress string, sessionName string
 			MachineItemsProducedMax.WithLabelValues(
 				prod.Name,
 				building.Building,
+				building.Recipe,
 				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
 				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
 				frmAddress, sessionName,
 			).Set(prod.MaxProd)
+		}
+
+		for _, ing := range building.Ingredients {
+			MachineItemsConsumedPerMin.WithLabelValues(
+				ing.Name,
+				building.Building,
+				building.Recipe,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(ing.CurrentConsumed)
+
+			MachineItemsConsumedEffiency.WithLabelValues(
+				ing.Name,
+				building.Building,
+				building.Recipe,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(ing.ConsPercent)
+
+			MachineItemsConsumedMax.WithLabelValues(
+				ing.Name,
+				building.Building,
+				building.Recipe,
+				strconv.FormatFloat(building.Location.X, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Y, 'f', -1, 64),
+				strconv.FormatFloat(building.Location.Z, 'f', -1, 64),
+				frmAddress, sessionName,
+			).Set(ing.MaxConsumed)
 		}
 
 		for _, item := range building.InputInventory {
